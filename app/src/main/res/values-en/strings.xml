@@ -25,7 +25,7 @@
     <string name="chat_input_placeholder">Write how you are feeling today…</string>
     <string name="chat_disclaimer">SafeDiary AI is a reflective companion and does not replace care from a licensed mental health professional.</string>
     <string name="chat_empty_title">Your safe space to reflect</string>
-    <string name="chat_empty_subtitle">What is on your mind today? I am here to listen and accompany you without judgment.</string>
+    <string name="chat_empty_subtitle">Write what you feel. I will listen and support you without judgment.</string>
     <string name="chat_e2ee_badge">End-to-End Encryption Active</string>
     <string name="chat_e2ee_protocol">E2EE-v4</string>
     <string name="chat_typing">SafeDiary is typing…</string>
@@ -46,7 +46,7 @@
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
     <string name="chat_tab_community">Community</string>
-    <string name="chat_greeting_title">What\'s on your mind today, Elena?</string>
+    <string name="chat_greeting_title">What is on your mind today?</string>
     <string name="chat_voice_e2ee_badge">E2EE Voice Encryption Active</string>
     <string name="chat_suggestion_summary">Summary of my day</string>
     <string name="chat_suggestion_vent">Guided vent</string>

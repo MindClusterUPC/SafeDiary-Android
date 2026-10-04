@@ -25,7 +25,7 @@
     <string name="chat_input_placeholder">Escribe cómo te sientes hoy…</string>
     <string name="chat_disclaimer">La IA de SafeDiary es de apoyo reflexivo y no reemplaza la atención de un profesional de la salud mental.</string>
     <string name="chat_empty_title">Tu espacio seguro para reflexionar</string>
-    <string name="chat_empty_subtitle">¿Qué pasa por tu mente hoy? Estoy aquí para escucharte y acompañarte sin juicios.</string>
+    <string name="chat_empty_subtitle">Escribe lo que sientes. Te escucho y te acompaño sin juicios.</string>
     <string name="chat_e2ee_badge">Cifrado de extremo a extremo activo</string>
     <string name="chat_e2ee_protocol">E2EE-v4</string>
     <string name="chat_typing">SafeDiary está escribiendo…</string>
@@ -46,7 +46,7 @@
     <string name="chat_tab_diary">Diario</string>
     <string name="chat_tab_help">Ayuda</string>
     <string name="chat_tab_community">Comunidad</string>
-    <string name="chat_greeting_title">¿Qué toca hoy, Elena?</string>
+    <string name="chat_greeting_title">¿En qué estás pensando hoy?</string>
     <string name="chat_voice_e2ee_badge">Cifrado de Voz E2EE Activo</string>
     <string name="chat_suggestion_summary">Resumen de mi día</string>
     <string name="chat_suggestion_vent">Desahogo guiado</string>
