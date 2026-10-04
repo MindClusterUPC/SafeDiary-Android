@@ -31,7 +31,9 @@ fun AppNavigation(
                     assistantModule.getChatHistoryHandler,
                     assistantModule.startNewChatHandler,
                     assistantModule.getCrisisSupportHandler,
-                    assistantModule.dismissCrisisSupportHandler
+                    assistantModule.dismissCrisisSupportHandler,
+                    assistantModule.getConversationListHandler,
+                    assistantModule.openConversationHandler
                 )
             )
             AiChatScreen(

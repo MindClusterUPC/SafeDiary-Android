@@ -71,7 +71,7 @@ import com.mindcluster.safediary.R
 import com.mindcluster.safediary.assistantai.presentation.components.ChatEmptyState
 import com.mindcluster.safediary.assistantai.presentation.components.ChatInputBar
 import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
-import com.mindcluster.safediary.assistantai.presentation.components.DiaryHistoryDrawer
+import com.mindcluster.safediary.assistantai.presentation.components.ConversationHistoryDrawer
 import com.mindcluster.safediary.assistantai.presentation.components.MessageBubble
 import com.mindcluster.safediary.assistantai.presentation.components.ReplyErrorNotice
 import com.mindcluster.safediary.assistantai.presentation.components.TypingIndicator
@@ -117,6 +117,10 @@ fun AiChatScreen(
         }
     }
 
+    LaunchedEffect(drawerState.isOpen) {
+        if (drawerState.isOpen) viewModel.refreshHistory()
+    }
+
     LaunchedEffect(uiState.messages.size, uiState.isTyping, uiState.replyFailed) {
         if (uiState.messages.isNotEmpty()) {
             val extraItems = (if (uiState.isTyping) 1 else 0) + (if (uiState.replyFailed) 1 else 0)
@@ -128,16 +132,21 @@ fun AiChatScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            DiaryHistoryDrawer(
-                onCloseClick = {
-                    coroutineScope.launch { drawerState.close() }
-                },
-                onNewDiaryClick = {
+            ConversationHistoryDrawer(
+                conversations = uiState.conversations,
+                activeConversationId = uiState.activeConversationId,
+                isLoading = uiState.isHistoryLoading,
+                loadFailed = uiState.historyFailed,
+                onRetry = { viewModel.refreshHistory() },
+                onNewChat = {
                     viewModel.newChat()
                     coroutineScope.launch { drawerState.close() }
                 },
-                onEntryClick = { entry ->
-                    viewModel.onSuggestionSelected(entry.title)
+                onConversationClick = { summary ->
+                    viewModel.openConversation(summary.remoteId)
+                    coroutineScope.launch { drawerState.close() }
+                },
+                onClose = {
                     coroutineScope.launch { drawerState.close() }
                 }
             )
