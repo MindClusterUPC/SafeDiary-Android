@@ -21,6 +21,24 @@
     <string name="shared_welcome_title">Welcome to SafeDiary</string>
     <string name="shared_welcome_desc">Your safe sanctuary for reflection and emotional wellbeing.</string>
 
+    <!-- AI Chat Strings (English) -->
+    <string name="chat_input_placeholder">Write how you are feeling today…</string>
+    <string name="chat_disclaimer">SafeDiary AI is a reflective companion and does not replace care from a licensed mental health professional.</string>
+    <string name="chat_empty_title">Your safe space to reflect</string>
+    <string name="chat_empty_subtitle">What is on your mind today? I am here to listen and accompany you without judgment.</string>
+    <string name="chat_e2ee_badge">End-to-End Encryption Active</string>
+    <string name="chat_e2ee_protocol">E2EE-v4</string>
+    <string name="chat_typing">SafeDiary is typing…</string>
+    <string name="chat_cd_send">Send message</string>
+    <string name="chat_cd_voice">Voice input (decorative)</string>
+    <string name="chat_cd_new_chat">New conversation</string>
+
+    <!-- Suggestions -->
+    <string name="chat_suggestion_1">I feel a bit overwhelmed today</string>
+    <string name="chat_suggestion_2">I had a good day and want to log it</string>
+    <string name="chat_suggestion_3">I have trouble sleeping lately</string>
+    <string name="chat_suggestion_4">How can I practice calm breathing right now?</string>
+
     <!-- AI Mock Responses (English) -->
     <string-array name="ai_responses_anxiety">
         <item>I understand you are feeling anxious or overwhelmed right now. Remember to take a slow, deep breath: inhale for 4 seconds, exhale gently. I am here with you.</item>

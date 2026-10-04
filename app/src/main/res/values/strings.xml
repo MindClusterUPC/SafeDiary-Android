@@ -21,6 +21,24 @@
     <string name="shared_welcome_title">Bienvenido a SafeDiary</string>
     <string name="shared_welcome_desc">Tu santuario seguro para la reflexión y el bienestar emocional.</string>
 
+    <!-- AI Chat Strings (Spanish) -->
+    <string name="chat_input_placeholder">Escribe cómo te sientes hoy…</string>
+    <string name="chat_disclaimer">La IA de SafeDiary es de apoyo reflexivo y no reemplaza la atención de un profesional de la salud mental.</string>
+    <string name="chat_empty_title">Tu espacio seguro para reflexionar</string>
+    <string name="chat_empty_subtitle">¿Qué pasa por tu mente hoy? Estoy aquí para escucharte y acompañarte sin juicios.</string>
+    <string name="chat_e2ee_badge">Cifrado de extremo a extremo activo</string>
+    <string name="chat_e2ee_protocol">E2EE-v4</string>
+    <string name="chat_typing">SafeDiary está escribiendo…</string>
+    <string name="chat_cd_send">Enviar mensaje</string>
+    <string name="chat_cd_voice">Entrada de voz (decorativa)</string>
+    <string name="chat_cd_new_chat">Nueva conversación</string>
+
+    <!-- Suggestions -->
+    <string name="chat_suggestion_1">Me siento un poco abrumado hoy</string>
+    <string name="chat_suggestion_2">Tuve un buen día y quiero registrarlo</string>
+    <string name="chat_suggestion_3">Me cuesta conciliar el sueño últimamente</string>
+    <string name="chat_suggestion_4">¿Cómo puedo calmar mi respiración ahora?</string>
+
     <!-- AI Mock Responses (Spanish) -->
     <string-array name="ai_responses_anxiety">
         <item>Entiendo que sientas ansiedad o tensión en este momento. Recuerda respirar profundo: inhala en 4 tiempos y exhala suavemente. Estoy aquí para acompañarte.</item>
