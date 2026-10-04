@@ -4,13 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mindcluster.safediary.assistantai.application.commands.DismissCrisisSupportHandler
+import com.mindcluster.safediary.assistantai.application.commands.OpenConversationCommand
+import com.mindcluster.safediary.assistantai.application.commands.OpenConversationHandler
 import com.mindcluster.safediary.assistantai.application.commands.RetryLastPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptCommand
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
 import com.mindcluster.safediary.assistantai.application.queries.GetChatHistoryHandler
+import com.mindcluster.safediary.assistantai.application.queries.GetConversationListHandler
 import com.mindcluster.safediary.assistantai.application.queries.GetCrisisSupportHandler
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
+import com.mindcluster.safediary.assistantai.domain.model.ConversationSummary
 import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -23,7 +27,11 @@ data class AssistantUiState(
     val input: String = "",
     val isTyping: Boolean = false,
     val replyFailed: Boolean = false,
-    val crisisResources: List<CrisisResource> = emptyList()
+    val crisisResources: List<CrisisResource> = emptyList(),
+    val conversations: List<ConversationSummary> = emptyList(),
+    val isHistoryLoading: Boolean = false,
+    val historyFailed: Boolean = false,
+    val activeConversationId: String? = null
 )
 
 class AssistantViewModel(
@@ -32,7 +40,9 @@ class AssistantViewModel(
     private val getChatHistoryHandler: GetChatHistoryHandler,
     private val startNewChatHandler: StartNewChatHandler,
     private val getCrisisSupportHandler: GetCrisisSupportHandler,
-    private val dismissCrisisSupportHandler: DismissCrisisSupportHandler
+    private val dismissCrisisSupportHandler: DismissCrisisSupportHandler,
+    private val getConversationListHandler: GetConversationListHandler,
+    private val openConversationHandler: OpenConversationHandler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssistantUiState())
@@ -47,6 +57,36 @@ class AssistantViewModel(
         viewModelScope.launch {
             getCrisisSupportHandler.handle().collect { resources ->
                 _uiState.update { it.copy(crisisResources = resources) }
+            }
+        }
+    }
+
+    fun refreshHistory() {
+        if (_uiState.value.isHistoryLoading) return
+        _uiState.update { it.copy(isHistoryLoading = true) }
+        viewModelScope.launch {
+            val result = getConversationListHandler.handle()
+            _uiState.update { state ->
+                state.copy(
+                    isHistoryLoading = false,
+                    historyFailed = result.isFailure,
+                    conversations = result.getOrDefault(state.conversations)
+                )
+            }
+        }
+    }
+
+    fun openConversation(remoteId: String) {
+        if (_uiState.value.isTyping) return
+        _uiState.update { it.copy(isTyping = true, replyFailed = false, input = "") }
+        viewModelScope.launch {
+            val result = openConversationHandler.handle(OpenConversationCommand(remoteId))
+            _uiState.update {
+                it.copy(
+                    isTyping = false,
+                    replyFailed = false,
+                    activeConversationId = if (result.isSuccess) remoteId else it.activeConversationId
+                )
             }
         }
     }
@@ -68,7 +108,13 @@ class AssistantViewModel(
         _uiState.update { it.copy(input = "", isTyping = true, replyFailed = false) }
         viewModelScope.launch {
             val result = sendPromptHandler.handle(SendPromptCommand(prompt))
-            _uiState.update { it.copy(isTyping = false, replyFailed = result.isFailure) }
+            _uiState.update {
+                it.copy(
+                    isTyping = false,
+                    replyFailed = result.isFailure,
+                    activeConversationId = result.getOrNull() ?: it.activeConversationId
+                )
+            }
         }
     }
 
@@ -77,7 +123,13 @@ class AssistantViewModel(
         _uiState.update { it.copy(isTyping = true, replyFailed = false) }
         viewModelScope.launch {
             val result = retryLastPromptHandler.handle()
-            _uiState.update { it.copy(isTyping = false, replyFailed = result.isFailure) }
+            _uiState.update {
+                it.copy(
+                    isTyping = false,
+                    replyFailed = result.isFailure,
+                    activeConversationId = result.getOrNull() ?: it.activeConversationId
+                )
+            }
         }
     }
 
@@ -89,7 +141,7 @@ class AssistantViewModel(
     fun newChat() {
         viewModelScope.launch {
             startNewChatHandler.handle()
-            _uiState.update { it.copy(input = "", isTyping = false, replyFailed = false) }
+            _uiState.update { it.copy(input = "", isTyping = false, replyFailed = false, activeConversationId = null) }
         }
     }
 
@@ -99,7 +151,9 @@ class AssistantViewModel(
         private val getChatHistoryHandler: GetChatHistoryHandler,
         private val startNewChatHandler: StartNewChatHandler,
         private val getCrisisSupportHandler: GetCrisisSupportHandler,
-        private val dismissCrisisSupportHandler: DismissCrisisSupportHandler
+        private val dismissCrisisSupportHandler: DismissCrisisSupportHandler,
+        private val getConversationListHandler: GetConversationListHandler,
+        private val openConversationHandler: OpenConversationHandler
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -109,7 +163,9 @@ class AssistantViewModel(
                 getChatHistoryHandler,
                 startNewChatHandler,
                 getCrisisSupportHandler,
-                dismissCrisisSupportHandler
+                dismissCrisisSupportHandler,
+                getConversationListHandler,
+                openConversationHandler
             ) as T
         }
     }

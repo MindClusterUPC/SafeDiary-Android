@@ -3,6 +3,9 @@ package com.mindcluster.safediary.assistantai.domain
 import com.mindcluster.safediary.assistantai.domain.events.CrisisSupportOfferedEvent
 import com.mindcluster.safediary.assistantai.domain.model.AiConversationAggregate
 import com.mindcluster.safediary.assistantai.domain.model.AssistantReply
+import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
+import com.mindcluster.safediary.assistantai.domain.model.ConversationSnapshot
+import com.mindcluster.safediary.assistantai.domain.model.MessageAuthor
 import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import com.mindcluster.safediary.assistantai.domain.model.RiskLevel
 import org.junit.Assert.assertEquals
@@ -67,6 +70,24 @@ class AiConversationAggregateTest {
 
         conversation.addAssistantResponse(AssistantReply(content = "Te escucho"))
         assertNull(conversation.pendingUserMessage())
+    }
+
+    @Test
+    fun restoreRebuildsAStoredConversationToContinueIt() {
+        val snapshot = ConversationSnapshot(
+            remoteId = "9",
+            messages = listOf(
+                ChatMessage(author = MessageAuthor.USER, content = "hola"),
+                ChatMessage(author = MessageAuthor.ASSISTANT, content = "Te escucho")
+            )
+        )
+
+        val conversation = AiConversationAggregate.restore(snapshot)
+
+        assertEquals("9", conversation.remoteConversationId)
+        assertEquals(2, conversation.messages.size)
+        assertNull(conversation.pendingUserMessage())
+        assertTrue(conversation.crisisResources.isEmpty())
     }
 
     @Test

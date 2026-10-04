@@ -62,6 +62,17 @@ class AiConversationAggregate(
         crisisResources = emptyList()
     }
 
+    companion object {
+        /** Rebuilds a conversation stored in the backend so it can be continued. */
+        fun restore(snapshot: ConversationSnapshot): AiConversationAggregate =
+            AiConversationAggregate().apply {
+                _messages.addAll(snapshot.messages)
+                remoteConversationId = snapshot.remoteId
+                crisisResources = snapshot.crisisResources
+                riskLevel = if (snapshot.crisisResources.isEmpty()) RiskLevel.LOW else RiskLevel.HIGH
+            }
+    }
+
     fun clear() {
         _messages.clear()
         remoteConversationId = null

@@ -47,12 +47,4 @@ class RetrofitAssistantResponder(
             throw AssistantUnavailableException(e)
         }
     }
-
-    override suspend fun endConversation(remoteConversationId: String) {
-        try {
-            apiService.closeSession(remoteConversationId)
-        } catch (e: Exception) {
-            Log.w(tag, "Could not close remote conversation (${e.javaClass.simpleName}).")
-        }
-    }
 }
