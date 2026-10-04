@@ -73,7 +73,7 @@ import com.mindcluster.safediary.assistantai.presentation.components.ChatInputBa
 import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
 import com.mindcluster.safediary.assistantai.presentation.components.DiaryHistoryDrawer
 import com.mindcluster.safediary.assistantai.presentation.components.MessageBubble
-import com.mindcluster.safediary.assistantai.presentation.components.SuggestionChips
+import com.mindcluster.safediary.assistantai.presentation.components.ReplyErrorNotice
 import com.mindcluster.safediary.assistantai.presentation.components.TypingIndicator
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
@@ -98,13 +98,6 @@ fun AiChatScreen(
     val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableIntStateOf(0) }
 
-    val suggestions = listOf(
-        stringResource(R.string.chat_suggestion_summary),
-        stringResource(R.string.chat_suggestion_vent),
-        stringResource(R.string.chat_suggestion_sleep),
-        stringResource(R.string.chat_suggestion_reflection)
-    )
-
     val view = LocalView.current
     val isDrawerOpen = drawerState.isOpen || drawerState.targetValue == DrawerValue.Open
     DisposableEffect(isDrawerOpen) {
@@ -124,9 +117,10 @@ fun AiChatScreen(
         }
     }
 
-    LaunchedEffect(uiState.messages.size, uiState.isTyping) {
+    LaunchedEffect(uiState.messages.size, uiState.isTyping, uiState.replyFailed) {
         if (uiState.messages.isNotEmpty()) {
-            val totalCount = uiState.messages.size + (if (uiState.isTyping) 1 else 0)
+            val extraItems = (if (uiState.isTyping) 1 else 0) + (if (uiState.replyFailed) 1 else 0)
+            val totalCount = uiState.messages.size + extraItems
             listState.animateScrollToItem(totalCount - 1)
         }
     }
@@ -342,6 +336,11 @@ fun AiChatScreen(
                                     TypingIndicator()
                                 }
                             }
+                            if (uiState.replyFailed && !uiState.isTyping) {
+                                item(key = "reply_error") {
+                                    ReplyErrorNotice(onRetry = { viewModel.retry() })
+                                }
+                            }
                         }
                     }
                 }
@@ -350,15 +349,6 @@ fun AiChatScreen(
                     CrisisSupportCard(
                         resources = uiState.crisisResources,
                         onDismiss = { viewModel.dismissCrisisSupport() }
-                    )
-                }
-
-                if (uiState.messages.isNotEmpty() && !uiState.isTyping && uiState.crisisResources.isEmpty()) {
-                    SuggestionChips(
-                        suggestions = suggestions,
-                        onSuggestionSelected = { suggestion ->
-                            viewModel.onSuggestionSelected(suggestion)
-                        }
                     )
                 }
 

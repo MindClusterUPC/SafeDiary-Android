@@ -15,7 +15,23 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import android.content.ClipData
 import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material3.IconButton
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.ClipEntry
+import androidx.compose.ui.platform.LocalClipboard
+import androidx.compose.ui.res.stringResource
+import com.mindcluster.safediary.R
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -67,6 +83,7 @@ fun MessageBubble(
             Spacer(modifier = Modifier.width(8.dp))
         }
 
+        Column(horizontalAlignment = if (isUser) Alignment.End else Alignment.Start) {
         Surface(
             shape = if (isUser) {
                 RoundedCornerShape(
@@ -98,5 +115,40 @@ fun MessageBubble(
                 )
             }
         }
+        if (!isUser) {
+            CopyReplyButton(text = message.content)
+        }
+        }
+    }
+}
+
+@Composable
+private fun CopyReplyButton(text: String) {
+    val clipboard = LocalClipboard.current
+    val scope = rememberCoroutineScope()
+    var copied by remember { mutableStateOf(false) }
+
+    LaunchedEffect(copied) {
+        if (copied) {
+            delay(1500)
+            copied = false
+        }
+    }
+
+    IconButton(
+        onClick = {
+            scope.launch {
+                clipboard.setClipEntry(ClipEntry(ClipData.newPlainText("SafeDiary", text)))
+                copied = true
+            }
+        },
+        modifier = Modifier.size(32.dp)
+    ) {
+        Icon(
+            imageVector = if (copied) Icons.Default.Check else Icons.Default.ContentCopy,
+            contentDescription = stringResource(R.string.chat_cd_copy),
+            tint = Color(0xFF94A3B8),
+            modifier = Modifier.size(15.dp)
+        )
     }
 }

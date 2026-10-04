@@ -25,15 +25,18 @@
     <string name="chat_input_placeholder">Write how you are feeling today…</string>
     <string name="chat_disclaimer">SafeDiary AI is a reflective companion and does not replace care from a licensed mental health professional.</string>
     <string name="chat_empty_title">Your safe space to reflect</string>
-    <string name="chat_empty_subtitle">What is on your mind today? I am here to listen and accompany you without judgment.</string>
+    <string name="chat_empty_subtitle">Write what you feel. I will listen and support you without judgment.</string>
     <string name="chat_e2ee_badge">End-to-End Encryption Active</string>
     <string name="chat_e2ee_protocol">E2EE-v4</string>
     <string name="chat_typing">SafeDiary is typing…</string>
     <string name="chat_cd_send">Send message</string>
+    <string name="chat_cd_copy">Copy reply</string>
     <string name="chat_cd_voice">Voice input (decorative)</string>
     <string name="chat_cd_new_chat">New conversation</string>
     <string name="chat_status_online">Online • Safe Sanctuary</string>
     <string name="chat_error_generic">An error occurred while processing your message. Please try again.</string>
+    <string name="chat_reply_error">I could not answer right now. Check your connection and try again.</string>
+    <string name="chat_retry">Retry</string>
     <string name="chat_crisis_title">Immediate support available</string>
     <string name="chat_crisis_body">You do not have to go through this alone. These lines are free and available 24 hours a day.</string>
     <string name="chat_crisis_call">Call %1$s</string>
@@ -44,7 +47,7 @@
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
     <string name="chat_tab_community">Community</string>
-    <string name="chat_greeting_title">What\'s on your mind today, Elena?</string>
+    <string name="chat_greeting_title">What is on your mind today?</string>
     <string name="chat_voice_e2ee_badge">E2EE Voice Encryption Active</string>
     <string name="chat_suggestion_summary">Summary of my day</string>
     <string name="chat_suggestion_vent">Guided vent</string>
@@ -169,27 +172,4 @@
     <string name="chat_suggestion_3">I have trouble sleeping lately</string>
     <string name="chat_suggestion_4">How can I practice calm breathing right now?</string>
 
-    <!-- AI Mock Responses (English) -->
-    <string-array name="ai_responses_anxiety">
-        <item>I understand you are feeling anxious or overwhelmed right now. Remember to take a slow, deep breath: inhale for 4 seconds, exhale gently. I am here with you.</item>
-        <item>Anxiety can feel heavy, but you are not alone. What thought or situation feels like it is triggering this pressure today?</item>
-        <item>It is completely normal to feel overwhelmed at times. Take a one-minute pause; your emotions are valid and safe here.</item>
-    </string-array>
-
-    <string-array name="ai_responses_sadness">
-        <item>I am so sorry you are going through this difficult moment. Allow yourself to feel without judgment; every day brings a different pace.</item>
-        <item>Sometimes the heart just needs a calm, quiet place to be heard. I am here with you—pour out whatever you are holding inside.</item>
-        <item>Acknowledging sadness is an act of courage. Would you like to explore what thought or memory is weighing most on you?</item>
-    </string-array>
-
-    <string-array name="ai_responses_sleep">
-        <item>Restful sleep deeply shapes our emotional wellbeing. Try disconnecting from screens and gently release any tension in your shoulders.</item>
-        <item>If sleep is hard to find or your mind is racing, writing down your thoughts right now can help leave them on the page until tomorrow.</item>
-    </string-array>
-
-    <string-array name="ai_responses_generic">
-        <item>Thank you for sharing this with me. Naming your feelings is the first step to processing them clearly. How does putting this into words feel right now?</item>
-        <item>I hear you attentively. Each reflection in your diary is an opportunity to connect with yourself honestly and without judgment.</item>
-        <item>I understand your perspective. Take all the time you need; SafeDiary is your safe sanctuary to release your thoughts.</item>
-    </string-array>
 </resources>
