@@ -10,6 +10,7 @@ import androidx.navigation.compose.rememberNavController
 import com.mindcluster.safediary.assistantai.infrastructure.AssistantAiModule
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.assistantai.presentation.views.AiChatScreen
+import com.mindcluster.safediary.profiles.presentation.views.SettingsScreen
 
 @Composable
 fun AppNavigation(
@@ -34,6 +35,14 @@ fun AppNavigation(
                 viewModel = assistantViewModel,
                 onNavigateToSettings = {
                     navController.navigate(NavRoutes.SETTINGS)
+                }
+            )
+        }
+
+        composable(NavRoutes.SETTINGS) {
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }
