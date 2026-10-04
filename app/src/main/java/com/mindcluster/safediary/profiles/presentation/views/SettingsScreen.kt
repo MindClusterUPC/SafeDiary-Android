@@ -56,6 +56,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mindcluster.safediary.R
+import com.mindcluster.safediary.profiles.presentation.components.LanguageBottomSheet
 import com.mindcluster.safediary.profiles.presentation.components.SettingsItem
 import com.mindcluster.safediary.profiles.presentation.components.SettingsSection
 import com.mindcluster.safediary.profiles.presentation.components.SettingsSwitchItem
@@ -316,6 +317,19 @@ fun SettingsScreen(
             },
             containerColor = BackgroundSanctuary,
             shape = RoundedCornerShape(16.dp)
+        )
+    }
+
+    if (uiState.isLanguageSheetOpen) {
+        LanguageBottomSheet(
+            currentLanguage = currentLanguage,
+            onLanguageSelected = { selectedLang ->
+                AppLocaleManager.set(context, selectedLang)
+                viewModel.closeLanguageSheet()
+            },
+            onDismissRequest = {
+                viewModel.closeLanguageSheet()
+            }
         )
     }
 }
