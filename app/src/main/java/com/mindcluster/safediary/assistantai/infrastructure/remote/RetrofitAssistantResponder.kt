@@ -2,6 +2,7 @@ package com.mindcluster.safediary.assistantai.infrastructure.remote
 
 import android.content.Context
 import android.util.Log
+import com.mindcluster.safediary.assistantai.domain.model.AssistantReply
 import com.mindcluster.safediary.assistantai.domain.model.AssistantResponder
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
 import com.mindcluster.safediary.assistantai.infrastructure.MockAssistantResponder
@@ -18,15 +19,19 @@ class RetrofitAssistantResponder(
 
     private val tag = "RetrofitAssistant"
 
-    override suspend fun respond(userPrompt: String, history: List<ChatMessage>): String {
+    override suspend fun respond(
+        userPrompt: String,
+        history: List<ChatMessage>,
+        remoteConversationId: String?
+    ): AssistantReply {
         return try {
             val locale = AppLocaleManager.current(context).code
             val request = PromptRequestDto(prompt = userPrompt, locale = locale)
             val response = apiService.sendPrompt(request)
-            response.reply
+            AssistantReply(content = response.reply)
         } catch (e: Exception) {
             Log.w(tag, "Remote API call failed or server unreachable (${e.javaClass.simpleName}). Resilient fallback activated.")
-            fallbackResponder.respond(userPrompt, history)
+            fallbackResponder.respond(userPrompt, history, remoteConversationId)
         }
     }
 }

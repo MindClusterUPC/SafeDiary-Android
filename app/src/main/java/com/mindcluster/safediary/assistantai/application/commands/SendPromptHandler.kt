@@ -17,8 +17,15 @@ class SendPromptHandler(
         eventBus.publish(conversation.getDomainEvents())
         conversation.clearEvents()
 
-        val responseContent = responder.respond(userMessage.content, conversation.messages)
-        conversation.addAssistantResponse(responseContent)
+        val reply = responder.respond(
+            userPrompt = userMessage.content,
+            history = conversation.messages,
+            remoteConversationId = conversation.remoteConversationId
+        )
+        conversation.addAssistantResponse(reply)
         repository.save(conversation)
+
+        eventBus.publish(conversation.getDomainEvents())
+        conversation.clearEvents()
     }
 }
