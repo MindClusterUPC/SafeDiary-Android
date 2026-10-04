@@ -32,6 +32,8 @@
     <string name="chat_cd_send">Enviar mensaje</string>
     <string name="chat_cd_voice">Entrada de voz (decorativa)</string>
     <string name="chat_cd_new_chat">Nueva conversación</string>
+    <string name="chat_status_online">En línea • Espacio seguro</string>
+    <string name="chat_error_generic">Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.</string>
 
     <!-- Suggestions -->
     <string name="chat_suggestion_1">Me siento un poco abrumado hoy</string>

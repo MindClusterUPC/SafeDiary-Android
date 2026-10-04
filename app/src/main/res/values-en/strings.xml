@@ -32,6 +32,8 @@
     <string name="chat_cd_send">Send message</string>
     <string name="chat_cd_voice">Voice input (decorative)</string>
     <string name="chat_cd_new_chat">New conversation</string>
+    <string name="chat_status_online">Online • Safe Sanctuary</string>
+    <string name="chat_error_generic">An error occurred while processing your message. Please try again.</string>
 
     <!-- Suggestions -->
     <string name="chat_suggestion_1">I feel a bit overwhelmed today</string>
