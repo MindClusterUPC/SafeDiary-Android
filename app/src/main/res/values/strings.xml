@@ -35,6 +35,41 @@
     <string name="chat_status_online">En línea • Espacio seguro</string>
     <string name="chat_error_generic">Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.</string>
 
+    <!-- Settings Screen (Spanish) -->
+    <string name="settings_anonymous_alias">Reflexivo Anónimo</string>
+    <string name="settings_anonymous_id">ID Protegido: #SD-8492</string>
+    <string name="settings_vault_badge">Bóveda Cifrada Activa</string>
+
+    <string name="settings_section_account">Cuenta y Privacidad</string>
+    <string name="settings_item_edit_profile">Editar alias anónimo</string>
+    <string name="settings_item_privacy_permissions">Permisos y confidencialidad</string>
+
+    <string name="settings_section_preferences">Preferencias</string>
+    <string name="settings_item_language">Idioma</string>
+    <string name="settings_item_notifications">Notificaciones de bienestar</string>
+    <string name="settings_item_dark_theme">Tema oscuro</string>
+    <string name="settings_item_daily_reminder">Recordatorio de reflexión</string>
+    <string name="settings_daily_reminder_time">21:00 hrs</string>
+
+    <string name="settings_section_security">Seguridad</string>
+    <string name="settings_item_pin_lock">Bloqueo por PIN de 4 dígitos</string>
+    <string name="settings_item_biometric_lock">Desbloqueo biométrico facial / huella</string>
+
+    <string name="settings_section_support">Soporte e Información</string>
+    <string name="settings_item_help_center">Centro de ayuda y crisis</string>
+    <string name="settings_item_terms">Términos de servicio</string>
+    <string name="settings_item_privacy_policy">Política de privacidad</string>
+    <string name="settings_item_about">Acerca de SafeDiary</string>
+    <string name="settings_app_version">Versión 1.0.0 (MindCluster 2026)</string>
+
+    <string name="settings_button_logout">Cerrar sesión segura</string>
+    <string name="settings_dialog_logout_title">¿Cerrar sesión?</string>
+    <string name="settings_dialog_logout_desc">Tu diario y reflexiones permanecerán cifrados localmente en este dispositivo.</string>
+
+    <string name="settings_lang_title">Seleccionar idioma de la app</string>
+    <string name="settings_lang_es">Español (Predeterminado)</string>
+    <string name="settings_lang_en">English</string>
+
     <!-- Suggestions -->
     <string name="chat_suggestion_1">Me siento un poco abrumado hoy</string>
     <string name="chat_suggestion_2">Tuve un buen día y quiero registrarlo</string>
