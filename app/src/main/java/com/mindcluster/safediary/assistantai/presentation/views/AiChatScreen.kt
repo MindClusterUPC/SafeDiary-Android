@@ -70,6 +70,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mindcluster.safediary.R
 import com.mindcluster.safediary.assistantai.presentation.components.ChatEmptyState
 import com.mindcluster.safediary.assistantai.presentation.components.ChatInputBar
+import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
 import com.mindcluster.safediary.assistantai.presentation.components.DiaryHistoryDrawer
 import com.mindcluster.safediary.assistantai.presentation.components.MessageBubble
 import com.mindcluster.safediary.assistantai.presentation.components.SuggestionChips
@@ -345,7 +346,14 @@ fun AiChatScreen(
                     }
                 }
 
-                if (uiState.messages.isNotEmpty() && !uiState.isTyping) {
+                if (uiState.crisisResources.isNotEmpty()) {
+                    CrisisSupportCard(
+                        resources = uiState.crisisResources,
+                        onDismiss = { viewModel.dismissCrisisSupport() }
+                    )
+                }
+
+                if (uiState.messages.isNotEmpty() && !uiState.isTyping && uiState.crisisResources.isEmpty()) {
                     SuggestionChips(
                         suggestions = suggestions,
                         onSuggestionSelected = { suggestion ->

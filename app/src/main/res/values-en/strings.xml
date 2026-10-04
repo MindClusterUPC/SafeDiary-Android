@@ -34,6 +34,10 @@
     <string name="chat_cd_new_chat">New conversation</string>
     <string name="chat_status_online">Online • Safe Sanctuary</string>
     <string name="chat_error_generic">An error occurred while processing your message. Please try again.</string>
+    <string name="chat_crisis_title">Immediate support available</string>
+    <string name="chat_crisis_body">You do not have to go through this alone. These lines are free and available 24 hours a day.</string>
+    <string name="chat_crisis_call">Call %1$s</string>
+    <string name="chat_crisis_dismiss">Dismiss</string>
 
     <!-- AI Voice Diary & History Drawer (English) -->
     <string name="chat_header_subtitle">AI Diary</string>
