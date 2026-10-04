@@ -47,4 +47,12 @@ class RetrofitAssistantResponder(
             fallbackResponder.respond(userPrompt, history, remoteConversationId)
         }
     }
+
+    override suspend fun endConversation(remoteConversationId: String) {
+        try {
+            apiService.closeSession(remoteConversationId)
+        } catch (e: Exception) {
+            Log.w(tag, "Could not close remote conversation (${e.javaClass.simpleName}).")
+        }
+    }
 }
