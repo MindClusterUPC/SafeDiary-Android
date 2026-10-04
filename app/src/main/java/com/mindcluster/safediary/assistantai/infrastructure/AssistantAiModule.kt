@@ -8,10 +8,12 @@ import com.mindcluster.safediary.assistantai.domain.repository.ConversationRepos
 import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 import com.mindcluster.safediary.shared.infrastructure.eventbus.InMemoryDomainEventBus
 
+import com.mindcluster.safediary.assistantai.infrastructure.remote.RetrofitAssistantResponder
+
 class AssistantAiModule(context: Context) {
     val eventBus: DomainEventPublisher by lazy { InMemoryDomainEventBus() }
     val repository: ConversationRepository by lazy { InMemoryConversationRepository() }
-    val responder: AssistantResponder by lazy { MockAssistantResponder(context.applicationContext) }
+    val responder: AssistantResponder by lazy { RetrofitAssistantResponder(context.applicationContext) }
 
     val sendPromptHandler: SendPromptHandler by lazy {
         SendPromptHandler(repository, responder, eventBus)
