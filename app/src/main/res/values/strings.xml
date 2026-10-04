@@ -34,6 +34,10 @@
     <string name="chat_cd_new_chat">Nueva conversación</string>
     <string name="chat_status_online">En línea • Espacio seguro</string>
     <string name="chat_error_generic">Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.</string>
+    <string name="chat_crisis_title">Apoyo inmediato disponible</string>
+    <string name="chat_crisis_body">No tienes que pasar por esto en soledad. Estas líneas son gratuitas y atienden las 24 horas.</string>
+    <string name="chat_crisis_call">Llamar al %1$s</string>
+    <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_header_subtitle">AI Diary</string>
@@ -115,7 +119,7 @@
 
     <string name="settings_crisis_title">Recursos de Crisis y Soporte</string>
     <string name="settings_crisis_body">SafeDiary AI brinda apoyo en regulación emocional pero no atiende emergencias de salud mental. Si te sientes en peligro, comunícate de inmediato.</string>
-    <string name="settings_crisis_call_btn">Llamar o enviar texto al 988</string>
+    <string name="settings_crisis_call_btn">Llamar a la Línea 113 (opción 5)</string>
     <string name="settings_crisis_confidential">24/7 • Gratuito y Confidencial</string>
 
     <string name="settings_link_privacy">Política de Privacidad</string>

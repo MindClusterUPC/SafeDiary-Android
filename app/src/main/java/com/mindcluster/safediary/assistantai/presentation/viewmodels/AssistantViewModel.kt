@@ -3,11 +3,14 @@ package com.mindcluster.safediary.assistantai.presentation.viewmodels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.mindcluster.safediary.assistantai.application.commands.DismissCrisisSupportHandler
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptCommand
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
 import com.mindcluster.safediary.assistantai.application.queries.GetChatHistoryHandler
+import com.mindcluster.safediary.assistantai.application.queries.GetCrisisSupportHandler
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
+import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,13 +21,16 @@ data class AssistantUiState(
     val messages: List<ChatMessage> = emptyList(),
     val input: String = "",
     val isTyping: Boolean = false,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val crisisResources: List<CrisisResource> = emptyList()
 )
 
 class AssistantViewModel(
     private val sendPromptHandler: SendPromptHandler,
     private val getChatHistoryHandler: GetChatHistoryHandler,
-    private val startNewChatHandler: StartNewChatHandler
+    private val startNewChatHandler: StartNewChatHandler,
+    private val getCrisisSupportHandler: GetCrisisSupportHandler,
+    private val dismissCrisisSupportHandler: DismissCrisisSupportHandler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssistantUiState())
@@ -35,6 +41,17 @@ class AssistantViewModel(
             getChatHistoryHandler.handle().collect { list ->
                 _uiState.update { it.copy(messages = list) }
             }
+        }
+        viewModelScope.launch {
+            getCrisisSupportHandler.handle().collect { resources ->
+                _uiState.update { it.copy(crisisResources = resources) }
+            }
+        }
+    }
+
+    fun dismissCrisisSupport() {
+        viewModelScope.launch {
+            dismissCrisisSupportHandler.handle()
         }
     }
 
@@ -73,14 +90,18 @@ class AssistantViewModel(
     class Factory(
         private val sendPromptHandler: SendPromptHandler,
         private val getChatHistoryHandler: GetChatHistoryHandler,
-        private val startNewChatHandler: StartNewChatHandler
+        private val startNewChatHandler: StartNewChatHandler,
+        private val getCrisisSupportHandler: GetCrisisSupportHandler,
+        private val dismissCrisisSupportHandler: DismissCrisisSupportHandler
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AssistantViewModel(
                 sendPromptHandler,
                 getChatHistoryHandler,
-                startNewChatHandler
+                startNewChatHandler,
+                getCrisisSupportHandler,
+                dismissCrisisSupportHandler
             ) as T
         }
     }
