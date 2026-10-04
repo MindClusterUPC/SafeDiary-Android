@@ -60,6 +60,16 @@ class AiConversationAggregateTest {
     }
 
     @Test
+    fun pendingUserMessageIsTheLastUnansweredPrompt() {
+        val conversation = AiConversationAggregate()
+        val prompt = conversation.addUserMessage("hola")
+        assertEquals(prompt, conversation.pendingUserMessage())
+
+        conversation.addAssistantResponse(AssistantReply(content = "Te escucho"))
+        assertNull(conversation.pendingUserMessage())
+    }
+
+    @Test
     fun unknownBackendRiskLevelFallsBackToLow() {
         assertEquals(RiskLevel.LOW, RiskLevel.fromBackend("UNKNOWN"))
         assertEquals(RiskLevel.HIGH, RiskLevel.fromBackend("HIGH"))

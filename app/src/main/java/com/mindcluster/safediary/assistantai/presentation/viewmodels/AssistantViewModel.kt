@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mindcluster.safediary.assistantai.application.commands.DismissCrisisSupportHandler
+import com.mindcluster.safediary.assistantai.application.commands.RetryLastPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptCommand
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
@@ -21,12 +22,13 @@ data class AssistantUiState(
     val messages: List<ChatMessage> = emptyList(),
     val input: String = "",
     val isTyping: Boolean = false,
-    val errorMessage: String? = null,
+    val replyFailed: Boolean = false,
     val crisisResources: List<CrisisResource> = emptyList()
 )
 
 class AssistantViewModel(
     private val sendPromptHandler: SendPromptHandler,
+    private val retryLastPromptHandler: RetryLastPromptHandler,
     private val getChatHistoryHandler: GetChatHistoryHandler,
     private val startNewChatHandler: StartNewChatHandler,
     private val getCrisisSupportHandler: GetCrisisSupportHandler,
@@ -63,15 +65,19 @@ class AssistantViewModel(
         val prompt = _uiState.value.input.trim()
         if (prompt.isBlank() || _uiState.value.isTyping) return
 
-        _uiState.update { it.copy(input = "", isTyping = true, errorMessage = null) }
+        _uiState.update { it.copy(input = "", isTyping = true, replyFailed = false) }
         viewModelScope.launch {
             val result = sendPromptHandler.handle(SendPromptCommand(prompt))
-            _uiState.update {
-                it.copy(
-                    isTyping = false,
-                    errorMessage = result.exceptionOrNull()?.localizedMessage
-                )
-            }
+            _uiState.update { it.copy(isTyping = false, replyFailed = result.isFailure) }
+        }
+    }
+
+    fun retry() {
+        if (_uiState.value.isTyping) return
+        _uiState.update { it.copy(isTyping = true, replyFailed = false) }
+        viewModelScope.launch {
+            val result = retryLastPromptHandler.handle()
+            _uiState.update { it.copy(isTyping = false, replyFailed = result.isFailure) }
         }
     }
 
@@ -83,12 +89,13 @@ class AssistantViewModel(
     fun newChat() {
         viewModelScope.launch {
             startNewChatHandler.handle()
-            _uiState.update { it.copy(input = "", isTyping = false, errorMessage = null) }
+            _uiState.update { it.copy(input = "", isTyping = false, replyFailed = false) }
         }
     }
 
     class Factory(
         private val sendPromptHandler: SendPromptHandler,
+        private val retryLastPromptHandler: RetryLastPromptHandler,
         private val getChatHistoryHandler: GetChatHistoryHandler,
         private val startNewChatHandler: StartNewChatHandler,
         private val getCrisisSupportHandler: GetCrisisSupportHandler,
@@ -98,6 +105,7 @@ class AssistantViewModel(
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AssistantViewModel(
                 sendPromptHandler,
+                retryLastPromptHandler,
                 getChatHistoryHandler,
                 startNewChatHandler,
                 getCrisisSupportHandler,

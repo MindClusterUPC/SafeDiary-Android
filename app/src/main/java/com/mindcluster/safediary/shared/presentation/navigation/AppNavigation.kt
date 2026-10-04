@@ -27,6 +27,7 @@ fun AppNavigation(
             val assistantViewModel: AssistantViewModel = viewModel(
                 factory = AssistantViewModel.Factory(
                     assistantModule.sendPromptHandler,
+                    assistantModule.retryLastPromptHandler,
                     assistantModule.getChatHistoryHandler,
                     assistantModule.startNewChatHandler,
                     assistantModule.getCrisisSupportHandler,

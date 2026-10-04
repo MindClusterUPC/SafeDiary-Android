@@ -73,6 +73,7 @@ import com.mindcluster.safediary.assistantai.presentation.components.ChatInputBa
 import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
 import com.mindcluster.safediary.assistantai.presentation.components.DiaryHistoryDrawer
 import com.mindcluster.safediary.assistantai.presentation.components.MessageBubble
+import com.mindcluster.safediary.assistantai.presentation.components.ReplyErrorNotice
 import com.mindcluster.safediary.assistantai.presentation.components.SuggestionChips
 import com.mindcluster.safediary.assistantai.presentation.components.TypingIndicator
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
@@ -124,9 +125,10 @@ fun AiChatScreen(
         }
     }
 
-    LaunchedEffect(uiState.messages.size, uiState.isTyping) {
+    LaunchedEffect(uiState.messages.size, uiState.isTyping, uiState.replyFailed) {
         if (uiState.messages.isNotEmpty()) {
-            val totalCount = uiState.messages.size + (if (uiState.isTyping) 1 else 0)
+            val extraItems = (if (uiState.isTyping) 1 else 0) + (if (uiState.replyFailed) 1 else 0)
+            val totalCount = uiState.messages.size + extraItems
             listState.animateScrollToItem(totalCount - 1)
         }
     }
@@ -340,6 +342,11 @@ fun AiChatScreen(
                             if (uiState.isTyping) {
                                 item(key = "typing_indicator") {
                                     TypingIndicator()
+                                }
+                            }
+                            if (uiState.replyFailed && !uiState.isTyping) {
+                                item(key = "reply_error") {
+                                    ReplyErrorNotice(onRetry = { viewModel.retry() })
                                 }
                             }
                         }

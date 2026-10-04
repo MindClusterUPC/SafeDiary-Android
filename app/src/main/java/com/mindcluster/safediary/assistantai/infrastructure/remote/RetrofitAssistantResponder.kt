@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.Log
 import com.mindcluster.safediary.assistantai.domain.model.AssistantReply
 import com.mindcluster.safediary.assistantai.domain.model.AssistantResponder
+import com.mindcluster.safediary.assistantai.domain.model.AssistantUnavailableException
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
 import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import com.mindcluster.safediary.assistantai.domain.model.RiskLevel
-import com.mindcluster.safediary.assistantai.infrastructure.MockAssistantResponder
 import com.mindcluster.safediary.assistantai.infrastructure.remote.api.AssistantApiService
 import com.mindcluster.safediary.assistantai.infrastructure.remote.dto.PromptRequestDto
 import com.mindcluster.safediary.shared.infrastructure.locale.AppLanguage
@@ -15,8 +15,7 @@ import com.mindcluster.safediary.shared.infrastructure.network.RetrofitClientPro
 
 class RetrofitAssistantResponder(
     private val context: Context,
-    private val apiService: AssistantApiService = RetrofitClientProvider.createService(),
-    private val fallbackResponder: AssistantResponder = MockAssistantResponder(context)
+    private val apiService: AssistantApiService = RetrofitClientProvider.createService()
 ) : AssistantResponder {
 
     private val tag = "RetrofitAssistant"
@@ -26,7 +25,7 @@ class RetrofitAssistantResponder(
         history: List<ChatMessage>,
         remoteConversationId: String?
     ): AssistantReply {
-        return try {
+        try {
             // Answer in the language the UI is actually displayed in.
             val locale = AppLanguage.fromCode(context.resources.configuration.locales[0].language).code
             val request = PromptRequestDto(
@@ -35,7 +34,7 @@ class RetrofitAssistantResponder(
                 locale = locale
             )
             val response = apiService.sendPrompt(request)
-            AssistantReply(
+            return AssistantReply(
                 content = response.reply,
                 remoteConversationId = response.conversationId,
                 riskLevel = RiskLevel.fromBackend(response.riskLevel),
@@ -44,8 +43,8 @@ class RetrofitAssistantResponder(
                 }
             )
         } catch (e: Exception) {
-            Log.w(tag, "Remote API call failed or server unreachable (${e.javaClass.simpleName}). Resilient fallback activated.")
-            fallbackResponder.respond(userPrompt, history, remoteConversationId)
+            Log.w(tag, "Assistant request failed (${e.javaClass.simpleName}).")
+            throw AssistantUnavailableException(e)
         }
     }
 

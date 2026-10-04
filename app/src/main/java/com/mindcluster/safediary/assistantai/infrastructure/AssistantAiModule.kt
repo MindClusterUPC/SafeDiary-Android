@@ -2,6 +2,7 @@ package com.mindcluster.safediary.assistantai.infrastructure
 
 import android.content.Context
 import com.mindcluster.safediary.assistantai.application.commands.DismissCrisisSupportHandler
+import com.mindcluster.safediary.assistantai.application.commands.RetryLastPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
 import com.mindcluster.safediary.assistantai.application.queries.GetChatHistoryHandler
@@ -20,6 +21,10 @@ class AssistantAiModule(context: Context) {
 
     val sendPromptHandler: SendPromptHandler by lazy {
         SendPromptHandler(repository, responder, eventBus)
+    }
+
+    val retryLastPromptHandler: RetryLastPromptHandler by lazy {
+        RetryLastPromptHandler(repository, responder, eventBus)
     }
 
     val startNewChatHandler: StartNewChatHandler by lazy {

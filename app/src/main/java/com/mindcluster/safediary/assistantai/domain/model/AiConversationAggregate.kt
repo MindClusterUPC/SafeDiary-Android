@@ -54,6 +54,10 @@ class AiConversationAggregate(
         return message
     }
 
+    /** Last user message still waiting for an assistant reply, if any. */
+    fun pendingUserMessage(): ChatMessage? =
+        _messages.lastOrNull()?.takeIf { it.author == MessageAuthor.USER }
+
     fun dismissCrisisSupport() {
         crisisResources = emptyList()
     }
