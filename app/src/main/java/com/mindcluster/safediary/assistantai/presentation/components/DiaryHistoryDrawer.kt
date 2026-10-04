@@ -8,11 +8,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -131,6 +134,8 @@ fun DiaryHistoryDrawer(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .statusBarsPadding()
+                    .displayCutoutPadding()
                     .padding(horizontal = 16.dp, vertical = 14.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -181,6 +186,7 @@ fun DiaryHistoryDrawer(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .displayCutoutPadding()
                     .padding(horizontal = 16.dp, vertical = 12.dp)
                     .clip(RoundedCornerShape(9999.dp))
                     .background(Color(0xFF14B8A6).copy(alpha = 0.15f))
@@ -213,6 +219,7 @@ fun DiaryHistoryDrawer(
             Surface(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .displayCutoutPadding()
                     .padding(horizontal = 16.dp, vertical = 4.dp),
                 shape = RoundedCornerShape(9999.dp),
                 color = DrawerSurface,
@@ -246,6 +253,7 @@ fun DiaryHistoryDrawer(
             Column(
                 modifier = Modifier
                     .weight(1f)
+                    .displayCutoutPadding()
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -278,7 +286,10 @@ fun DiaryHistoryDrawer(
                 border = BorderStroke(1.dp, DrawerBorder)
             ) {
                 Column(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .displayCutoutPadding()
+                        .padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Row(

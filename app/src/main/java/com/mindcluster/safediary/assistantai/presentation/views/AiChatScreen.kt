@@ -1,5 +1,6 @@
 package com.mindcluster.safediary.assistantai.presentation.views
 
+import android.app.Activity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -7,14 +8,21 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -39,6 +47,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -50,7 +59,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.core.view.WindowCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -93,6 +104,25 @@ fun AiChatScreen(
         stringResource(R.string.chat_suggestion_reflection)
     )
 
+    val view = LocalView.current
+    val isDrawerOpen = drawerState.isOpen || drawerState.targetValue == DrawerValue.Open
+    DisposableEffect(isDrawerOpen) {
+        val window = (view.context as? Activity)?.window
+        window?.let {
+            val controller = WindowCompat.getInsetsController(it, view)
+            controller.isAppearanceLightStatusBars = !isDrawerOpen
+            controller.isAppearanceLightNavigationBars = !isDrawerOpen
+        }
+        onDispose {
+            val window = (view.context as? Activity)?.window
+            window?.let {
+                val controller = WindowCompat.getInsetsController(it, view)
+                controller.isAppearanceLightStatusBars = true
+                controller.isAppearanceLightNavigationBars = true
+            }
+        }
+    }
+
     LaunchedEffect(uiState.messages.size, uiState.isTyping) {
         if (uiState.messages.isNotEmpty()) {
             val totalCount = uiState.messages.size + (if (uiState.isTyping) 1 else 0)
@@ -121,11 +151,14 @@ fun AiChatScreen(
         Scaffold(
             modifier = modifier.fillMaxSize(),
             containerColor = BackgroundSanctuary,
+            contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(SurfaceContainerLowest)
+                        .statusBarsPadding()
+                        .displayCutoutPadding()
                 ) {
                     // Header Bar (Matching HTML 1:1)
                     Row(
@@ -275,9 +308,13 @@ fun AiChatScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(innerPadding)
-                    .navigationBarsPadding()
-                    .imePadding()
+                    .padding(top = innerPadding.calculateTopPadding())
+                    .displayCutoutPadding()
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(
+                            WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal
+                        )
+                    )
             ) {
                 Box(
                     modifier = Modifier
