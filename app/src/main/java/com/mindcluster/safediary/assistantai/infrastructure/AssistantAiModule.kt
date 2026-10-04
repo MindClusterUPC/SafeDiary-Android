@@ -34,7 +34,7 @@ class AssistantAiModule(context: Context) {
     }
 
     val startNewChatHandler: StartNewChatHandler by lazy {
-        StartNewChatHandler(repository, responder)
+        StartNewChatHandler(repository)
     }
 
     val getChatHistoryHandler: GetChatHistoryHandler by lazy {

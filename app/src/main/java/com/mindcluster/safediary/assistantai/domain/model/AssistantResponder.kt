@@ -6,6 +6,4 @@ interface AssistantResponder {
         history: List<ChatMessage>,
         remoteConversationId: String?
     ): AssistantReply
-
-    suspend fun endConversation(remoteConversationId: String) = Unit
 }
