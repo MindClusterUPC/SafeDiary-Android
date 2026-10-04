@@ -20,4 +20,28 @@
     <!-- Shared Placeholder Welcome -->
     <string name="shared_welcome_title">Bienvenido a SafeDiary</string>
     <string name="shared_welcome_desc">Tu santuario seguro para la reflexión y el bienestar emocional.</string>
+
+    <!-- AI Mock Responses (Spanish) -->
+    <string-array name="ai_responses_anxiety">
+        <item>Entiendo que sientas ansiedad o tensión en este momento. Recuerda respirar profundo: inhala en 4 tiempos y exhala suavemente. Estoy aquí para acompañarte.</item>
+        <item>La ansiedad puede ser abrumadora, pero no estás solo. ¿Qué pensamiento o situación sientes que está detonando esa presión hoy?</item>
+        <item>Es completamente normal sentirse abrumado a veces. Tómate una pausa de un minuto; tus emociones son válidas y tienen espacio aquí.</item>
+    </string-array>
+
+    <string-array name="ai_responses_sadness">
+        <item>Siento mucho que estés atravesando por este momento difícil. Permítete sentir sin juzgarte; cada día trae un ritmo distinto.</item>
+        <item>A veces el corazón solo necesita ser escuchado con calma. Estoy aquí contigo, puedes desahogar todo lo que lleves dentro.</item>
+        <item>Reconocer la tristeza es un acto de valentía. ¿Te gustaría explorar qué detalle o recuerdo te está pesando más?</item>
+    </string-array>
+
+    <string-array name="ai_responses_sleep">
+        <item>El descanso nocturno influye profundamente en nuestra paz mental. Intenta desconectarte de las pantallas unos minutos y concéntrate en relajar tus hombros.</item>
+        <item>Si te cuesta conciliar el sueño o tu mente no se apaga, anotar tus preocupaciones aquí puede ayudarte a dejarlas ir hasta mañana.</item>
+    </string-array>
+
+    <string-array name="ai_responses_generic">
+        <item>Gracias por compartir esto conmigo. Registrar lo que sientes es el primer paso para procesarlo con claridad. ¿Cómo te hace sentir expresarlo ahora?</item>
+        <item>Te escucho atentamente. Cada reflexión en tu diario es una oportunidad para conectar contigo mismo de forma sincera y sin juicios.</item>
+        <item>Comprendo tu perspectiva. Tómate el tiempo necesario para reflexionar; SafeDiary es tu espacio seguro para vaciar tus pensamientos.</item>
+    </string-array>
 </resources>
