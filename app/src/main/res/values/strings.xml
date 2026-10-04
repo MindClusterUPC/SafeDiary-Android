@@ -35,6 +35,35 @@
     <string name="chat_status_online">En línea • Espacio seguro</string>
     <string name="chat_error_generic">Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.</string>
 
+    <!-- AI Voice Diary & History Drawer (Spanish) -->
+    <string name="chat_header_subtitle">AI Diary</string>
+    <string name="chat_tab_diary">Diario</string>
+    <string name="chat_tab_help">Ayuda</string>
+    <string name="chat_tab_community">Comunidad</string>
+    <string name="chat_greeting_title">¿Qué toca hoy, Elena?</string>
+    <string name="chat_voice_e2ee_badge">Cifrado de Voz E2EE Activo</string>
+    <string name="chat_suggestion_summary">Resumen de mi día</string>
+    <string name="chat_suggestion_vent">Desahogo guiado</string>
+    <string name="chat_suggestion_sleep">Registrar sueño</string>
+    <string name="chat_suggestion_reflection">Reflexión emocional</string>
+    <string name="chat_input_placeholder_voice">Pregunta o desahógate…</string>
+    <string name="chat_cd_add_context">Añadir emoción o nota</string>
+    <string name="chat_cd_mic">Comenzar a hablar</string>
+    <string name="chat_drawer_title">Historial de Diarios</string>
+    <string name="chat_drawer_new_diary">Nuevo Diario de Voz</string>
+    <string name="chat_drawer_search_hint">Buscar entradas anteriores…</string>
+    <string name="chat_drawer_group_today">Hoy</string>
+    <string name="chat_drawer_group_yesterday">Ayer</string>
+    <string name="chat_drawer_group_this_week">Esta semana</string>
+    <string name="chat_drawer_security_notice">Cifrado E2E activo 🔒</string>
+    <string name="chat_drawer_private_badge">100% Privado</string>
+    <string name="chat_drawer_export_btn">Exportar Historial Seguro</string>
+    <string name="chat_tag_calm">Calma</string>
+    <string name="chat_tag_positive">Positivo</string>
+    <string name="chat_tag_vent">Desahogo</string>
+    <string name="chat_tag_creative">Creativo</string>
+    <string name="chat_tag_pride">Orgullo</string>
+
     <!-- Settings Screen (Spanish) -->
     <string name="settings_anonymous_alias">Reflexivo Anónimo</string>
     <string name="settings_anonymous_id">ID Protegido: #SD-8492</string>
