@@ -35,6 +35,35 @@
     <string name="chat_status_online">Online • Safe Sanctuary</string>
     <string name="chat_error_generic">An error occurred while processing your message. Please try again.</string>
 
+    <!-- AI Voice Diary & History Drawer (English) -->
+    <string name="chat_header_subtitle">AI Diary</string>
+    <string name="chat_tab_diary">Diary</string>
+    <string name="chat_tab_help">Help</string>
+    <string name="chat_tab_community">Community</string>
+    <string name="chat_greeting_title">What\'s on your mind today, Elena?</string>
+    <string name="chat_voice_e2ee_badge">E2EE Voice Encryption Active</string>
+    <string name="chat_suggestion_summary">Summary of my day</string>
+    <string name="chat_suggestion_vent">Guided vent</string>
+    <string name="chat_suggestion_sleep">Log sleep</string>
+    <string name="chat_suggestion_reflection">Emotional reflection</string>
+    <string name="chat_input_placeholder_voice">Ask or vent…</string>
+    <string name="chat_cd_add_context">Add emotion or note</string>
+    <string name="chat_cd_mic">Start speaking</string>
+    <string name="chat_drawer_title">Diary History</string>
+    <string name="chat_drawer_new_diary">New Voice Diary</string>
+    <string name="chat_drawer_search_hint">Search past entries…</string>
+    <string name="chat_drawer_group_today">Today</string>
+    <string name="chat_drawer_group_yesterday">Yesterday</string>
+    <string name="chat_drawer_group_this_week">This week</string>
+    <string name="chat_drawer_security_notice">E2EE Active 🔒</string>
+    <string name="chat_drawer_private_badge">100% Private</string>
+    <string name="chat_drawer_export_btn">Export Secure History</string>
+    <string name="chat_tag_calm">Calm</string>
+    <string name="chat_tag_positive">Positive</string>
+    <string name="chat_tag_vent">Vent</string>
+    <string name="chat_tag_creative">Creative</string>
+    <string name="chat_tag_pride">Pride</string>
+
     <!-- Settings Screen (English) -->
     <string name="settings_anonymous_alias">Reflective Anonymous</string>
     <string name="settings_anonymous_id">Protected ID: #SD-8492</string>

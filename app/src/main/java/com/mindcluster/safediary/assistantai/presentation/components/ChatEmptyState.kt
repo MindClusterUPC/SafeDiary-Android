@@ -1,9 +1,18 @@
 package com.mindcluster.safediary.assistantai.presentation.components
 
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,149 +23,152 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.ChevronRight
-import androidx.compose.material.icons.filled.Security
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.mindcluster.safediary.R
-import com.mindcluster.safediary.shared.presentation.components.SafeDiaryCard
 import com.mindcluster.safediary.shared.presentation.theme.OnSurface
 import com.mindcluster.safediary.shared.presentation.theme.OnSurfaceVariant
 import com.mindcluster.safediary.shared.presentation.theme.OutlineVariantBorder
-import com.mindcluster.safediary.shared.presentation.theme.PillShape
 import com.mindcluster.safediary.shared.presentation.theme.PrimaryNavy
 import com.mindcluster.safediary.shared.presentation.theme.SecondaryTeal
-import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerHigh
 import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerLow
 import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerLowest
 
+data class SuggestionItem(
+    val emoji: String,
+    val text: String
+)
+
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ChatEmptyState(
-    suggestions: List<String>,
     onSuggestionSelected: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse_dot")
+    val dotScale by infiniteTransition.animateFloat(
+        initialValue = 0.8f,
+        targetValue = 1.3f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(700),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "dot_scale"
+    )
+
+    val items = listOf(
+        SuggestionItem("✨", stringResource(R.string.chat_suggestion_summary)),
+        SuggestionItem("🧘", stringResource(R.string.chat_suggestion_vent)),
+        SuggestionItem("💭", stringResource(R.string.chat_suggestion_sleep)),
+        SuggestionItem("🎯", stringResource(R.string.chat_suggestion_reflection))
+    )
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp, vertical = 12.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .padding(horizontal = 24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        // E2EE Privacy Shield Badge (From Serene Sanctuary & Mockups)
+        // Top Encryption Badge Subtle Pill
         Surface(
-            shape = PillShape,
-            color = SurfaceContainerHigh,
-            border = BorderStroke(1.dp, OutlineVariantBorder.copy(alpha = 0.3f)),
-            modifier = Modifier.padding(bottom = 20.dp)
+            shape = RoundedCornerShape(9999.dp),
+            color = SurfaceContainerLow,
+            border = BorderStroke(1.dp, OutlineVariantBorder.copy(alpha = 0.35f)),
+            shadowElevation = 1.dp
         ) {
             Row(
-                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp),
+                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Box(
+                    modifier = Modifier
+                        .size(6.dp)
+                        .scale(dotScale)
+                        .clip(CircleShape)
+                        .background(SecondaryTeal)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
                 Icon(
-                    imageVector = Icons.Default.Security,
+                    imageVector = Icons.Default.Lock,
                     contentDescription = null,
                     tint = SecondaryTeal,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(13.dp)
                 )
-                Spacer(modifier = Modifier.width(8.dp))
+                Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = stringResource(R.string.chat_e2ee_badge),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = PrimaryNavy,
-                    fontWeight = FontWeight.Medium
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "• " + stringResource(R.string.chat_e2ee_protocol),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = SecondaryTeal,
-                    fontWeight = FontWeight.Bold
+                    text = stringResource(R.string.chat_voice_e2ee_badge),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontWeight = FontWeight.Medium,
+                        fontSize = 11.sp,
+                        letterSpacing = 0.3.sp
+                    ),
+                    color = OnSurfaceVariant
                 )
             }
         }
 
-        // AI Welcoming Orb / Avatar
-        Surface(
-            shape = CircleShape,
-            color = SecondaryTeal,
-            modifier = Modifier.size(54.dp),
-            shadowElevation = 2.dp
-        ) {
-            Icon(
-                imageVector = Icons.Default.AutoAwesome,
-                contentDescription = null,
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(14.dp)
-                    .size(26.dp)
-            )
-        }
+        Spacer(modifier = Modifier.height(28.dp))
 
-        Spacer(modifier = Modifier.height(14.dp))
-
+        // Gemini-style Warm Greeting Heading in Deep Primary Navy
         Text(
-            text = stringResource(R.string.chat_empty_title),
-            style = MaterialTheme.typography.headlineSmall,
+            text = stringResource(R.string.chat_greeting_title),
+            style = MaterialTheme.typography.headlineMedium.copy(
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 26.sp,
+                letterSpacing = (-0.5).sp
+            ),
             color = PrimaryNavy,
             textAlign = TextAlign.Center
         )
 
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = stringResource(R.string.chat_empty_subtitle),
-            style = MaterialTheme.typography.bodyMedium,
-            color = OnSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 12.dp)
-        )
-
         Spacer(modifier = Modifier.height(24.dp))
 
-        // Suggestion Cards
-        Column(
+        // Suggestion Action Pills Wrapped
+        FlowRow(
             modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.Center,
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            suggestions.take(3).forEach { suggestion ->
-                SafeDiaryCard(
+            items.forEach { item ->
+                Surface(
+                    shape = RoundedCornerShape(9999.dp),
+                    color = SurfaceContainerLowest,
+                    border = BorderStroke(1.dp, OutlineVariantBorder.copy(alpha = 0.4f)),
+                    shadowElevation = 1.dp,
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .clickable { onSuggestionSelected(suggestion) },
-                    cornerRadius = 14.dp,
-                    containerColor = SurfaceContainerLowest,
-                    contentPadding = 14.dp
+                        .padding(horizontal = 4.dp)
+                        .clip(RoundedCornerShape(9999.dp))
+                        .clickable { onSuggestionSelected(item.text) }
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 7.dp),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(text = item.emoji, fontSize = 12.sp)
+                        Spacer(modifier = Modifier.width(6.dp))
                         Text(
-                            text = suggestion,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = OnSurface,
-                            modifier = Modifier.weight(1f)
-                        )
-                        Icon(
-                            imageVector = Icons.Default.ChevronRight,
-                            contentDescription = null,
-                            tint = SecondaryTeal,
-                            modifier = Modifier.size(20.dp)
+                            text = item.text,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 12.sp
+                            ),
+                            color = OnSurface
                         )
                     }
                 }

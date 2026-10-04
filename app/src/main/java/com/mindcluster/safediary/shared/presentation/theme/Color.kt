@@ -39,3 +39,10 @@ val SurfaceContainerHighest = Color(0xFFD6E3FE)
 val OutlineBorder = Color(0xFF73777F)
 val OutlineVariantBorder = Color(0xFFC3C6CF)
 val SurfaceTint = Color(0xFF426086)
+
+// Drawer & Ambient Voice Colors
+val DrawerBackground = Color(0xFF0B1424)
+val DrawerSurface = Color(0xFF121F33)
+val DrawerBorder = Color(0xFF1E293B)
+val MicGradientStart = Color(0xFF14B8A6)
+val MicGradientEnd = Color(0xFF34D399)
