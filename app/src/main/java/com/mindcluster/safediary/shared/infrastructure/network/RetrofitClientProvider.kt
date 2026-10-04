@@ -1,5 +1,6 @@
 package com.mindcluster.safediary.shared.infrastructure.network
 
+import com.mindcluster.safediary.BuildConfig
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -8,12 +9,13 @@ import java.util.concurrent.TimeUnit
 
 object RetrofitClientProvider {
 
-    // Default development base URL. Can point to local emulator host (10.0.2.2:8080) or cloud API
-    private const val DEFAULT_BASE_URL = "https://api.safediary.app/"
+    // Debug builds point to the local backend (10.0.2.2:8080 from the emulator); release builds to the cloud API.
+    private val baseUrl: String = BuildConfig.API_BASE_URL
 
     private val loggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
-            level = HttpLoggingInterceptor.Level.BODY
+            // Message bodies hold sensitive emotional content: only log them in debug builds.
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
         }
     }
 
@@ -36,7 +38,7 @@ object RetrofitClientProvider {
 
     private val retrofitInstance: Retrofit by lazy {
         Retrofit.Builder()
-            .baseUrl(DEFAULT_BASE_URL)
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
