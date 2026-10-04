@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">SafeDiary</string>
+
+    <!-- Shared TopBar & Navigation -->
+    <string name="shared_topbar_title_prefix">SafeDiary</string>
+    <string name="shared_topbar_section_assistant">Assistant</string>
+    <string name="shared_topbar_section_settings">Settings</string>
+    <string name="shared_topbar_section_home">Home</string>
+    <string name="shared_cd_logo">SafeDiary Logo</string>
+    <string name="shared_cd_back">Back</string>
+    <string name="shared_cd_settings">Settings</string>
+    <string name="shared_cd_menu">Menu</string>
+    <string name="shared_cd_user_avatar">User Avatar</string>
+
+    <!-- Shared Buttons & Actions -->
+    <string name="shared_button_continue">Continue</string>
+    <string name="shared_button_save">Save</string>
+    <string name="shared_button_cancel">Cancel</string>
+
+    <!-- Shared Placeholder Welcome -->
+    <string name="shared_welcome_title">Welcome to SafeDiary</string>
+    <string name="shared_welcome_desc">Your safe sanctuary for reflection and emotional wellbeing.</string>
+</resources>
