@@ -28,7 +28,9 @@ fun AppNavigation(
                 factory = AssistantViewModel.Factory(
                     assistantModule.sendPromptHandler,
                     assistantModule.getChatHistoryHandler,
-                    assistantModule.startNewChatHandler
+                    assistantModule.startNewChatHandler,
+                    assistantModule.getCrisisSupportHandler,
+                    assistantModule.dismissCrisisSupportHandler
                 )
             )
             AiChatScreen(
