@@ -62,7 +62,7 @@ fun MessageBubble(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 6.dp),
         horizontalArrangement = if (isUser) Arrangement.End else Arrangement.Start,
-        verticalAlignment = Alignment.Bottom
+        verticalAlignment = Alignment.Top
     ) {
         if (!isUser) {
             // Assistant Avatar
