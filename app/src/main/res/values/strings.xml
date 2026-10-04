@@ -30,6 +30,7 @@
     <string name="chat_e2ee_protocol">E2EE-v4</string>
     <string name="chat_typing">SafeDiary está escribiendo…</string>
     <string name="chat_cd_send">Enviar mensaje</string>
+    <string name="chat_cd_copy">Copiar respuesta</string>
     <string name="chat_cd_voice">Entrada de voz (decorativa)</string>
     <string name="chat_cd_new_chat">Nueva conversación</string>
     <string name="chat_status_online">En línea • Espacio seguro</string>
