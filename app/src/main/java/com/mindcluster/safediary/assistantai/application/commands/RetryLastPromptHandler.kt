@@ -12,9 +12,9 @@ class RetryLastPromptHandler(
     private val responder: AssistantResponder,
     private val eventBus: DomainEventPublisher
 ) {
-    suspend fun handle(command: RetryLastPromptCommand = RetryLastPromptCommand()): Result<Unit> = runCatching {
+    suspend fun handle(command: RetryLastPromptCommand = RetryLastPromptCommand()): Result<String?> = runCatching {
         val conversation = repository.getActiveConversation()
-        val pending = conversation.pendingUserMessage() ?: return@runCatching
+        val pending = conversation.pendingUserMessage() ?: return@runCatching conversation.remoteConversationId
 
         val reply = responder.respond(
             userPrompt = pending.content,
@@ -26,5 +26,6 @@ class RetryLastPromptHandler(
 
         eventBus.publish(conversation.getDomainEvents())
         conversation.clearEvents()
+        conversation.remoteConversationId
     }
 }

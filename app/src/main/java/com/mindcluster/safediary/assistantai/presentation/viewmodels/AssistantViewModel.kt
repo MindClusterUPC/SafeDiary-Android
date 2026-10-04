@@ -108,7 +108,13 @@ class AssistantViewModel(
         _uiState.update { it.copy(input = "", isTyping = true, replyFailed = false) }
         viewModelScope.launch {
             val result = sendPromptHandler.handle(SendPromptCommand(prompt))
-            _uiState.update { it.copy(isTyping = false, replyFailed = result.isFailure) }
+            _uiState.update {
+                it.copy(
+                    isTyping = false,
+                    replyFailed = result.isFailure,
+                    activeConversationId = result.getOrNull() ?: it.activeConversationId
+                )
+            }
         }
     }
 
@@ -117,7 +123,13 @@ class AssistantViewModel(
         _uiState.update { it.copy(isTyping = true, replyFailed = false) }
         viewModelScope.launch {
             val result = retryLastPromptHandler.handle()
-            _uiState.update { it.copy(isTyping = false, replyFailed = result.isFailure) }
+            _uiState.update {
+                it.copy(
+                    isTyping = false,
+                    replyFailed = result.isFailure,
+                    activeConversationId = result.getOrNull() ?: it.activeConversationId
+                )
+            }
         }
     }
 

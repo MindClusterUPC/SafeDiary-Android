@@ -9,7 +9,8 @@ class SendPromptHandler(
     private val responder: AssistantResponder,
     private val eventBus: DomainEventPublisher
 ) {
-    suspend fun handle(command: SendPromptCommand): Result<Unit> = runCatching {
+    /** Returns the backend conversation id, so the UI can track the current chat. */
+    suspend fun handle(command: SendPromptCommand): Result<String?> = runCatching {
         val conversation = repository.getActiveConversation()
         val userMessage = conversation.addUserMessage(command.prompt)
         repository.save(conversation)
@@ -27,5 +28,6 @@ class SendPromptHandler(
 
         eventBus.publish(conversation.getDomainEvents())
         conversation.clearEvents()
+        conversation.remoteConversationId
     }
 }
