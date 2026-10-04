@@ -119,7 +119,7 @@
 
     <string name="settings_crisis_title">Recursos de Crisis y Soporte</string>
     <string name="settings_crisis_body">SafeDiary AI brinda apoyo en regulación emocional pero no atiende emergencias de salud mental. Si te sientes en peligro, comunícate de inmediato.</string>
-    <string name="settings_crisis_call_btn">Llamar o enviar texto al 988</string>
+    <string name="settings_crisis_call_btn">Llamar a la Línea 113 (opción 5)</string>
     <string name="settings_crisis_confidential">24/7 • Gratuito y Confidencial</string>
 
     <string name="settings_link_privacy">Política de Privacidad</string>

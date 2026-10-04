@@ -1,5 +1,8 @@
 package com.mindcluster.safediary.profiles.presentation.views
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -863,7 +866,14 @@ fun SettingsScreen(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(9999.dp))
                                 .background(PrimaryNavy)
-                                .clickable { /* phone dialer */ }
+                                .clickable {
+                                    // Opens the dialer with MINSA mental health line 113; the user decides to call.
+                                    try {
+                                        context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:113")))
+                                    } catch (_: ActivityNotFoundException) {
+                                        // No dialer available on this device.
+                                    }
+                                }
                                 .padding(horizontal = 12.dp, vertical = 7.dp)
                         ) {
                             Row(verticalAlignment = Alignment.CenterVertically) {
