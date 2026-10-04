@@ -10,7 +10,7 @@ import com.mindcluster.safediary.assistantai.domain.model.RiskLevel
 import com.mindcluster.safediary.assistantai.infrastructure.MockAssistantResponder
 import com.mindcluster.safediary.assistantai.infrastructure.remote.api.AssistantApiService
 import com.mindcluster.safediary.assistantai.infrastructure.remote.dto.PromptRequestDto
-import com.mindcluster.safediary.shared.infrastructure.locale.AppLocaleManager
+import com.mindcluster.safediary.shared.infrastructure.locale.AppLanguage
 import com.mindcluster.safediary.shared.infrastructure.network.RetrofitClientProvider
 
 class RetrofitAssistantResponder(
@@ -27,7 +27,8 @@ class RetrofitAssistantResponder(
         remoteConversationId: String?
     ): AssistantReply {
         return try {
-            val locale = AppLocaleManager.current(context).code
+            // Answer in the language the UI is actually displayed in.
+            val locale = AppLanguage.fromCode(context.resources.configuration.locales[0].language).code
             val request = PromptRequestDto(
                 prompt = userPrompt,
                 conversationId = remoteConversationId,
