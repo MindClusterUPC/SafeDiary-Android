@@ -35,6 +35,41 @@
     <string name="chat_status_online">Online • Safe Sanctuary</string>
     <string name="chat_error_generic">An error occurred while processing your message. Please try again.</string>
 
+    <!-- Settings Screen (English) -->
+    <string name="settings_anonymous_alias">Reflective Anonymous</string>
+    <string name="settings_anonymous_id">Protected ID: #SD-8492</string>
+    <string name="settings_vault_badge">Active Encrypted Vault</string>
+
+    <string name="settings_section_account">Account &amp; Privacy</string>
+    <string name="settings_item_edit_profile">Edit anonymous alias</string>
+    <string name="settings_item_privacy_permissions">Permissions &amp; confidentiality</string>
+
+    <string name="settings_section_preferences">Preferences</string>
+    <string name="settings_item_language">Language</string>
+    <string name="settings_item_notifications">Wellbeing notifications</string>
+    <string name="settings_item_dark_theme">Dark theme</string>
+    <string name="settings_item_daily_reminder">Reflection reminder</string>
+    <string name="settings_daily_reminder_time">9:00 PM</string>
+
+    <string name="settings_section_security">Security</string>
+    <string name="settings_item_pin_lock">4-Digit PIN Lock</string>
+    <string name="settings_item_biometric_lock">Biometric Unlock (Face / Fingerprint)</string>
+
+    <string name="settings_section_support">Support &amp; About</string>
+    <string name="settings_item_help_center">Help center &amp; crisis lines</string>
+    <string name="settings_item_terms">Terms of service</string>
+    <string name="settings_item_privacy_policy">Privacy policy</string>
+    <string name="settings_item_about">About SafeDiary</string>
+    <string name="settings_app_version">Version 1.0.0 (MindCluster 2026)</string>
+
+    <string name="settings_button_logout">Secure sign out</string>
+    <string name="settings_dialog_logout_title">Sign out?</string>
+    <string name="settings_dialog_logout_desc">Your diary notes and reflections will remain securely encrypted on this device.</string>
+
+    <string name="settings_lang_title">Select app language</string>
+    <string name="settings_lang_es">Español (Default)</string>
+    <string name="settings_lang_en">English</string>
+
     <!-- Suggestions -->
     <string name="chat_suggestion_1">I feel a bit overwhelmed today</string>
     <string name="chat_suggestion_2">I had a good day and want to log it</string>
