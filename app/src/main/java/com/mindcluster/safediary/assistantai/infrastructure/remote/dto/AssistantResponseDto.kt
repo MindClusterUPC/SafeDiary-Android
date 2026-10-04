@@ -10,5 +10,14 @@ data class AssistantResponseDto(
     val sentiment: String? = null,
 
     @SerializedName("timestamp")
-    val timestamp: Long = System.currentTimeMillis()
+    val timestamp: Long = System.currentTimeMillis(),
+
+    @SerializedName("conversationId")
+    val conversationId: String? = null,
+
+    @SerializedName("riskLevel")
+    val riskLevel: String? = null,
+
+    @SerializedName("crisisResources")
+    val crisisResources: List<CrisisResourceDto>? = null
 )

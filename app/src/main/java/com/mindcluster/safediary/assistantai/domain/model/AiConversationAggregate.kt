@@ -1,5 +1,6 @@
 package com.mindcluster.safediary.assistantai.domain.model
 
+import com.mindcluster.safediary.assistantai.domain.events.CrisisSupportOfferedEvent
 import com.mindcluster.safediary.assistantai.domain.events.PromptSentEvent
 import com.mindcluster.safediary.shared.domain.model.AggregateRoot
 import java.util.UUID
@@ -10,6 +11,15 @@ class AiConversationAggregate(
 
     private val _messages = mutableListOf<ChatMessage>()
     val messages: List<ChatMessage> get() = _messages.toList()
+
+    var remoteConversationId: String? = null
+        private set
+
+    var riskLevel: RiskLevel = RiskLevel.LOW
+        private set
+
+    var crisisResources: List<CrisisResource> = emptyList()
+        private set
 
     fun addUserMessage(content: String): ChatMessage {
         val trimmed = content.trim()
@@ -29,17 +39,30 @@ class AiConversationAggregate(
         return message
     }
 
-    fun addAssistantResponse(content: String): ChatMessage {
+    fun addAssistantResponse(reply: AssistantReply): ChatMessage {
         val message = ChatMessage(
             author = MessageAuthor.ASSISTANT,
-            content = content
+            content = reply.content
         )
         _messages.add(message)
+        reply.remoteConversationId?.let { remoteConversationId = it }
+        riskLevel = reply.riskLevel
+        if (reply.riskLevel.requiresCrisisSupport && reply.crisisResources.isNotEmpty()) {
+            crisisResources = reply.crisisResources
+            raise(CrisisSupportOfferedEvent(conversationId = id, riskLevel = reply.riskLevel))
+        }
         return message
+    }
+
+    fun dismissCrisisSupport() {
+        crisisResources = emptyList()
     }
 
     fun clear() {
         _messages.clear()
+        remoteConversationId = null
+        riskLevel = RiskLevel.LOW
+        crisisResources = emptyList()
         clearEvents()
     }
 }

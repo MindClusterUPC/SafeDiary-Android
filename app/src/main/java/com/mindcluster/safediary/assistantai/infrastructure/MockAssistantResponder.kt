@@ -2,6 +2,7 @@ package com.mindcluster.safediary.assistantai.infrastructure
 
 import android.content.Context
 import com.mindcluster.safediary.R
+import com.mindcluster.safediary.assistantai.domain.model.AssistantReply
 import com.mindcluster.safediary.assistantai.domain.model.AssistantResponder
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
 import kotlinx.coroutines.delay
@@ -16,7 +17,11 @@ class MockAssistantResponder(
     private var sleepIndex = 0
     private var genericIndex = 0
 
-    override suspend fun respond(userPrompt: String, history: List<ChatMessage>): String {
+    override suspend fun respond(
+        userPrompt: String,
+        history: List<ChatMessage>,
+        remoteConversationId: String?
+    ): AssistantReply {
         delay(delayMillis)
         val normalized = userPrompt.lowercase()
 
@@ -42,7 +47,7 @@ class MockAssistantResponder(
         }
 
         val responses = context.resources.getStringArray(resId)
-        if (responses.isEmpty()) return ""
+        if (responses.isEmpty()) return AssistantReply(content = "")
 
         val index = when (resId) {
             R.array.ai_responses_anxiety -> (anxietyIndex++ % responses.size)
@@ -50,6 +55,6 @@ class MockAssistantResponder(
             R.array.ai_responses_sleep -> (sleepIndex++ % responses.size)
             else -> (genericIndex++ % responses.size)
         }
-        return responses[index]
+        return AssistantReply(content = responses[index])
     }
 }

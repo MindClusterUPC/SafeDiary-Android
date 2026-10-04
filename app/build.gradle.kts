@@ -20,7 +20,14 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Emulator loopback to the local safediary-platform backend.
+            // On a physical device run: ./gradlew installDebug -Psafediary.apiBaseUrl=http://<pc-ip>:8080/
+            val debugApiBaseUrl = (project.findProperty("safediary.apiBaseUrl") as String?) ?: "http://10.0.2.2:8080/"
+            buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+        }
         release {
+            buildConfigField("String", "API_BASE_URL", "\"https://api.safediary.app/\"")
             optimization {
                 enable = false
             }
@@ -32,6 +39,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 

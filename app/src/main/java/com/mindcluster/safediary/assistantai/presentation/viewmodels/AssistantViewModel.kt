@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptCommand
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
+import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
 import com.mindcluster.safediary.assistantai.application.queries.GetChatHistoryHandler
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
-import com.mindcluster.safediary.assistantai.domain.repository.ConversationRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +24,7 @@ data class AssistantUiState(
 class AssistantViewModel(
     private val sendPromptHandler: SendPromptHandler,
     private val getChatHistoryHandler: GetChatHistoryHandler,
-    private val conversationRepository: ConversationRepository
+    private val startNewChatHandler: StartNewChatHandler
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AssistantUiState())
@@ -65,7 +65,7 @@ class AssistantViewModel(
 
     fun newChat() {
         viewModelScope.launch {
-            conversationRepository.reset()
+            startNewChatHandler.handle()
             _uiState.update { it.copy(input = "", isTyping = false, errorMessage = null) }
         }
     }
@@ -73,14 +73,14 @@ class AssistantViewModel(
     class Factory(
         private val sendPromptHandler: SendPromptHandler,
         private val getChatHistoryHandler: GetChatHistoryHandler,
-        private val conversationRepository: ConversationRepository
+        private val startNewChatHandler: StartNewChatHandler
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
             return AssistantViewModel(
                 sendPromptHandler,
                 getChatHistoryHandler,
-                conversationRepository
+                startNewChatHandler
             ) as T
         }
     }

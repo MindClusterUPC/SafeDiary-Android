@@ -2,8 +2,11 @@ package com.mindcluster.safediary.assistantai.infrastructure.remote
 
 import android.content.Context
 import android.util.Log
+import com.mindcluster.safediary.assistantai.domain.model.AssistantReply
 import com.mindcluster.safediary.assistantai.domain.model.AssistantResponder
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
+import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
+import com.mindcluster.safediary.assistantai.domain.model.RiskLevel
 import com.mindcluster.safediary.assistantai.infrastructure.MockAssistantResponder
 import com.mindcluster.safediary.assistantai.infrastructure.remote.api.AssistantApiService
 import com.mindcluster.safediary.assistantai.infrastructure.remote.dto.PromptRequestDto
@@ -18,15 +21,38 @@ class RetrofitAssistantResponder(
 
     private val tag = "RetrofitAssistant"
 
-    override suspend fun respond(userPrompt: String, history: List<ChatMessage>): String {
+    override suspend fun respond(
+        userPrompt: String,
+        history: List<ChatMessage>,
+        remoteConversationId: String?
+    ): AssistantReply {
         return try {
             val locale = AppLocaleManager.current(context).code
-            val request = PromptRequestDto(prompt = userPrompt, locale = locale)
+            val request = PromptRequestDto(
+                prompt = userPrompt,
+                conversationId = remoteConversationId,
+                locale = locale
+            )
             val response = apiService.sendPrompt(request)
-            response.reply
+            AssistantReply(
+                content = response.reply,
+                remoteConversationId = response.conversationId,
+                riskLevel = RiskLevel.fromBackend(response.riskLevel),
+                crisisResources = response.crisisResources.orEmpty().map {
+                    CrisisResource(name = it.name, phone = it.phone, description = it.description.orEmpty())
+                }
+            )
         } catch (e: Exception) {
             Log.w(tag, "Remote API call failed or server unreachable (${e.javaClass.simpleName}). Resilient fallback activated.")
-            fallbackResponder.respond(userPrompt, history)
+            fallbackResponder.respond(userPrompt, history, remoteConversationId)
+        }
+    }
+
+    override suspend fun endConversation(remoteConversationId: String) {
+        try {
+            apiService.closeSession(remoteConversationId)
+        } catch (e: Exception) {
+            Log.w(tag, "Could not close remote conversation (${e.javaClass.simpleName}).")
         }
     }
 }

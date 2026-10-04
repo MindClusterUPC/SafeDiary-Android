@@ -2,6 +2,7 @@ package com.mindcluster.safediary.assistantai.infrastructure
 
 import android.content.Context
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
+import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
 import com.mindcluster.safediary.assistantai.application.queries.GetChatHistoryHandler
 import com.mindcluster.safediary.assistantai.domain.model.AssistantResponder
 import com.mindcluster.safediary.assistantai.domain.repository.ConversationRepository
@@ -17,6 +18,10 @@ class AssistantAiModule(context: Context) {
 
     val sendPromptHandler: SendPromptHandler by lazy {
         SendPromptHandler(repository, responder, eventBus)
+    }
+
+    val startNewChatHandler: StartNewChatHandler by lazy {
+        StartNewChatHandler(repository, responder)
     }
 
     val getChatHistoryHandler: GetChatHistoryHandler by lazy {
