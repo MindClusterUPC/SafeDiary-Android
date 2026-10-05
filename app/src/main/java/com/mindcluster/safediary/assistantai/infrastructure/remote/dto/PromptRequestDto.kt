@@ -10,5 +10,8 @@ data class PromptRequestDto(
     val conversationId: String? = null,
 
     @SerializedName("locale")
-    val locale: String? = null
+    val locale: String? = null,
+
+    @SerializedName("personality")
+    val personality: String? = null
 )
