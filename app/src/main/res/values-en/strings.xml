@@ -49,6 +49,16 @@
     <string name="chat_cd_edit_message">Edit message</string>
     <string name="chat_cd_regenerate_reply">Regenerate reply</string>
 
+    <!-- Conversation Management (English) -->
+    <string name="chat_conversation_rename">Rename</string>
+    <string name="chat_conversation_delete">Delete</string>
+    <string name="chat_rename_dialog_title">Rename conversation</string>
+    <string name="chat_rename_dialog_hint">Conversation title</string>
+    <string name="chat_delete_dialog_title">Delete conversation?</string>
+    <string name="chat_delete_dialog_body">This action cannot be undone.</string>
+    <string name="chat_delete_dialog_confirm">Delete</string>
+    <string name="chat_cd_more_options">More options</string>
+
     <!-- AI Voice Diary & History Drawer (English) -->
     <string name="chat_header_subtitle">%1$s mode</string>
     <string name="chat_tab_diary">Diary</string>

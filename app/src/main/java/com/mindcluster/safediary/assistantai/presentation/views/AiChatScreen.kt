@@ -161,6 +161,12 @@ fun AiChatScreen(
                     viewModel.openConversation(summary.remoteId)
                     coroutineScope.launch { drawerState.close() }
                 },
+                onRenameConversation = { remoteId, newTitle ->
+                    viewModel.renameConversation(remoteId, newTitle)
+                },
+                onDeleteConversation = { remoteId ->
+                    viewModel.deleteConversation(remoteId)
+                },
                 onClose = {
                     coroutineScope.launch { drawerState.close() }
                 }

@@ -24,16 +24,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.ChatBubbleOutline
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import com.mindcluster.safediary.shared.presentation.theme.DrawerSurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,9 +82,15 @@ fun ConversationHistoryDrawer(
     onNewChat: () -> Unit,
     onConversationClick: (ConversationSummary) -> Unit,
     onClose: () -> Unit,
+    onRenameConversation: (remoteId: String, newTitle: String) -> Unit = { _, _ -> },
+    onDeleteConversation: (remoteId: String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
+    var renamingSummary by remember { mutableStateOf<ConversationSummary?>(null) }
+    var renameTitleInput by remember { mutableStateOf("") }
+    var deletingSummary by remember { mutableStateOf<ConversationSummary?>(null) }
+
     val zone = ZoneId.systemDefault()
     val today = LocalDate.now(zone)
     val filtered = conversations.filter {
@@ -90,6 +104,95 @@ fun ConversationHistoryDrawer(
             day.isAfter(today.minusDays(7)) -> HistoryGroup.THIS_WEEK
             else -> HistoryGroup.OLDER
         }
+    }
+
+    renamingSummary?.let { target ->
+        AlertDialog(
+            onDismissRequest = { renamingSummary = null },
+            containerColor = DrawerSurface,
+            title = {
+                Text(
+                    text = stringResource(R.string.chat_rename_dialog_title),
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
+            },
+            text = {
+                OutlinedTextField(
+                    value = renameTitleInput,
+                    onValueChange = { if (it.length <= 80) renameTitleInput = it },
+                    singleLine = true,
+                    label = { Text(stringResource(R.string.chat_rename_dialog_hint)) },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        focusedBorderColor = SecondaryTeal,
+                        unfocusedBorderColor = DrawerBorder,
+                        focusedLabelColor = SecondaryTeal,
+                        unfocusedLabelColor = Color(0xFF94A3B8)
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val text = renameTitleInput.trim()
+                        if (text.isNotBlank()) {
+                            onRenameConversation(target.remoteId, text)
+                        }
+                        renamingSummary = null
+                    },
+                    enabled = renameTitleInput.trim().isNotBlank()
+                ) {
+                    Text(stringResource(R.string.shared_button_save), color = SecondaryTeal)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { renamingSummary = null }) {
+                    Text(stringResource(R.string.shared_button_cancel), color = Color(0xFF94A3B8))
+                }
+            }
+        )
+    }
+
+    deletingSummary?.let { target ->
+        AlertDialog(
+            onDismissRequest = { deletingSummary = null },
+            containerColor = DrawerSurface,
+            title = {
+                Text(
+                    text = stringResource(R.string.chat_delete_dialog_title),
+                    color = Color.White,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
+            },
+            text = {
+                Text(
+                    text = stringResource(R.string.chat_delete_dialog_body),
+                    color = Color(0xFF94A3B8),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        onDeleteConversation(target.remoteId)
+                        deletingSummary = null
+                    }
+                ) {
+                    Text(
+                        text = stringResource(R.string.chat_delete_dialog_confirm),
+                        color = Color(0xFFEF4444),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { deletingSummary = null }) {
+                    Text(stringResource(R.string.shared_button_cancel), color = Color(0xFF94A3B8))
+                }
+            }
+        )
     }
 
     Surface(
@@ -259,7 +362,14 @@ fun ConversationHistoryDrawer(
                                         summary = summary,
                                         isActive = summary.remoteId == activeConversationId,
                                         timeLabel = timeLabel(summary, group, zone),
-                                        onClick = { onConversationClick(summary) }
+                                        onClick = { onConversationClick(summary) },
+                                        onRename = {
+                                            renamingSummary = summary
+                                            renameTitleInput = summary.title ?: ""
+                                        },
+                                        onDelete = {
+                                            deletingSummary = summary
+                                        }
                                     )
                                 }
                             }
@@ -292,8 +402,12 @@ private fun ConversationRow(
     summary: ConversationSummary,
     isActive: Boolean,
     timeLabel: String,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onRename: () -> Unit,
+    onDelete: () -> Unit
 ) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -301,7 +415,7 @@ private fun ConversationRow(
             .clip(RoundedCornerShape(10.dp))
             .background(if (isActive) Color.White.copy(alpha = 0.10f) else Color.Transparent)
             .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 11.dp),
+            .padding(start = 12.dp, top = 6.dp, bottom = 6.dp, end = 6.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
@@ -319,12 +433,61 @@ private fun ConversationRow(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f)
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(6.dp))
         Text(
             text = timeLabel,
             style = MaterialTheme.typography.labelSmall,
             color = Color(0xFF64748B)
         )
+        Box {
+            IconButton(
+                onClick = { showMenu = true },
+                modifier = Modifier.size(28.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = stringResource(R.string.chat_cd_more_options),
+                    tint = Color(0xFF94A3B8),
+                    modifier = Modifier.size(16.dp)
+                )
+            }
+            DropdownMenu(
+                expanded = showMenu,
+                onDismissRequest = { showMenu = false },
+                modifier = Modifier.background(DrawerSurface)
+            ) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.chat_conversation_rename), color = Color.White) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = null,
+                            tint = Color(0xFF94A3B8),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    onClick = {
+                        showMenu = false
+                        onRename()
+                    }
+                )
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.chat_conversation_delete), color = Color(0xFFEF4444)) },
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            tint = Color(0xFFEF4444),
+                            modifier = Modifier.size(16.dp)
+                        )
+                    },
+                    onClick = {
+                        showMenu = false
+                        onDelete()
+                    }
+                )
+            }
+        }
     }
 }
 

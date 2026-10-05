@@ -49,6 +49,16 @@
     <string name="chat_cd_edit_message">Editar mensaje</string>
     <string name="chat_cd_regenerate_reply">Regenerar respuesta</string>
 
+    <!-- Conversation Management (Spanish) -->
+    <string name="chat_conversation_rename">Renombrar</string>
+    <string name="chat_conversation_delete">Eliminar</string>
+    <string name="chat_rename_dialog_title">Renombrar conversación</string>
+    <string name="chat_rename_dialog_hint">Título de la conversación</string>
+    <string name="chat_delete_dialog_title">¿Eliminar conversación?</string>
+    <string name="chat_delete_dialog_body">Esta acción no se puede deshacer.</string>
+    <string name="chat_delete_dialog_confirm">Eliminar</string>
+    <string name="chat_cd_more_options">Más opciones</string>
+
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_header_title" translatable="false">Diarito</string>
     <string name="chat_header_subtitle">Modo %1$s</string>
