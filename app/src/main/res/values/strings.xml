@@ -62,7 +62,7 @@
     <string name="settings_section_diarito">Diarito</string>
     <string name="settings_personality_sol_desc">Cálido y cercano, te acompaña</string>
     <string name="settings_personality_luma_desc">Te ayuda a ver las cosas desde otro ángulo</string>
-    <string name="settings_personality_kai_desc">Práctico: ordena, prioriza y propone pasos</string>
+    <string name="settings_personality_kai_desc">Práctico: ordena y propone pasos</string>
     <string name="settings_personality_nara_desc">Sereno y pausado, baja la intensidad</string>
     <string name="personality_sol_name" translatable="false">Sol</string>
     <string name="personality_luma_name" translatable="false">Luma</string>

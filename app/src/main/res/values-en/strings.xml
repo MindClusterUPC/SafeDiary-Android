@@ -61,7 +61,7 @@
     <string name="settings_section_diarito">Diarito</string>
     <string name="settings_personality_sol_desc">Warm and close, keeps you company</string>
     <string name="settings_personality_luma_desc">Helps you see things from another angle</string>
-    <string name="settings_personality_kai_desc">Practical: organizes, prioritizes, suggests steps</string>
+    <string name="settings_personality_kai_desc">Practical: organizes and suggests steps</string>
     <string name="settings_personality_nara_desc">Calm and slow-paced, lowers the intensity</string>
 
     <string name="settings_section_preferences">Preferences</string>
