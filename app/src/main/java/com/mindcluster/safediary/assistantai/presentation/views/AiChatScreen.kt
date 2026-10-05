@@ -227,7 +227,7 @@ fun AiChatScreen(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 Text(
-                                    text = stringResource(R.string.chat_header_title),
+                                    text = stringResource(R.string.shared_topbar_title_prefix),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.SemiBold,
                                         color = PrimaryNavy
