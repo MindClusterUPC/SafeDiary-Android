@@ -40,7 +40,7 @@
     <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
-    <string name="chat_header_title">Diarito</string>
+    <string name="chat_header_title" translatable="false">Diarito</string>
     <string name="chat_header_subtitle">Modo %1$s</string>
     <string name="chat_tab_diary">Diario</string>
     <string name="chat_tab_help">Ayuda</string>
@@ -76,15 +76,19 @@
     <string name="settings_model_architecture_title">Arquitectura del Modelo</string>
     <string name="settings_model_architecture_sub">MindCore v4.2 (Ajuste Clínico)</string>
     <string name="settings_model_badge">Grok-Safe</string>
+    <string name="settings_section_diarito">Diarito</string>
     <string name="settings_personality_title">Personalidad de Diarito</string>
     <string name="settings_personality_sol_desc">Cálido y cercano, te acompaña</string>
     <string name="settings_personality_luma_desc">Te ayuda a ver las cosas desde otro ángulo</string>
     <string name="settings_personality_kai_desc">Práctico: ordena, prioriza y propone pasos</string>
     <string name="settings_personality_nara_desc">Sereno y pausado, baja la intensidad</string>
-    <string name="personality_sol_name">Sol</string>
-    <string name="personality_luma_name">Luma</string>
-    <string name="personality_kai_name">Kai</string>
-    <string name="personality_nara_name">Nara</string>
+    <string name="personality_sol_name" translatable="false">Sol</string>
+    <string name="personality_luma_name" translatable="false">Luma</string>
+    <string name="personality_kai_name" translatable="false">Kai</string>
+    <string name="personality_nara_name" translatable="false">Nara</string>
+    <string name="settings_section_help">Ayuda inmediata</string>
+    <string name="settings_help_body">Si estás en peligro o sientes que no puedes más, llama ahora. Es gratuito y confidencial, 24/7.</string>
+    <string name="settings_version">SafeDiary · versión %1$s</string>
 
     <string name="settings_header_vault">Privacidad, Bóveda y Zero-Trust</string>
     <string name="settings_vault_zero_knowledge">Cero Conocimiento</string>

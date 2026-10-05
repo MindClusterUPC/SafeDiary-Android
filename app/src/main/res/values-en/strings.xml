@@ -40,7 +40,6 @@
     <string name="chat_crisis_dismiss">Dismiss</string>
 
     <!-- AI Voice Diary & History Drawer (English) -->
-    <string name="chat_header_title">Diarito</string>
     <string name="chat_header_subtitle">%1$s mode</string>
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
@@ -76,15 +75,15 @@
     <string name="settings_model_architecture_title">Model Architecture</string>
     <string name="settings_model_architecture_sub">MindCore v4.2 (Clinical Tuning)</string>
     <string name="settings_model_badge">Grok-Safe</string>
+    <string name="settings_section_diarito">Diarito</string>
     <string name="settings_personality_title">Diarito\'s personality</string>
     <string name="settings_personality_sol_desc">Warm and close, keeps you company</string>
     <string name="settings_personality_luma_desc">Helps you see things from another angle</string>
     <string name="settings_personality_kai_desc">Practical: organizes, prioritizes, suggests steps</string>
     <string name="settings_personality_nara_desc">Calm and slow-paced, lowers the intensity</string>
-    <string name="personality_sol_name">Sol</string>
-    <string name="personality_luma_name">Luma</string>
-    <string name="personality_kai_name">Kai</string>
-    <string name="personality_nara_name">Nara</string>
+    <string name="settings_section_help">Immediate help</string>
+    <string name="settings_help_body">If you are in danger or feel you can\'t go on, call now. It\'s free and confidential, 24/7.</string>
+    <string name="settings_version">SafeDiary · version %1$s</string>
 
     <string name="settings_header_vault">Privacy, Vault &amp; Zero-Trust Data</string>
     <string name="settings_vault_zero_knowledge">Zero Knowledge</string>
