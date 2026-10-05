@@ -44,6 +44,9 @@ fun AppNavigation(
                 viewModel = assistantViewModel,
                 onNavigateToSettings = {
                     navController.navigate(NavRoutes.SETTINGS)
+                },
+                onNavigateToRoute = { route ->
+                    navController.navigate(route)
                 }
             )
         }

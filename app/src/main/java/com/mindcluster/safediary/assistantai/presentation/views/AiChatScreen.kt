@@ -29,14 +29,10 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.MenuBook
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.Groups
+import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.MenuBook
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.SupportAgent
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -50,7 +46,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -95,13 +90,13 @@ import kotlinx.coroutines.launch
 fun AiChatScreen(
     viewModel: AssistantViewModel,
     onNavigateToSettings: () -> Unit,
+    onNavigateToRoute: (String) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-    var selectedTab by remember { mutableIntStateOf(0) }
 
     val context = LocalContext.current
     var currentPersonality by remember {
@@ -167,6 +162,8 @@ fun AiChatScreen(
                 onDeleteConversation = { remoteId ->
                     viewModel.deleteConversation(remoteId)
                 },
+                onNavigateToRoute = onNavigateToRoute,
+                onNavigateToSettings = onNavigateToSettings,
                 onClose = {
                     coroutineScope.launch { drawerState.close() }
                 }
@@ -252,29 +249,20 @@ fun AiChatScreen(
                             }
                         }
 
-                        // Right: Notification Bell + Profile Avatar
+                        // Right: New Chat Pencil + Profile Avatar
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(6.dp)
                         ) {
-                            Box(contentAlignment = Alignment.TopEnd) {
-                                IconButton(
-                                    onClick = { /* notification badge */ },
-                                    modifier = Modifier.size(36.dp)
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Notifications,
-                                        contentDescription = null,
-                                        tint = Color(0xFF475569),
-                                        modifier = Modifier.size(22.dp)
-                                    )
-                                }
-                                Box(
-                                    modifier = Modifier
-                                        .padding(top = 6.dp, end = 6.dp)
-                                        .size(7.dp)
-                                        .clip(CircleShape)
-                                        .background(SecondaryTeal)
+                            IconButton(
+                                onClick = { viewModel.newChat() },
+                                modifier = Modifier.size(36.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.EditNote,
+                                    contentDescription = stringResource(R.string.chat_cd_new_chat_button),
+                                    tint = Color(0xFF475569),
+                                    modifier = Modifier.size(24.dp)
                                 )
                             }
 
@@ -294,36 +282,6 @@ fun AiChatScreen(
                                 )
                             }
                         }
-                    }
-
-                    // Secondary Navigation Tabs Bar (Diario, Ayuda, Comunidad)
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 24.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        TabItem(
-                            title = stringResource(R.string.chat_tab_diary),
-                            icon = Icons.AutoMirrored.Filled.MenuBook,
-                            isSelected = selectedTab == 0,
-                            onClick = { selectedTab = 0 }
-                        )
-                        Spacer(modifier = Modifier.width(28.dp))
-                        TabItem(
-                            title = stringResource(R.string.chat_tab_help),
-                            icon = Icons.Default.SupportAgent,
-                            isSelected = selectedTab == 1,
-                            onClick = { selectedTab = 1 }
-                        )
-                        Spacer(modifier = Modifier.width(28.dp))
-                        TabItem(
-                            title = stringResource(R.string.chat_tab_community),
-                            icon = Icons.Default.Groups,
-                            isSelected = selectedTab == 2,
-                            onClick = { selectedTab = 2 }
-                        )
                     }
 
                     HorizontalDivider(color = SurfaceContainer, thickness = 1.dp)
@@ -411,50 +369,5 @@ fun AiChatScreen(
                 )
             }
         }
-    }
-}
-
-@Composable
-private fun TabItem(
-    title: String,
-    icon: ImageVector,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable { onClick() }
-            .padding(vertical = 8.dp)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(6.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (isSelected) SecondaryTeal else Color(0xFF94A3B8),
-                modifier = Modifier.size(17.dp)
-            )
-            Text(
-                text = title,
-                style = MaterialTheme.typography.labelMedium.copy(
-                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
-                    fontSize = 13.sp
-                ),
-                color = if (isSelected) PrimaryNavy else Color(0xFF64748B)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Box(
-            modifier = Modifier
-                .width(44.dp)
-                .height(2.dp)
-                .clip(RoundedCornerShape(9999.dp))
-                .background(if (isSelected) SecondaryTeal else Color.Transparent)
-        )
     }
 }

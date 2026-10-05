@@ -59,6 +59,15 @@
     <string name="chat_delete_dialog_confirm">Eliminar</string>
     <string name="chat_cd_more_options">Más opciones</string>
 
+    <!-- Navigation Drawer & Header (Spanish) -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_emotions">Emociones</string>
+    <string name="nav_professionals">Profesionales</string>
+    <string name="nav_community">Comunidad</string>
+    <string name="nav_settings">Configuración</string>
+    <string name="chat_drawer_recent">Recientes</string>
+    <string name="chat_cd_new_chat_button">Nueva conversación</string>
+
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_header_title" translatable="false">Diarito</string>
     <string name="chat_header_subtitle">Modo %1$s</string>
