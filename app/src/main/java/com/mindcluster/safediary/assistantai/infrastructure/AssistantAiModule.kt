@@ -1,8 +1,12 @@
 package com.mindcluster.safediary.assistantai.infrastructure
 
 import android.content.Context
+import com.mindcluster.safediary.assistantai.application.commands.DeleteConversationHandler
 import com.mindcluster.safediary.assistantai.application.commands.DismissCrisisSupportHandler
+import com.mindcluster.safediary.assistantai.application.commands.EditMessageHandler
 import com.mindcluster.safediary.assistantai.application.commands.OpenConversationHandler
+import com.mindcluster.safediary.assistantai.application.commands.RegenerateReplyHandler
+import com.mindcluster.safediary.assistantai.application.commands.RenameConversationHandler
 import com.mindcluster.safediary.assistantai.application.commands.RetryLastPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.SendPromptHandler
 import com.mindcluster.safediary.assistantai.application.commands.StartNewChatHandler
@@ -26,11 +30,11 @@ class AssistantAiModule(context: Context) {
     val historyGateway: ConversationHistoryGateway by lazy { RetrofitConversationHistoryGateway() }
 
     val sendPromptHandler: SendPromptHandler by lazy {
-        SendPromptHandler(repository, responder, eventBus)
+        SendPromptHandler(repository, responder, eventBus, historyGateway)
     }
 
     val retryLastPromptHandler: RetryLastPromptHandler by lazy {
-        RetryLastPromptHandler(repository, responder, eventBus)
+        RetryLastPromptHandler(repository, responder, eventBus, historyGateway)
     }
 
     val startNewChatHandler: StartNewChatHandler by lazy {
@@ -55,6 +59,22 @@ class AssistantAiModule(context: Context) {
 
     val dismissCrisisSupportHandler: DismissCrisisSupportHandler by lazy {
         DismissCrisisSupportHandler(repository)
+    }
+
+    val editMessageHandler: EditMessageHandler by lazy {
+        EditMessageHandler(repository, responder, historyGateway, eventBus)
+    }
+
+    val regenerateReplyHandler: RegenerateReplyHandler by lazy {
+        RegenerateReplyHandler(repository, responder, historyGateway, eventBus)
+    }
+
+    val renameConversationHandler: RenameConversationHandler by lazy {
+        RenameConversationHandler(historyGateway)
+    }
+
+    val deleteConversationHandler: DeleteConversationHandler by lazy {
+        DeleteConversationHandler(historyGateway, repository)
     }
 
     companion object {

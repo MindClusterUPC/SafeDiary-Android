@@ -6,4 +6,14 @@ interface AssistantResponder {
         history: List<ChatMessage>,
         remoteConversationId: String?
     ): AssistantReply
+
+    suspend fun editMessage(
+        remoteConversationId: String,
+        messageRemoteId: Long,
+        newPrompt: String
+    ): AssistantReply
+
+    suspend fun regenerate(
+        remoteConversationId: String
+    ): AssistantReply
 }

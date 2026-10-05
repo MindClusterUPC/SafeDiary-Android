@@ -9,6 +9,7 @@ import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import com.mindcluster.safediary.assistantai.domain.model.MessageAuthor
 import com.mindcluster.safediary.assistantai.domain.repository.ConversationHistoryGateway
 import com.mindcluster.safediary.assistantai.infrastructure.remote.api.AssistantApiService
+import com.mindcluster.safediary.assistantai.infrastructure.remote.dto.RenameConversationRequestDto
 import com.mindcluster.safediary.shared.infrastructure.network.RetrofitClientProvider
 import java.time.Instant
 
@@ -34,6 +35,7 @@ class RetrofitConversationHistoryGateway(
             remoteId = conversation.conversationId,
             messages = conversation.messages.map {
                 ChatMessage(
+                    remoteId = it.id,
                     author = if (it.role == "user") MessageAuthor.USER else MessageAuthor.ASSISTANT,
                     content = it.content,
                     sentAt = parseInstant(it.sentAt)
@@ -43,6 +45,19 @@ class RetrofitConversationHistoryGateway(
                 CrisisResource(name = it.name, phone = it.phone, description = it.description.orEmpty())
             }
         )
+    }
+
+    override suspend fun renameConversation(remoteId: String, title: String): ConversationSummary = remote {
+        val dto = apiService.renameConversation(remoteId, RenameConversationRequestDto(title))
+        ConversationSummary(
+            remoteId = dto.conversationId,
+            title = dto.title,
+            lastActivityAt = parseInstant(dto.lastMessageAt ?: dto.startedAt)
+        )
+    }
+
+    override suspend fun deleteConversation(remoteId: String): Unit = remote {
+        apiService.deleteConversation(remoteId)
     }
 
     private suspend fun <T> remote(block: suspend () -> T): T = try {

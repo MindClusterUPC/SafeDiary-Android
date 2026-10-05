@@ -54,6 +54,30 @@ class AiConversationAggregate(
         return message
     }
 
+    fun truncateFrom(remoteId: Long): Boolean {
+        val index = _messages.indexOfFirst { it.remoteId == remoteId }
+        if (index == -1) return false
+        while (_messages.size > index) {
+            _messages.removeAt(_messages.lastIndex)
+        }
+        return true
+    }
+
+    fun removeLastAssistantMessage(): ChatMessage? {
+        if (_messages.isNotEmpty() && _messages.last().author == MessageAuthor.ASSISTANT) {
+            return _messages.removeAt(_messages.lastIndex)
+        }
+        return null
+    }
+
+    fun syncWith(snapshot: ConversationSnapshot) {
+        _messages.clear()
+        _messages.addAll(snapshot.messages)
+        remoteConversationId = snapshot.remoteId
+        crisisResources = snapshot.crisisResources
+        riskLevel = if (snapshot.crisisResources.isEmpty()) RiskLevel.LOW else RiskLevel.HIGH
+    }
+
     /** Last user message still waiting for an assistant reply, if any. */
     fun pendingUserMessage(): ChatMessage? =
         _messages.lastOrNull()?.takeIf { it.author == MessageAuthor.USER }
@@ -66,10 +90,7 @@ class AiConversationAggregate(
         /** Rebuilds a conversation stored in the backend so it can be continued. */
         fun restore(snapshot: ConversationSnapshot): AiConversationAggregate =
             AiConversationAggregate().apply {
-                _messages.addAll(snapshot.messages)
-                remoteConversationId = snapshot.remoteId
-                crisisResources = snapshot.crisisResources
-                riskLevel = if (snapshot.crisisResources.isEmpty()) RiskLevel.LOW else RiskLevel.HIGH
+                syncWith(snapshot)
             }
     }
 

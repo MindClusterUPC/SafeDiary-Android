@@ -1,6 +1,7 @@
 package com.mindcluster.safediary.assistantai.application.commands
 
 import com.mindcluster.safediary.assistantai.domain.model.AssistantResponder
+import com.mindcluster.safediary.assistantai.domain.repository.ConversationHistoryGateway
 import com.mindcluster.safediary.assistantai.domain.repository.ConversationRepository
 import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 
@@ -10,7 +11,8 @@ import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 class RetryLastPromptHandler(
     private val repository: ConversationRepository,
     private val responder: AssistantResponder,
-    private val eventBus: DomainEventPublisher
+    private val eventBus: DomainEventPublisher,
+    private val gateway: ConversationHistoryGateway? = null
 ) {
     suspend fun handle(command: RetryLastPromptCommand = RetryLastPromptCommand()): Result<String?> = runCatching {
         val conversation = repository.getActiveConversation()
@@ -26,6 +28,17 @@ class RetryLastPromptHandler(
 
         eventBus.publish(conversation.getDomainEvents())
         conversation.clearEvents()
+
+        conversation.remoteConversationId?.let { remoteId ->
+            gateway?.let { gw ->
+                runCatching {
+                    val snapshot = gw.openConversation(remoteId)
+                    conversation.syncWith(snapshot)
+                    repository.save(conversation)
+                }
+            }
+        }
+
         conversation.remoteConversationId
     }
 }
