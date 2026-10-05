@@ -40,7 +40,7 @@
     <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
-    <string name="chat_header_title">Diarito</string>
+    <string name="chat_header_title" translatable="false">Diarito</string>
     <string name="chat_header_subtitle">Modo %1$s</string>
     <string name="chat_tab_diary">Diario</string>
     <string name="chat_tab_help">Ayuda</string>
@@ -59,99 +59,24 @@
 
     <!-- Settings Screen (Spanish) -->
     <string name="settings_title">Configuración</string>
-    <string name="settings_user_name">Elena Rostova</string>
-    <string name="settings_user_email">elena.rostova@safediary.app</string>
-    <string name="settings_pro_badge">SafeDiary Pro AI</string>
-    <string name="settings_tier_info">Nivel GPT-4o y Claude 3.5 Sonnet</string>
-    <string name="settings_tier_manage">Gestionar</string>
-
-    <string name="settings_header_ai_engine">Motor de IA y Reflexión</string>
-    <string name="settings_status_active">Activo</string>
-    <string name="settings_voice_mode_title">Modo de Voz y Habla</string>
-    <string name="settings_voice_mode_sub">Breeze (Empática y Suave)</string>
-    <string name="settings_voice_sample">Muestra</string>
-    <string name="settings_voice_playing">Reproduciendo…</string>
-    <string name="settings_custom_instructions_title">Instrucciones Personalizadas</string>
-    <string name="settings_custom_instructions_sub">3 temas de contexto personal activos</string>
-    <string name="settings_model_architecture_title">Arquitectura del Modelo</string>
-    <string name="settings_model_architecture_sub">MindCore v4.2 (Ajuste Clínico)</string>
-    <string name="settings_model_badge">Grok-Safe</string>
-    <string name="settings_personality_title">Personalidad de Diarito</string>
+    <string name="settings_section_diarito">Diarito</string>
     <string name="settings_personality_sol_desc">Cálido y cercano, te acompaña</string>
     <string name="settings_personality_luma_desc">Te ayuda a ver las cosas desde otro ángulo</string>
     <string name="settings_personality_kai_desc">Práctico: ordena, prioriza y propone pasos</string>
     <string name="settings_personality_nara_desc">Sereno y pausado, baja la intensidad</string>
-    <string name="personality_sol_name">Sol</string>
-    <string name="personality_luma_name">Luma</string>
-    <string name="personality_kai_name">Kai</string>
-    <string name="personality_nara_name">Nara</string>
-
-    <string name="settings_header_vault">Privacidad, Bóveda y Zero-Trust</string>
-    <string name="settings_vault_zero_knowledge">Cero Conocimiento</string>
-    <string name="settings_vault_e2ee_title">Cifrado de Bóveda Extremo a Extremo</string>
-    <string name="settings_vault_e2ee_sub">Par de claves locales por hardware AES-GCM-256</string>
-    <string name="settings_vault_training_title">Entrenar Modelos con Entradas</string>
-    <string name="settings_vault_training_sub">Desactivado. SafeDiary nunca comparte reflexiones con laboratorios</string>
-    <string name="settings_vault_biometric_title">Bloqueo Biométrico de la App</string>
-    <string name="settings_vault_biometric_sub">Requerir Face ID / Huella dactilar al abrir</string>
-    <string name="settings_vault_export_title">Exportar Archivo de Bóveda</string>
-    <string name="settings_vault_export_sub">JSON descifrado + reflexiones de voz (.zip)</string>
-    <string name="settings_vault_delete_title">Eliminar Cuenta y Limpiar Nube</string>
-    <string name="settings_vault_delete_sub">Purgar permanentemente todos los datos sincronizados y claves privadas</string>
-
-    <string name="settings_header_app_experience">Experiencia de la Aplicación</string>
-    <string name="settings_theme_title">Apariencia de Color</string>
-    <string name="settings_theme_sub">Calibrado para uso nocturno relajante</string>
-    <string name="settings_theme_light">Claro</string>
-    <string name="settings_theme_dark">Oscuro</string>
-    <string name="settings_theme_system">Sistema</string>
-    <string name="settings_haptics_title">Retroalimentación Háptica Sensorial</string>
-    <string name="settings_haptics_sub">Micro-pulsos suaves al ritmo de la respiración</string>
-    <string name="settings_reminder_prompt_title">Recordatorio Diario de Reflexión</string>
-    <string name="settings_reminder_prompt_sub">Recordatorio suave cada mañana</string>
-    <string name="settings_reminder_time_morning">8:30 AM</string>
-
-    <string name="settings_crisis_title">Recursos de Crisis y Soporte</string>
-    <string name="settings_crisis_body">SafeDiary AI brinda apoyo en regulación emocional pero no atiende emergencias de salud mental. Si te sientes en peligro, comunícate de inmediato.</string>
-    <string name="settings_crisis_call_btn">Llamar a la Línea 113 (opción 5)</string>
-    <string name="settings_crisis_confidential">24/7 • Gratuito y Confidencial</string>
-
-    <string name="settings_link_privacy">Política de Privacidad</string>
-    <string name="settings_link_terms">Términos de Servicio</string>
-    <string name="settings_link_safety">Estándar de Seguridad</string>
-    <string name="settings_logout_btn_full">Cerrar Sesión de SafeDiary</string>
-    <string name="settings_build_info_1">SafeDiary Companion v2.4.1 (Build 890)</string>
-    <string name="settings_build_info_2">Ajustado con MindCore Neuro-Affective Framework</string>
-
-    <string name="settings_anonymous_alias">Elena Rostova</string>
-    <string name="settings_anonymous_id">ID Protegido: #SD-8492</string>
-    <string name="settings_vault_badge">Bóveda Cifrada Activa</string>
-
-    <string name="settings_section_account">Cuenta y Privacidad</string>
-    <string name="settings_item_edit_profile">Editar alias anónimo</string>
-    <string name="settings_item_privacy_permissions">Permisos y confidencialidad</string>
+    <string name="personality_sol_name" translatable="false">Sol</string>
+    <string name="personality_luma_name" translatable="false">Luma</string>
+    <string name="personality_kai_name" translatable="false">Kai</string>
+    <string name="personality_nara_name" translatable="false">Nara</string>
 
     <string name="settings_section_preferences">Preferencias</string>
     <string name="settings_item_language">Idioma</string>
-    <string name="settings_item_notifications">Notificaciones de bienestar</string>
-    <string name="settings_item_dark_theme">Tema oscuro</string>
-    <string name="settings_item_daily_reminder">Recordatorio de reflexión</string>
-    <string name="settings_daily_reminder_time">21:00 hrs</string>
 
-    <string name="settings_section_security">Seguridad</string>
-    <string name="settings_item_pin_lock">Bloqueo por PIN de 4 dígitos</string>
-    <string name="settings_item_biometric_lock">Desbloqueo biométrico facial / huella</string>
+    <string name="settings_section_help">Ayuda inmediata</string>
+    <string name="settings_help_body">Si estás en peligro o sientes que no puedes más, llama ahora. Es gratuito y confidencial, 24/7.</string>
+    <string name="settings_crisis_call_btn">Llamar a la Línea 113 (opción 5)</string>
 
-    <string name="settings_section_support">Soporte e Información</string>
-    <string name="settings_item_help_center">Centro de ayuda y crisis</string>
-    <string name="settings_item_terms">Términos de servicio</string>
-    <string name="settings_item_privacy_policy">Política de privacidad</string>
-    <string name="settings_item_about">Acerca de SafeDiary</string>
-    <string name="settings_app_version">Versión 1.0.0 (MindCluster 2026)</string>
-
-    <string name="settings_button_logout">Cerrar sesión segura</string>
-    <string name="settings_dialog_logout_title">¿Cerrar sesión?</string>
-    <string name="settings_dialog_logout_desc">Tu diario y reflexiones permanecerán cifrados localmente en este dispositivo.</string>
+    <string name="settings_version">SafeDiary · versión %1$s</string>
 
     <string name="settings_lang_title">Seleccionar idioma de la app</string>
     <string name="settings_lang_es">Español (Predeterminado)</string>
