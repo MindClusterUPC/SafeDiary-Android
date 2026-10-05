@@ -39,6 +39,16 @@
     <string name="chat_crisis_call">Call %1$s</string>
     <string name="chat_crisis_dismiss">Dismiss</string>
 
+    <!-- Message Actions (English) -->
+    <string name="chat_action_copy">Copy</string>
+    <string name="chat_action_edit">Edit</string>
+    <string name="chat_action_regenerate">Regenerate</string>
+    <string name="chat_editing_label">Editing message</string>
+    <string name="chat_cancel_edit">Cancel</string>
+    <string name="chat_cd_copy_user">Copy message</string>
+    <string name="chat_cd_edit_message">Edit message</string>
+    <string name="chat_cd_regenerate_reply">Regenerate reply</string>
+
     <!-- AI Voice Diary & History Drawer (English) -->
     <string name="chat_header_subtitle">%1$s mode</string>
     <string name="chat_tab_diary">Diary</string>

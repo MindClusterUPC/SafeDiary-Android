@@ -39,6 +39,16 @@
     <string name="chat_crisis_call">Llamar al %1$s</string>
     <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
+    <!-- Message Actions (Spanish) -->
+    <string name="chat_action_copy">Copiar</string>
+    <string name="chat_action_edit">Editar</string>
+    <string name="chat_action_regenerate">Regenerar</string>
+    <string name="chat_editing_label">Editando mensaje</string>
+    <string name="chat_cancel_edit">Cancelar</string>
+    <string name="chat_cd_copy_user">Copiar mensaje</string>
+    <string name="chat_cd_edit_message">Editar mensaje</string>
+    <string name="chat_cd_regenerate_reply">Regenerar respuesta</string>
+
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_header_title" translatable="false">Diarito</string>
     <string name="chat_header_subtitle">Modo %1$s</string>

@@ -79,6 +79,7 @@ import com.mindcluster.safediary.assistantai.presentation.components.Conversatio
 import com.mindcluster.safediary.assistantai.presentation.components.MessageBubble
 import com.mindcluster.safediary.assistantai.presentation.components.ReplyErrorNotice
 import com.mindcluster.safediary.assistantai.presentation.components.TypingIndicator
+import com.mindcluster.safediary.assistantai.domain.model.MessageAuthor
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import com.mindcluster.safediary.shared.presentation.theme.OnSurface
@@ -351,8 +352,17 @@ fun AiChatScreen(
                             state = listState,
                             modifier = Modifier.fillMaxSize()
                         ) {
+                            val lastAssistantIndex = uiState.messages.indexOfLast { it.author == MessageAuthor.ASSISTANT }
                             items(uiState.messages, key = { it.id }) { message ->
-                                MessageBubble(message = message)
+                                val isLastAssistant = message.author == MessageAuthor.ASSISTANT &&
+                                    uiState.messages.indexOf(message) == lastAssistantIndex
+                                MessageBubble(
+                                    message = message,
+                                    isLastAssistantReply = isLastAssistant,
+                                    isTyping = uiState.isTyping,
+                                    onEditMessage = { msg -> viewModel.startEditing(msg) },
+                                    onRegenerate = { viewModel.regenerateLastReply() }
+                                )
                             }
                             if (uiState.isTyping) {
                                 item(key = "typing_indicator") {
@@ -389,7 +399,9 @@ fun AiChatScreen(
                     value = uiState.input,
                     onValueChange = { viewModel.onInputChanged(it) },
                     onSend = { viewModel.send() },
-                    isTyping = uiState.isTyping
+                    isTyping = uiState.isTyping,
+                    isEditing = uiState.editingMessageRemoteId != null,
+                    onCancelEdit = { viewModel.cancelEditing() }
                 )
             }
         }
