@@ -62,7 +62,7 @@ import java.time.format.DateTimeFormatter
 private enum class HistoryGroup { TODAY, YESTERDAY, THIS_WEEK, OLDER }
 
 /**
- * Conversation history drawer, like the chat list of ChatGPT or Claude.
+ * Conversation history drawer.
  */
 @Composable
 fun ConversationHistoryDrawer(

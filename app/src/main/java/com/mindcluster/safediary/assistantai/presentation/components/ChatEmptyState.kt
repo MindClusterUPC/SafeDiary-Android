@@ -38,7 +38,7 @@ data class SuggestionItem(
 )
 
 /**
- * Welcome screen of a new chat with conversation starters, like ChatGPT or Claude.
+ * Welcome screen of a new chat with conversation starters.
  */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
