@@ -27,7 +27,10 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
         }
         release {
-            buildConfigField("String", "API_BASE_URL", "\"https://api.safediary.app/\"")
+            // Backend deployed on Render (safediary-platform/render.yaml). Override with -Psafediary.releaseApiBaseUrl=...
+            val releaseApiBaseUrl = (project.findProperty("safediary.releaseApiBaseUrl") as String?)
+                ?: "https://safediary-platform.onrender.com/"
+            buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
             optimization {
                 enable = false
             }
