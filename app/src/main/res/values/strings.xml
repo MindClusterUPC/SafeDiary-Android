@@ -69,8 +69,7 @@
     <string name="chat_cd_new_chat_button">Nueva conversación</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
-    <string name="chat_header_title" translatable="false">Diarito</string>
-    <string name="chat_header_subtitle">Modo %1$s</string>
+    <string name="chat_header_subtitle">Diarito · Modo %1$s</string>
     <string name="chat_tab_diary">Diario</string>
     <string name="chat_tab_help">Ayuda</string>
     <string name="chat_tab_community">Comunidad</string>

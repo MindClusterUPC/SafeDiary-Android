@@ -69,7 +69,7 @@
     <string name="chat_cd_new_chat_button">New conversation</string>
 
     <!-- AI Voice Diary & History Drawer (English) -->
-    <string name="chat_header_subtitle">%1$s mode</string>
+    <string name="chat_header_subtitle">Diarito · %1$s mode</string>
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
     <string name="chat_tab_community">Community</string>
