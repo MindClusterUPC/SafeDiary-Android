@@ -10,6 +10,10 @@ import androidx.navigation.compose.rememberNavController
 import com.mindcluster.safediary.assistantai.infrastructure.AssistantAiModule
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.assistantai.presentation.views.AiChatScreen
+import com.mindcluster.safediary.communities.presentation.views.CommunityScreen
+import com.mindcluster.safediary.emotions.presentation.views.EmotionsScreen
+import com.mindcluster.safediary.home.presentation.views.HomeScreen
+import com.mindcluster.safediary.professionals.presentation.views.ProfessionalsScreen
 import com.mindcluster.safediary.profiles.presentation.views.SettingsScreen
 
 @Composable
@@ -53,6 +57,38 @@ fun AppNavigation(
 
         composable(NavRoutes.SETTINGS) {
             SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.HOME) {
+            HomeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.EMOTIONS) {
+            EmotionsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.PROFESSIONALS) {
+            ProfessionalsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.COMMUNITY) {
+            CommunityScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }

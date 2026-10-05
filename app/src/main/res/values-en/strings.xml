@@ -112,4 +112,32 @@
     <string name="chat_suggestion_3">I have trouble sleeping lately</string>
     <string name="chat_suggestion_4">How can I practice calm breathing right now?</string>
 
+    <!-- Coming Soon Placeholder Screens (English) -->
+    <string name="coming_soon_badge">Coming soon</string>
+    <string name="home_subtitle">Your day at a glance</string>
+    <string name="home_feature_1">Daily greeting and summary</string>
+    <string name="home_feature_2">Quick mood check-in</string>
+    <string name="home_feature_3">Writing streak</string>
+    <string name="home_feature_4">Latest diary entry</string>
+    <string name="home_feature_5">Quick access to Diarito and SOS exercises</string>
+
+    <string name="emotions_subtitle">How you\'ve felt over time</string>
+    <string name="emotions_feature_1">Mood calendar</string>
+    <string name="emotions_feature_2">Weekly and monthly trends</string>
+    <string name="emotions_feature_3">Emotions detected by Diarito</string>
+    <string name="emotions_feature_4">Contributing factors (sleep, stress)</string>
+    <string name="emotions_feature_5">Summary for your psychologist (with your permission)</string>
+
+    <string name="professionals_subtitle">Find professional support</string>
+    <string name="professionals_feature_1">Directory of verified psychologists</string>
+    <string name="professionals_feature_2">Profiles with specialties and availability</string>
+    <string name="professionals_feature_3">Save specialists</string>
+    <string name="professionals_feature_4">Share your history with consent</string>
+
+    <string name="community_subtitle">Anonymous support spaces</string>
+    <string name="community_feature_1">Voice rooms by topic</string>
+    <string name="community_feature_2">Anonymous participation with handles</string>
+    <string name="community_feature_3">Speaking turns and reactions</string>
+    <string name="community_feature_4">Moderation and reports</string>
+
 </resources>
