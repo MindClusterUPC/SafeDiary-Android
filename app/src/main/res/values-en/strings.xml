@@ -23,7 +23,7 @@
 
     <!-- AI Chat Strings (English) -->
     <string name="chat_input_placeholder">Write how you are feeling today…</string>
-    <string name="chat_disclaimer">SafeDiary AI is a reflective companion and does not replace care from a licensed mental health professional.</string>
+    <string name="chat_disclaimer">Diarito is a reflective AI companion and does not replace care from a licensed mental health professional.</string>
     <string name="chat_empty_title">Your safe space to reflect</string>
     <string name="chat_empty_subtitle">Write what you feel. I will listen and support you without judgment.</string>
     <string name="chat_typing">SafeDiary is typing…</string>
@@ -40,11 +40,12 @@
     <string name="chat_crisis_dismiss">Dismiss</string>
 
     <!-- AI Voice Diary & History Drawer (English) -->
-    <string name="chat_header_subtitle">AI Diary</string>
+    <string name="chat_header_title">Diarito</string>
+    <string name="chat_header_subtitle">%1$s mode</string>
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
     <string name="chat_tab_community">Community</string>
-    <string name="chat_greeting_title">What is on your mind today?</string>
+    <string name="chat_greeting_title">Hi, I\'m Diarito 👋</string>
     <string name="chat_drawer_title">Chats</string>
     <string name="chat_drawer_search_hint">Search chats…</string>
     <string name="chat_drawer_new_chat">New chat</string>
@@ -75,10 +76,15 @@
     <string name="settings_model_architecture_title">Model Architecture</string>
     <string name="settings_model_architecture_sub">MindCore v4.2 (Clinical Tuning)</string>
     <string name="settings_model_badge">Grok-Safe</string>
-    <string name="settings_tone_title">Tone &amp; Therapeutic Stance</string>
-    <string name="settings_tone_empathetic">Empathetic &amp; Warm</string>
-    <string name="settings_tone_direct">Direct</string>
-    <string name="settings_tone_mindful">Mindful &amp; Slow</string>
+    <string name="settings_personality_title">Diarito\'s personality</string>
+    <string name="settings_personality_sol_desc">Warm and close, keeps you company</string>
+    <string name="settings_personality_luma_desc">Helps you see things from another angle</string>
+    <string name="settings_personality_kai_desc">Practical: organizes, prioritizes, suggests steps</string>
+    <string name="settings_personality_nara_desc">Calm and slow-paced, lowers the intensity</string>
+    <string name="personality_sol_name">Sol</string>
+    <string name="personality_luma_name">Luma</string>
+    <string name="personality_kai_name">Kai</string>
+    <string name="personality_nara_name">Nara</string>
 
     <string name="settings_header_vault">Privacy, Vault &amp; Zero-Trust Data</string>
     <string name="settings_vault_zero_knowledge">Zero Knowledge</string>

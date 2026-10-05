@@ -8,6 +8,7 @@ import com.mindcluster.safediary.assistantai.domain.model.AssistantUnavailableEx
 import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
 import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import com.mindcluster.safediary.assistantai.domain.model.RiskLevel
+import com.mindcluster.safediary.assistantai.infrastructure.local.PersonalityPreferences
 import com.mindcluster.safediary.assistantai.infrastructure.remote.api.AssistantApiService
 import com.mindcluster.safediary.assistantai.infrastructure.remote.dto.PromptRequestDto
 import com.mindcluster.safediary.shared.infrastructure.locale.AppLanguage
@@ -28,10 +29,12 @@ class RetrofitAssistantResponder(
         try {
             // Answer in the language the UI is actually displayed in.
             val locale = AppLanguage.fromCode(context.resources.configuration.locales[0].language).code
+            val personality = PersonalityPreferences(context).get().apiName
             val request = PromptRequestDto(
                 prompt = userPrompt,
                 conversationId = remoteConversationId,
-                locale = locale
+                locale = locale,
+                personality = personality
             )
             val response = apiService.sendPrompt(request)
             return AssistantReply(

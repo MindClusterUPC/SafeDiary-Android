@@ -51,6 +51,7 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
@@ -59,6 +60,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
@@ -66,8 +68,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mindcluster.safediary.R
+import com.mindcluster.safediary.assistantai.infrastructure.local.PersonalityPreferences
 import com.mindcluster.safediary.assistantai.presentation.components.ChatEmptyState
 import com.mindcluster.safediary.assistantai.presentation.components.ChatInputBar
 import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
@@ -97,6 +101,16 @@ fun AiChatScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableIntStateOf(0) }
+
+    val context = LocalContext.current
+    var currentPersonality by remember {
+        mutableStateOf(PersonalityPreferences(context).get())
+    }
+
+    LifecycleResumeEffect(Unit) {
+        currentPersonality = PersonalityPreferences(context).get()
+        onPauseOrDispose { }
+    }
 
     val view = LocalView.current
     val isDrawerOpen = drawerState.isOpen || drawerState.targetValue == DrawerValue.Open
@@ -209,7 +223,7 @@ fun AiChatScreen(
                                 horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 Text(
-                                    text = stringResource(R.string.shared_topbar_title_prefix),
+                                    text = stringResource(R.string.chat_header_title),
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.SemiBold,
                                         color = PrimaryNavy
@@ -222,7 +236,7 @@ fun AiChatScreen(
                                     )
                                 )
                                 Text(
-                                    text = stringResource(R.string.chat_header_subtitle),
+                                    text = stringResource(R.string.chat_header_subtitle, currentPersonality.apiName),
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontWeight = FontWeight.Medium,
                                         color = SecondaryTeal

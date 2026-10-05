@@ -49,6 +49,7 @@ import androidx.compose.material.icons.filled.Fingerprint
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.ModelTraining
 import androidx.compose.material.icons.filled.Palette
@@ -62,7 +63,9 @@ import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material.icons.filled.UnfoldMore
 import androidx.compose.material.icons.filled.Verified
 import androidx.compose.material.icons.filled.Vibration
+import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.material3.AlertDialog
+import com.mindcluster.safediary.assistantai.domain.model.DiaritoPersonality
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -140,10 +143,31 @@ fun SettingsScreen(
         label = "active_dot_scale"
     )
 
-    val tones = listOf(
-        Triple(stringResource(R.string.settings_tone_empathetic), Icons.Default.Favorite, "Empathetic"),
-        Triple(stringResource(R.string.settings_tone_direct), Icons.Default.TrackChanges, "Direct"),
-        Triple(stringResource(R.string.settings_tone_mindful), Icons.Default.SelfImprovement, "Mindful")
+    val personalities = listOf(
+        PersonalityOption(
+            personality = DiaritoPersonality.SOL,
+            nameRes = R.string.personality_sol_name,
+            descriptionRes = R.string.settings_personality_sol_desc,
+            icon = Icons.Default.WbSunny
+        ),
+        PersonalityOption(
+            personality = DiaritoPersonality.LUMA,
+            nameRes = R.string.personality_luma_name,
+            descriptionRes = R.string.settings_personality_luma_desc,
+            icon = Icons.Default.Lightbulb
+        ),
+        PersonalityOption(
+            personality = DiaritoPersonality.KAI,
+            nameRes = R.string.personality_kai_name,
+            descriptionRes = R.string.settings_personality_kai_desc,
+            icon = Icons.Default.TrackChanges
+        ),
+        PersonalityOption(
+            personality = DiaritoPersonality.NARA,
+            nameRes = R.string.personality_nara_name,
+            descriptionRes = R.string.settings_personality_nara_desc,
+            icon = Icons.Default.SelfImprovement
+        )
     )
 
     Scaffold(
@@ -497,61 +521,70 @@ fun SettingsScreen(
                     )
                     HorizontalDivider(color = SurfaceContainerLow, thickness = 1.dp, modifier = Modifier.padding(horizontal = 16.dp))
 
-                    // Tone & Therapeutic Stance
+                    // Diarito Personality Selection
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
                     ) {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = stringResource(R.string.settings_tone_title),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                                color = OnSurface
-                            )
-                            Text(
-                                text = tones[uiState.selectedToneIndex].third,
-                                style = MaterialTheme.typography.bodySmall,
-                                color = OnSurfaceVariant
-                            )
-                        }
+                        Text(
+                            text = stringResource(R.string.settings_personality_title),
+                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
+                            color = OnSurface
+                        )
 
-                        Spacer(modifier = Modifier.height(10.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .horizontalScroll(rememberScrollState()),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        Column(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            tones.forEachIndexed { index, tone ->
+                            personalities.forEachIndexed { index, item ->
                                 val isSelected = uiState.selectedToneIndex == index
-                                Box(
+                                Surface(
                                     modifier = Modifier
-                                        .clip(RoundedCornerShape(9999.dp))
-                                        .background(if (isSelected) SecondaryTeal else SurfaceContainerLow)
-                                        .clickable { viewModel.selectTone(index) }
-                                        .padding(horizontal = 12.dp, vertical = 7.dp)
+                                        .fillMaxWidth()
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .clickable { viewModel.selectTone(index) },
+                                    shape = RoundedCornerShape(12.dp),
+                                    color = if (isSelected) SecondaryContainer.copy(alpha = 0.5f) else SurfaceContainerLow,
+                                    border = if (isSelected) BorderStroke(1.5.dp, SecondaryTeal) else null
                                 ) {
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
-                                        Icon(
-                                            imageVector = tone.second,
-                                            contentDescription = null,
-                                            tint = if (isSelected) Color.White else OnSurfaceVariant,
-                                            modifier = Modifier.size(15.dp)
-                                        )
-                                        Spacer(modifier = Modifier.width(6.dp))
-                                        Text(
-                                            text = tone.first,
-                                            style = MaterialTheme.typography.labelSmall.copy(
-                                                fontWeight = FontWeight.SemiBold
-                                            ),
-                                            color = if (isSelected) Color.White else OnSurfaceVariant
-                                        )
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Box(
+                                            modifier = Modifier
+                                                .size(36.dp)
+                                                .clip(CircleShape)
+                                                .background(if (isSelected) SecondaryTeal else SurfaceContainer),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Icon(
+                                                imageVector = item.icon,
+                                                contentDescription = null,
+                                                tint = if (isSelected) Color.White else PrimaryNavy,
+                                                modifier = Modifier.size(20.dp)
+                                            )
+                                        }
+
+                                        Spacer(modifier = Modifier.width(12.dp))
+
+                                        Column(modifier = Modifier.weight(1f)) {
+                                            Text(
+                                                text = stringResource(item.nameRes),
+                                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                                color = OnSurface
+                                            )
+                                            Spacer(modifier = Modifier.height(2.dp))
+                                            Text(
+                                                text = stringResource(item.descriptionRes),
+                                                style = MaterialTheme.typography.bodySmall,
+                                                color = OnSurfaceVariant
+                                            )
+                                        }
                                     }
                                 }
                             }
@@ -1186,3 +1219,11 @@ private fun SettingSwitchRow(
         )
     }
 }
+
+private data class PersonalityOption(
+    val personality: DiaritoPersonality,
+    val nameRes: Int,
+    val descriptionRes: Int,
+    val icon: ImageVector
+)
+

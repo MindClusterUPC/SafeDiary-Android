@@ -1,7 +1,10 @@
 package com.mindcluster.safediary.profiles.presentation.viewmodels
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.mindcluster.safediary.assistantai.domain.model.DiaritoPersonality
+import com.mindcluster.safediary.assistantai.infrastructure.local.PersonalityPreferences
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,11 +24,20 @@ data class SettingsUiState(
     val isLanguageSheetOpen: Boolean = false
 )
 
-class SettingsViewModel : ViewModel() {
-    private val _uiState = MutableStateFlow(SettingsUiState())
+class SettingsViewModel @JvmOverloads constructor(
+    application: Application,
+    private val personalityPreferences: PersonalityPreferences = PersonalityPreferences(application)
+) : AndroidViewModel(application) {
+    private val _uiState = MutableStateFlow(
+        SettingsUiState(
+            selectedToneIndex = DiaritoPersonality.entries.indexOf(personalityPreferences.get()).coerceAtLeast(0)
+        )
+    )
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
     fun selectTone(index: Int) {
+        val personality = DiaritoPersonality.entries.getOrNull(index) ?: DiaritoPersonality.SOL
+        personalityPreferences.set(personality)
         _uiState.update { it.copy(selectedToneIndex = index) }
     }
 

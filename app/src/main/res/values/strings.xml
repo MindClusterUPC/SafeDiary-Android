@@ -23,7 +23,7 @@
 
     <!-- AI Chat Strings (Spanish) -->
     <string name="chat_input_placeholder">Escribe cómo te sientes hoy…</string>
-    <string name="chat_disclaimer">La IA de SafeDiary es de apoyo reflexivo y no reemplaza la atención de un profesional de la salud mental.</string>
+    <string name="chat_disclaimer">Diarito es una IA de apoyo reflexivo y no reemplaza la atención de un profesional de la salud mental.</string>
     <string name="chat_empty_title">Tu espacio seguro para reflexionar</string>
     <string name="chat_empty_subtitle">Escribe lo que sientes. Te escucho y te acompaño sin juicios.</string>
     <string name="chat_typing">SafeDiary está escribiendo…</string>
@@ -40,11 +40,12 @@
     <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
-    <string name="chat_header_subtitle">AI Diary</string>
+    <string name="chat_header_title">Diarito</string>
+    <string name="chat_header_subtitle">Modo %1$s</string>
     <string name="chat_tab_diary">Diario</string>
     <string name="chat_tab_help">Ayuda</string>
     <string name="chat_tab_community">Comunidad</string>
-    <string name="chat_greeting_title">¿En qué estás pensando hoy?</string>
+    <string name="chat_greeting_title">Hola, soy Diarito 👋</string>
     <string name="chat_drawer_title">Conversaciones</string>
     <string name="chat_drawer_search_hint">Buscar conversaciones…</string>
     <string name="chat_drawer_new_chat">Nuevo chat</string>
@@ -75,10 +76,15 @@
     <string name="settings_model_architecture_title">Arquitectura del Modelo</string>
     <string name="settings_model_architecture_sub">MindCore v4.2 (Ajuste Clínico)</string>
     <string name="settings_model_badge">Grok-Safe</string>
-    <string name="settings_tone_title">Tono y Postura Terapéutica</string>
-    <string name="settings_tone_empathetic">Empático y Cálido</string>
-    <string name="settings_tone_direct">Directo</string>
-    <string name="settings_tone_mindful">Consciente y Lento</string>
+    <string name="settings_personality_title">Personalidad de Diarito</string>
+    <string name="settings_personality_sol_desc">Cálido y cercano, te acompaña</string>
+    <string name="settings_personality_luma_desc">Te ayuda a ver las cosas desde otro ángulo</string>
+    <string name="settings_personality_kai_desc">Práctico: ordena, prioriza y propone pasos</string>
+    <string name="settings_personality_nara_desc">Sereno y pausado, baja la intensidad</string>
+    <string name="personality_sol_name">Sol</string>
+    <string name="personality_luma_name">Luma</string>
+    <string name="personality_kai_name">Kai</string>
+    <string name="personality_nara_name">Nara</string>
 
     <string name="settings_header_vault">Privacidad, Bóveda y Zero-Trust</string>
     <string name="settings_vault_zero_knowledge">Cero Conocimiento</string>
