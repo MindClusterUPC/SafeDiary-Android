@@ -31,6 +31,8 @@ android {
             val releaseApiBaseUrl = (project.findProperty("safediary.releaseApiBaseUrl") as String?)
                 ?: "https://safediary-platform.onrender.com/"
             buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
+            // Course project: sign with the debug key so the release APK can be installed directly.
+            signingConfig = signingConfigs.getByName("debug")
             optimization {
                 enable = false
             }
