@@ -22,8 +22,9 @@ object RetrofitClientProvider {
     private val okHttpClient: OkHttpClient by lazy {
         OkHttpClient.Builder()
             .connectTimeout(15, TimeUnit.SECONDS)
-            // AI replies can take a while when the model is busy and the backend retries with a fallback model.
-            .readTimeout(60, TimeUnit.SECONDS)
+            // AI replies can take a while when the model is busy, and the free Render instance
+            // needs up to ~2.5 minutes to wake up after being idle.
+            .readTimeout(180, TimeUnit.SECONDS)
             .writeTimeout(25, TimeUnit.SECONDS)
             .addInterceptor { chain ->
                 val request = chain.request().newBuilder()
