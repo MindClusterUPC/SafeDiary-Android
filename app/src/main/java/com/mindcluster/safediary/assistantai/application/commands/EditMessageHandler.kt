@@ -5,25 +5,29 @@ import com.mindcluster.safediary.assistantai.domain.repository.ConversationHisto
 import com.mindcluster.safediary.assistantai.domain.repository.ConversationRepository
 import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 
-class SendPromptHandler(
+class EditMessageHandler(
     private val repository: ConversationRepository,
     private val responder: AssistantResponder,
-    private val eventBus: DomainEventPublisher,
-    private val gateway: ConversationHistoryGateway? = null
+    private val gateway: ConversationHistoryGateway,
+    private val eventBus: DomainEventPublisher
 ) {
-    /** Returns the backend conversation id, so the UI can track the current chat. */
-    suspend fun handle(command: SendPromptCommand): Result<String?> = runCatching {
+    suspend fun handle(command: EditMessageCommand): Result<String?> = runCatching {
         val conversation = repository.getActiveConversation()
-        val userMessage = conversation.addUserMessage(command.prompt)
+        val remoteConversationId = checkNotNull(conversation.remoteConversationId) {
+            "Cannot edit message in an unsaved conversation"
+        }
+
+        conversation.truncateFrom(command.messageRemoteId)
+        val userMessage = conversation.addUserMessage(command.newPrompt)
         repository.save(conversation)
 
         eventBus.publish(conversation.getDomainEvents())
         conversation.clearEvents()
 
-        val reply = responder.respond(
-            userPrompt = userMessage.content,
-            history = conversation.messages,
-            remoteConversationId = conversation.remoteConversationId
+        val reply = responder.editMessage(
+            remoteConversationId = remoteConversationId,
+            messageRemoteId = command.messageRemoteId,
+            newPrompt = userMessage.content
         )
         conversation.addAssistantResponse(reply)
         repository.save(conversation)
@@ -31,14 +35,10 @@ class SendPromptHandler(
         eventBus.publish(conversation.getDomainEvents())
         conversation.clearEvents()
 
-        conversation.remoteConversationId?.let { remoteId ->
-            gateway?.let { gw ->
-                runCatching {
-                    val snapshot = gw.openConversation(remoteId)
-                    conversation.syncWith(snapshot)
-                    repository.save(conversation)
-                }
-            }
+        runCatching {
+            val snapshot = gateway.openConversation(remoteConversationId)
+            conversation.syncWith(snapshot)
+            repository.save(conversation)
         }
 
         conversation.remoteConversationId

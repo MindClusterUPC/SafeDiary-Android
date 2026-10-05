@@ -95,4 +95,74 @@ class AiConversationAggregateTest {
         assertEquals(RiskLevel.LOW, RiskLevel.fromBackend("UNKNOWN"))
         assertEquals(RiskLevel.HIGH, RiskLevel.fromBackend("HIGH"))
     }
+
+    @Test
+    fun truncateFromRemovesTargetMessageAndSubsequentMessages() {
+        val snapshot = ConversationSnapshot(
+            remoteId = "10",
+            messages = listOf(
+                ChatMessage(author = MessageAuthor.USER, content = "m1", remoteId = 101L),
+                ChatMessage(author = MessageAuthor.ASSISTANT, content = "m2", remoteId = 102L),
+                ChatMessage(author = MessageAuthor.USER, content = "m3", remoteId = 103L),
+                ChatMessage(author = MessageAuthor.ASSISTANT, content = "m4", remoteId = 104L)
+            )
+        )
+        val conversation = AiConversationAggregate.restore(snapshot)
+
+        val result = conversation.truncateFrom(103L)
+        assertTrue(result)
+        assertEquals(2, conversation.messages.size)
+        assertEquals(listOf(101L, 102L), conversation.messages.map { it.remoteId })
+    }
+
+    @Test
+    fun truncateFromReturnsFalseWhenRemoteIdNotFound() {
+        val snapshot = ConversationSnapshot(
+            remoteId = "10",
+            messages = listOf(
+                ChatMessage(author = MessageAuthor.USER, content = "m1", remoteId = 101L)
+            )
+        )
+        val conversation = AiConversationAggregate.restore(snapshot)
+
+        val result = conversation.truncateFrom(999L)
+        org.junit.Assert.assertFalse(result)
+        assertEquals(1, conversation.messages.size)
+    }
+
+    @Test
+    fun removeLastAssistantMessageRemovesOnlyIfAssistant() {
+        val conversation = AiConversationAggregate()
+        conversation.addUserMessage("hola")
+        val reply = conversation.addAssistantResponse(AssistantReply(content = "hola respuesta"))
+
+        val removed = conversation.removeLastAssistantMessage()
+        assertEquals(reply.content, removed?.content)
+        assertEquals(1, conversation.messages.size)
+
+        val removedAgain = conversation.removeLastAssistantMessage()
+        assertNull(removedAgain)
+        assertEquals(1, conversation.messages.size)
+    }
+
+    @Test
+    fun syncWithReplacesMessagesAndUpdatesState() {
+        val conversation = AiConversationAggregate()
+        conversation.addUserMessage("old message")
+
+        val snapshot = ConversationSnapshot(
+            remoteId = "new-id",
+            messages = listOf(
+                ChatMessage(author = MessageAuthor.USER, content = "synced message", remoteId = 50L)
+            ),
+            crisisResources = listOf(hotline)
+        )
+
+        conversation.syncWith(snapshot)
+        assertEquals("new-id", conversation.remoteConversationId)
+        assertEquals(1, conversation.messages.size)
+        assertEquals(50L, conversation.messages[0].remoteId)
+        assertEquals(listOf(hotline), conversation.crisisResources)
+        assertEquals(RiskLevel.HIGH, conversation.riskLevel)
+    }
 }

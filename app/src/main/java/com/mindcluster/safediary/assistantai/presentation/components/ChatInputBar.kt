@@ -38,6 +38,9 @@ import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerHigh
 import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerHighest
 import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerLowest
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.ui.text.font.FontWeight
+
 /**
  * Multiline message composer. The send button is only enabled when there is text and no reply in progress.
  */
@@ -47,6 +50,8 @@ fun ChatInputBar(
     onValueChange: (String) -> Unit,
     onSend: () -> Unit,
     isTyping: Boolean,
+    isEditing: Boolean = false,
+    onCancelEdit: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val canSend = value.isNotBlank() && !isTyping
@@ -55,17 +60,47 @@ fun ChatInputBar(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(28.dp),
+        shape = RoundedCornerShape(24.dp),
         color = SurfaceContainerLowest,
         border = androidx.compose.foundation.BorderStroke(1.dp, SurfaceContainerHighest),
         shadowElevation = 6.dp
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
-            verticalAlignment = Alignment.Bottom
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
+            if (isEditing) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(SecondaryTeal.copy(alpha = 0.08f))
+                        .padding(horizontal = 18.dp, vertical = 7.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = stringResource(R.string.chat_editing_label),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Medium),
+                        color = PrimaryNavy
+                    )
+                    Text(
+                        text = " · ",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = Color(0xFF94A3B8)
+                    )
+                    Text(
+                        text = stringResource(R.string.chat_cancel_edit),
+                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                        color = SecondaryTeal,
+                        modifier = Modifier.clickable { onCancelEdit() }
+                    )
+                }
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(start = 18.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
+                verticalAlignment = Alignment.Bottom
+            ) {
             Box(
                 modifier = Modifier
                     .weight(1f)
@@ -111,6 +146,7 @@ fun ChatInputBar(
                     modifier = Modifier.size(20.dp)
                 )
             }
+        }
         }
     }
 }

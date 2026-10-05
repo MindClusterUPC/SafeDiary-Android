@@ -8,5 +8,6 @@ data class ChatMessage(
     override val id: String = UUID.randomUUID().toString(),
     val author: MessageAuthor,
     val content: String,
-    val sentAt: Instant = Instant.now()
+    val sentAt: Instant = Instant.now(),
+    val remoteId: Long? = null
 ) : Entity<String>()

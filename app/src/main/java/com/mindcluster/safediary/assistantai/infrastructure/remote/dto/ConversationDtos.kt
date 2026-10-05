@@ -37,6 +37,9 @@ data class ConversationDto(
 )
 
 data class ConversationMessageDto(
+    @SerializedName("id")
+    val id: Long? = null,
+
     @SerializedName("role")
     val role: String,
 
@@ -45,4 +48,28 @@ data class ConversationMessageDto(
 
     @SerializedName("sentAt")
     val sentAt: String? = null
+)
+
+data class RenameConversationRequestDto(
+    @SerializedName("title")
+    val title: String
+)
+
+data class EditMessageRequestDto(
+    @SerializedName("prompt")
+    val prompt: String,
+
+    @SerializedName("locale")
+    val locale: String? = null,
+
+    @SerializedName("personality")
+    val personality: String? = null
+)
+
+data class RegenerateRequestDto(
+    @SerializedName("locale")
+    val locale: String? = null,
+
+    @SerializedName("personality")
+    val personality: String? = null
 )

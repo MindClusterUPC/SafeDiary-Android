@@ -19,6 +19,8 @@ import android.content.ClipData
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ContentCopy
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -53,6 +55,10 @@ import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerLowes
 @Composable
 fun MessageBubble(
     message: ChatMessage,
+    isLastAssistantReply: Boolean = false,
+    isTyping: Boolean = false,
+    onEditMessage: ((ChatMessage) -> Unit)? = null,
+    onRegenerate: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     val isUser = message.author == MessageAuthor.USER
@@ -115,15 +121,64 @@ fun MessageBubble(
                 )
             }
         }
-        if (!isUser) {
-            CopyReplyButton(text = message.content)
+        if (isUser) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(top = 2.dp, end = 2.dp)
+            ) {
+                CopyButton(
+                    text = message.content,
+                    contentDesc = stringResource(R.string.chat_cd_copy_user)
+                )
+                if (message.remoteId != null && !isTyping && onEditMessage != null) {
+                    IconButton(
+                        onClick = { onEditMessage(message) },
+                        modifier = Modifier.size(30.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.chat_cd_edit_message),
+                            tint = Color(0xFF94A3B8),
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                }
+            }
+        } else {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(2.dp),
+                modifier = Modifier.padding(top = 2.dp, start = 2.dp)
+            ) {
+                CopyButton(
+                    text = message.content,
+                    contentDesc = stringResource(R.string.chat_cd_copy)
+                )
+                if (isLastAssistantReply && message.remoteId != null && !isTyping && onRegenerate != null) {
+                    IconButton(
+                        onClick = { onRegenerate() },
+                        modifier = Modifier.size(30.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Refresh,
+                            contentDescription = stringResource(R.string.chat_cd_regenerate_reply),
+                            tint = Color(0xFF94A3B8),
+                            modifier = Modifier.size(15.dp)
+                        )
+                    }
+                }
+            }
         }
         }
     }
 }
 
 @Composable
-private fun CopyReplyButton(text: String) {
+private fun CopyButton(
+    text: String,
+    contentDesc: String
+) {
     val clipboard = LocalClipboard.current
     val scope = rememberCoroutineScope()
     var copied by remember { mutableStateOf(false) }
@@ -142,11 +197,11 @@ private fun CopyReplyButton(text: String) {
                 copied = true
             }
         },
-        modifier = Modifier.size(32.dp)
+        modifier = Modifier.size(30.dp)
     ) {
         Icon(
             imageVector = if (copied) Icons.Default.Check else Icons.Default.ContentCopy,
-            contentDescription = stringResource(R.string.chat_cd_copy),
+            contentDescription = contentDesc,
             tint = Color(0xFF94A3B8),
             modifier = Modifier.size(15.dp)
         )

@@ -39,6 +39,35 @@
     <string name="chat_crisis_call">Llamar al %1$s</string>
     <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
+    <!-- Message Actions (Spanish) -->
+    <string name="chat_action_copy">Copiar</string>
+    <string name="chat_action_edit">Editar</string>
+    <string name="chat_action_regenerate">Regenerar</string>
+    <string name="chat_editing_label">Editando mensaje</string>
+    <string name="chat_cancel_edit">Cancelar</string>
+    <string name="chat_cd_copy_user">Copiar mensaje</string>
+    <string name="chat_cd_edit_message">Editar mensaje</string>
+    <string name="chat_cd_regenerate_reply">Regenerar respuesta</string>
+
+    <!-- Conversation Management (Spanish) -->
+    <string name="chat_conversation_rename">Renombrar</string>
+    <string name="chat_conversation_delete">Eliminar</string>
+    <string name="chat_rename_dialog_title">Renombrar conversación</string>
+    <string name="chat_rename_dialog_hint">Título de la conversación</string>
+    <string name="chat_delete_dialog_title">¿Eliminar conversación?</string>
+    <string name="chat_delete_dialog_body">Esta acción no se puede deshacer.</string>
+    <string name="chat_delete_dialog_confirm">Eliminar</string>
+    <string name="chat_cd_more_options">Más opciones</string>
+
+    <!-- Navigation Drawer & Header (Spanish) -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_emotions">Emociones</string>
+    <string name="nav_professionals">Profesionales</string>
+    <string name="nav_community">Comunidad</string>
+    <string name="nav_settings">Configuración</string>
+    <string name="chat_drawer_recent">Recientes</string>
+    <string name="chat_cd_new_chat_button">Nueva conversación</string>
+
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_header_title" translatable="false">Diarito</string>
     <string name="chat_header_subtitle">Modo %1$s</string>
@@ -87,5 +116,33 @@
     <string name="chat_suggestion_2">Tuve un buen día y quiero registrarlo</string>
     <string name="chat_suggestion_3">Me cuesta conciliar el sueño últimamente</string>
     <string name="chat_suggestion_4">¿Cómo puedo calmar mi respiración ahora?</string>
+
+    <!-- Coming Soon Placeholder Screens (Spanish) -->
+    <string name="coming_soon_badge">Próximamente</string>
+    <string name="home_subtitle">Tu resumen del día</string>
+    <string name="home_feature_1">Saludo y resumen de tu día</string>
+    <string name="home_feature_2">Registro rápido de ánimo</string>
+    <string name="home_feature_3">Racha de escritura</string>
+    <string name="home_feature_4">Última entrada del diario</string>
+    <string name="home_feature_5">Accesos rápidos a Diarito y ejercicios SOS</string>
+
+    <string name="emotions_subtitle">Cómo te has sentido con el tiempo</string>
+    <string name="emotions_feature_1">Calendario de ánimo</string>
+    <string name="emotions_feature_2">Tendencia semanal y mensual</string>
+    <string name="emotions_feature_3">Emociones detectadas por Diarito</string>
+    <string name="emotions_feature_4">Factores que influyen (sueño, estrés)</string>
+    <string name="emotions_feature_5">Resumen para tu psicólogo (con tu permiso)</string>
+
+    <string name="professionals_subtitle">Encuentra apoyo profesional</string>
+    <string name="professionals_feature_1">Directorio de psicólogos verificados</string>
+    <string name="professionals_feature_2">Perfiles con especialidades y disponibilidad</string>
+    <string name="professionals_feature_3">Guardar especialistas</string>
+    <string name="professionals_feature_4">Compartir tu historial con consentimiento</string>
+
+    <string name="community_subtitle">Espacios anónimos de apoyo</string>
+    <string name="community_feature_1">Salas de voz por temas</string>
+    <string name="community_feature_2">Participación anónima con alias</string>
+    <string name="community_feature_3">Turnos de palabra y reacciones</string>
+    <string name="community_feature_4">Moderación y reportes</string>
 
 </resources>
