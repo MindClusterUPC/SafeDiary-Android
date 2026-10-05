@@ -53,9 +53,10 @@ fun SafeDiaryTheme(
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as? Activity)?.window
-            window?.let {
-                it.statusBarColor = BackgroundSanctuary.toArgb()
-                WindowCompat.getInsetsController(it, view).isAppearanceLightStatusBars = true
+            window?.let { w ->
+                val insetsController = WindowCompat.getInsetsController(w, view)
+                insetsController.isAppearanceLightStatusBars = !darkTheme
+                insetsController.isAppearanceLightNavigationBars = !darkTheme
             }
         }
     }

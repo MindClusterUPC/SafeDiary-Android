@@ -20,7 +20,17 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Emulator loopback to the local safediary-platform backend.
+            // On a physical device run: ./gradlew installDebug -Psafediary.apiBaseUrl=http://<pc-ip>:8080/
+            val debugApiBaseUrl = (project.findProperty("safediary.apiBaseUrl") as String?) ?: "http://10.0.2.2:8080/"
+            buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
+        }
         release {
+            // Backend deployed on Render (safediary-platform/render.yaml). Override with -Psafediary.releaseApiBaseUrl=...
+            val releaseApiBaseUrl = (project.findProperty("safediary.releaseApiBaseUrl") as String?)
+                ?: "https://safediary-platform.onrender.com/"
+            buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
             optimization {
                 enable = false
             }
@@ -32,6 +42,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -49,6 +60,12 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+
+    // Retrofit & OkHttp Networking
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
+    implementation(libs.okhttp)
+    implementation(libs.okhttp.logging.interceptor)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

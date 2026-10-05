@@ -1,85 +1,97 @@
 package com.mindcluster.safediary.shared.presentation.navigation
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.mindcluster.safediary.R
-import com.mindcluster.safediary.shared.presentation.components.PrimaryButton
-import com.mindcluster.safediary.shared.presentation.components.SafeDiaryCard
-import com.mindcluster.safediary.shared.presentation.components.SafeDiaryTopBar
-import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
-import com.mindcluster.safediary.shared.presentation.theme.PrimaryNavy
+import com.mindcluster.safediary.assistantai.infrastructure.AssistantAiModule
+import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
+import com.mindcluster.safediary.assistantai.presentation.views.AiChatScreen
+import com.mindcluster.safediary.communities.presentation.views.CommunityScreen
+import com.mindcluster.safediary.emotions.presentation.views.EmotionsScreen
+import com.mindcluster.safediary.home.presentation.views.HomeScreen
+import com.mindcluster.safediary.professionals.presentation.views.ProfessionalsScreen
+import com.mindcluster.safediary.profiles.presentation.views.SettingsScreen
 
 @Composable
 fun AppNavigation(
     navController: NavHostController = rememberNavController()
 ) {
+    val context = LocalContext.current
+    val assistantModule = AssistantAiModule.getInstance(context)
+
     NavHost(
         navController = navController,
-        startDestination = NavRoutes.WELCOME
+        startDestination = NavRoutes.AI_CHAT
     ) {
-        composable(NavRoutes.WELCOME) {
-            WelcomePlaceholderScreen()
-        }
-    }
-}
-
-@Composable
-fun WelcomePlaceholderScreen() {
-    Scaffold(
-        topBar = {
-            SafeDiaryTopBar(
-                sectionTitle = stringResource(R.string.shared_topbar_section_home)
+        composable(NavRoutes.AI_CHAT) {
+            val assistantViewModel: AssistantViewModel = viewModel(
+                factory = AssistantViewModel.Factory(
+                    assistantModule.sendPromptHandler,
+                    assistantModule.retryLastPromptHandler,
+                    assistantModule.getChatHistoryHandler,
+                    assistantModule.startNewChatHandler,
+                    assistantModule.getCrisisSupportHandler,
+                    assistantModule.dismissCrisisSupportHandler,
+                    assistantModule.getConversationListHandler,
+                    assistantModule.openConversationHandler,
+                    assistantModule.editMessageHandler,
+                    assistantModule.regenerateReplyHandler,
+                    assistantModule.renameConversationHandler,
+                    assistantModule.deleteConversationHandler
+                )
             )
-        },
-        containerColor = BackgroundSanctuary
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(24.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            SafeDiaryCard(
-                modifier = Modifier.padding(bottom = 24.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.shared_welcome_title),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = PrimaryNavy,
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-                Text(
-                    text = stringResource(R.string.shared_welcome_desc),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
-                )
-            }
+            AiChatScreen(
+                viewModel = assistantViewModel,
+                onNavigateToSettings = {
+                    navController.navigate(NavRoutes.SETTINGS)
+                },
+                onNavigateToRoute = { route ->
+                    navController.navigate(route)
+                }
+            )
+        }
 
-            PrimaryButton(
-                text = stringResource(R.string.shared_button_continue),
-                onClick = {}
+        composable(NavRoutes.SETTINGS) {
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.HOME) {
+            HomeScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.EMOTIONS) {
+            EmotionsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.PROFESSIONALS) {
+            ProfessionalsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.COMMUNITY) {
+            CommunityScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
             )
         }
     }
