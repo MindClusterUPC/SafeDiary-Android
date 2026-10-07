@@ -22,8 +22,9 @@
     <string name="shared_welcome_desc">Your safe sanctuary for reflection and emotional wellbeing.</string>
 
     <!-- AI Chat Strings (English) -->
+    <string name="chat_header_diarito">Diarito</string>
     <string name="chat_input_placeholder">Write how you are feeling today…</string>
-    <string name="chat_disclaimer">Diarito is a reflective AI companion and does not replace care from a licensed mental health professional.</string>
+    <string name="chat_disclaimer">Diarito is a reflective AI companion and does not replace a professional.</string>
     <string name="chat_empty_title">Your safe space to reflect</string>
     <string name="chat_empty_subtitle">Write what you feel. I will listen and support you without judgment.</string>
     <string name="chat_typing">SafeDiary is typing…</string>
@@ -61,29 +62,32 @@
 
     <!-- Navigation Drawer & Header (English) -->
     <string name="nav_home">Home</string>
-    <string name="nav_emotions">Emotions</string>
     <string name="nav_professionals">Professionals</string>
-    <string name="nav_community">Community</string>
     <string name="nav_settings">Settings</string>
     <string name="chat_drawer_recent">Recent</string>
     <string name="chat_cd_new_chat_button">New conversation</string>
 
+    <!-- Bottom Navigation Tabs (Figma) -->
+    <string name="nav_tab_diarito">Diarito</string>
+    <string name="nav_tab_rutines">Rutines</string>
+    <string name="nav_tab_home">Home</string>
+    <string name="nav_tab_psychologist">Psychologist</string>
+    <string name="nav_tab_scheduling">Scheduling</string>
+
     <!-- AI Voice Diary & History Drawer (English) -->
-    <string name="chat_header_subtitle">Diarito · %1$s mode</string>
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
     <string name="chat_tab_community">Community</string>
     <string name="chat_greeting_title">Hi, I\'m Diarito 👋</string>
-    <string name="chat_drawer_title">Chats</string>
+    <string name="chat_drawer_title">Chat history</string>
     <string name="chat_drawer_search_hint">Search chats…</string>
     <string name="chat_drawer_new_chat">New chat</string>
-    <string name="chat_drawer_group_older">Older</string>
+    <string name="chat_drawer_group_older">Previous</string>
     <string name="chat_drawer_empty">No conversations yet. Send your first message to get started.</string>
     <string name="chat_drawer_error">Could not load your history.</string>
     <string name="chat_drawer_untitled">Untitled chat</string>
     <string name="chat_drawer_group_today">Today</string>
     <string name="chat_drawer_group_yesterday">Yesterday</string>
-    <string name="chat_drawer_group_this_week">This week</string>
 
     <!-- Settings Screen (English) -->
     <string name="settings_title">Settings</string>
@@ -114,6 +118,7 @@
 
     <!-- Coming Soon Placeholder Screens (English) -->
     <string name="coming_soon_badge">Coming soon</string>
+    <string name="home_title">Home</string>
     <string name="home_subtitle">Your day at a glance</string>
     <string name="home_feature_1">Daily greeting and summary</string>
     <string name="home_feature_2">Quick mood check-in</string>
@@ -121,23 +126,25 @@
     <string name="home_feature_4">Latest diary entry</string>
     <string name="home_feature_5">Quick access to Diarito and SOS exercises</string>
 
-    <string name="emotions_subtitle">How you\'ve felt over time</string>
-    <string name="emotions_feature_1">Mood calendar</string>
-    <string name="emotions_feature_2">Weekly and monthly trends</string>
-    <string name="emotions_feature_3">Emotions detected by Diarito</string>
-    <string name="emotions_feature_4">Contributing factors (sleep, stress)</string>
-    <string name="emotions_feature_5">Summary for your psychologist (with your permission)</string>
+    <string name="rutines_title">Rutines</string>
+    <string name="rutines_subtitle">Wellbeing routines and healthy habits</string>
+    <string name="rutines_feature_1">Guided morning and evening routines</string>
+    <string name="rutines_feature_2">Daily habit tracking</string>
+    <string name="rutines_feature_3">Mindful reminders and active pauses</string>
+    <string name="rutines_feature_4">Integration with your reflective diary</string>
 
+    <string name="professionals_title">Psychologist</string>
     <string name="professionals_subtitle">Find professional support</string>
     <string name="professionals_feature_1">Directory of verified psychologists</string>
     <string name="professionals_feature_2">Profiles with specialties and availability</string>
     <string name="professionals_feature_3">Save specialists</string>
     <string name="professionals_feature_4">Share your history with consent</string>
 
-    <string name="community_subtitle">Anonymous support spaces</string>
-    <string name="community_feature_1">Voice rooms by topic</string>
-    <string name="community_feature_2">Anonymous participation with handles</string>
-    <string name="community_feature_3">Speaking turns and reactions</string>
-    <string name="community_feature_4">Moderation and reports</string>
+    <string name="scheduling_title">Scheduling</string>
+    <string name="scheduling_subtitle">Schedule your sessions and calm moments</string>
+    <string name="scheduling_feature_1">Session bookings with specialists</string>
+    <string name="scheduling_feature_2">Appointment reminders and confirmations</string>
+    <string name="scheduling_feature_3">Sync with personal calendar</string>
+    <string name="scheduling_feature_4">Appointment history and preparation notes</string>
 
 </resources>

@@ -1,91 +1,81 @@
 package com.mindcluster.safediary.assistantai.presentation.views
 
 import android.app.Activity
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.core.view.WindowCompat
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mindcluster.safediary.R
-import com.mindcluster.safediary.assistantai.infrastructure.local.PersonalityPreferences
+import com.mindcluster.safediary.assistantai.domain.model.MessageAuthor
 import com.mindcluster.safediary.assistantai.presentation.components.ChatEmptyState
 import com.mindcluster.safediary.assistantai.presentation.components.ChatInputBar
-import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
 import com.mindcluster.safediary.assistantai.presentation.components.ConversationHistoryDrawer
+import com.mindcluster.safediary.assistantai.presentation.components.CrisisSupportCard
 import com.mindcluster.safediary.assistantai.presentation.components.MessageBubble
 import com.mindcluster.safediary.assistantai.presentation.components.ReplyErrorNotice
 import com.mindcluster.safediary.assistantai.presentation.components.TypingIndicator
-import com.mindcluster.safediary.assistantai.domain.model.MessageAuthor
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
+import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
+import com.mindcluster.safediary.shared.presentation.navigation.NavRoutes
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
-import com.mindcluster.safediary.shared.presentation.theme.OnSurface
-import com.mindcluster.safediary.shared.presentation.theme.OnSurfaceVariant
 import com.mindcluster.safediary.shared.presentation.theme.PrimaryNavy
-import com.mindcluster.safediary.shared.presentation.theme.SecondaryContainer
-import com.mindcluster.safediary.shared.presentation.theme.SecondaryTeal
+import com.mindcluster.safediary.shared.presentation.theme.SlateBreadcrumbDark
+import com.mindcluster.safediary.shared.presentation.theme.SlateMenuIcon
+import com.mindcluster.safediary.shared.presentation.theme.SlatePlaceholder
+import com.mindcluster.safediary.shared.presentation.theme.SlateSubtle
 import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainer
-import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerLowest
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun AiChatScreen(
     viewModel: AssistantViewModel,
@@ -97,16 +87,6 @@ fun AiChatScreen(
     val listState = rememberLazyListState()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
-
-    val context = LocalContext.current
-    var currentPersonality by remember {
-        mutableStateOf(PersonalityPreferences(context).get())
-    }
-
-    LifecycleResumeEffect(Unit) {
-        currentPersonality = PersonalityPreferences(context).get()
-        onPauseOrDispose { }
-    }
 
     val view = LocalView.current
     val isDrawerOpen = drawerState.isOpen || drawerState.targetValue == DrawerValue.Open
@@ -129,6 +109,11 @@ fun AiChatScreen(
 
     LaunchedEffect(drawerState.isOpen) {
         if (drawerState.isOpen) viewModel.refreshHistory()
+    }
+
+    // System back closes the history drawer instead of leaving the app.
+    BackHandler(enabled = isDrawerOpen) {
+        coroutineScope.launch { drawerState.close() }
     }
 
     LaunchedEffect(uiState.messages.size, uiState.isTyping, uiState.replyFailed) {
@@ -162,8 +147,6 @@ fun AiChatScreen(
                 onDeleteConversation = { remoteId ->
                     viewModel.deleteConversation(remoteId)
                 },
-                onNavigateToRoute = onNavigateToRoute,
-                onNavigateToSettings = onNavigateToSettings,
                 onClose = {
                     coroutineScope.launch { drawerState.close() }
                 }
@@ -175,129 +158,110 @@ fun AiChatScreen(
             containerColor = BackgroundSanctuary,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             topBar = {
-                Column(
+                Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(SurfaceContainerLowest)
                         .statusBarsPadding()
-                        .displayCutoutPadding()
+                        .displayCutoutPadding(),
+                    color = Color.White.copy(alpha = 0.90f),
+                    shadowElevation = 1.dp
                 ) {
-                    // Header Bar (Matching HTML 1:1)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                            .height(64.dp)
+                            .padding(horizontal = 16.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        // Left: Hamburger + Logo + Brand
+                        // Left side: Hamburger (40dp circle) + Logo (32dp, 8dp corners) + Breadcrumb
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(10.dp)
                         ) {
-                            IconButton(
-                                onClick = { coroutineScope.launch { drawerState.open() } },
-                                modifier = Modifier.size(38.dp)
+                            Box(
+                                modifier = Modifier
+                                    .size(40.dp)
+                                    .clip(CircleShape)
+                                    .clickable { coroutineScope.launch { drawerState.open() } },
+                                contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
                                     contentDescription = stringResource(R.string.shared_cd_menu),
-                                    tint = PrimaryNavy,
+                                    tint = SlateMenuIcon,
                                     modifier = Modifier.size(24.dp)
                                 )
                             }
 
-                            Box(
+                            Image(
+                                painter = painterResource(id = R.drawable.safediary_logo),
+                                contentDescription = stringResource(R.string.shared_cd_logo),
+                                contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .size(32.dp)
                                     .clip(RoundedCornerShape(8.dp))
-                                    .background(PrimaryNavy),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.AutoAwesome,
-                                    contentDescription = null,
-                                    tint = SecondaryTeal,
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
+                            )
 
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(4.dp)
-                            ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
                                 Text(
                                     text = stringResource(R.string.shared_topbar_title_prefix),
-                                    style = MaterialTheme.typography.titleMedium.copy(
-                                        fontWeight = FontWeight.SemiBold,
-                                        color = PrimaryNavy
-                                    )
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = PrimaryNavy
                                 )
                                 Text(
-                                    text = "/",
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        color = Color(0xFF94A3B8)
-                                    )
+                                    text = " / ",
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Light,
+                                    color = SlatePlaceholder
                                 )
                                 Text(
-                                    text = stringResource(R.string.chat_header_subtitle, currentPersonality.apiName),
-                                    style = MaterialTheme.typography.bodySmall.copy(
-                                        fontWeight = FontWeight.Medium,
-                                        color = SecondaryTeal
-                                    )
+                                    text = stringResource(R.string.chat_header_diarito),
+                                    fontSize = 17.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    color = SlateBreadcrumbDark
                                 )
                             }
                         }
 
-                        // Right: New Chat Pencil + Profile Avatar
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        // Right side: Profile avatar (36dp circle with person icon on #E7EEFF circle)
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(SurfaceContainer)
+                                .clickable { onNavigateToSettings() },
+                            contentAlignment = Alignment.Center
                         ) {
-                            IconButton(
-                                onClick = { viewModel.newChat() },
-                                modifier = Modifier.size(36.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.EditNote,
-                                    contentDescription = stringResource(R.string.chat_cd_new_chat_button),
-                                    tint = Color(0xFF475569),
-                                    modifier = Modifier.size(24.dp)
-                                )
-                            }
-
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(SecondaryContainer)
-                                    .clickable { onNavigateToSettings() },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = stringResource(R.string.shared_cd_user_avatar),
-                                    tint = PrimaryNavy,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                            }
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = stringResource(R.string.shared_cd_user_avatar),
+                                tint = PrimaryNavy,
+                                modifier = Modifier.size(20.dp)
+                            )
                         }
                     }
-
-                    HorizontalDivider(color = SurfaceContainer, thickness = 1.dp)
+                }
+            },
+            bottomBar = {
+                if (!WindowInsets.isImeVisible) {
+                    SafeDiaryBottomNavBar(
+                        currentRoute = NavRoutes.AI_CHAT,
+                        onNavigateToRoute = onNavigateToRoute
+                    )
                 }
             }
         ) { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = innerPadding.calculateTopPadding())
-                    .displayCutoutPadding()
-                    .windowInsetsPadding(
-                        WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Bottom + WindowInsetsSides.Horizontal
-                        )
+                    .padding(
+                        top = innerPadding.calculateTopPadding(),
+                        bottom = innerPadding.calculateBottomPadding()
                     )
+                    .displayCutoutPadding()
+                    .imePadding()
             ) {
                 Box(
                     modifier = Modifier
@@ -351,8 +315,9 @@ fun AiChatScreen(
 
                 Text(
                     text = stringResource(R.string.chat_disclaimer),
-                    style = MaterialTheme.typography.labelSmall,
-                    color = OnSurfaceVariant.copy(alpha = 0.6f),
+                    fontSize = 11.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = SlateSubtle,
                     textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()

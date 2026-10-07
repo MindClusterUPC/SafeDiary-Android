@@ -3,6 +3,7 @@ package com.mindcluster.safediary.shared.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -10,11 +11,11 @@ import androidx.navigation.compose.rememberNavController
 import com.mindcluster.safediary.assistantai.infrastructure.AssistantAiModule
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.assistantai.presentation.views.AiChatScreen
-import com.mindcluster.safediary.communities.presentation.views.CommunityScreen
-import com.mindcluster.safediary.emotions.presentation.views.EmotionsScreen
 import com.mindcluster.safediary.home.presentation.views.HomeScreen
 import com.mindcluster.safediary.professionals.presentation.views.ProfessionalsScreen
 import com.mindcluster.safediary.profiles.presentation.views.SettingsScreen
+import com.mindcluster.safediary.rutines.presentation.views.RutinesScreen
+import com.mindcluster.safediary.scheduling.presentation.views.SchedulingScreen
 
 @Composable
 fun AppNavigation(
@@ -22,6 +23,16 @@ fun AppNavigation(
 ) {
     val context = LocalContext.current
     val assistantModule = AssistantAiModule.getInstance(context)
+
+    fun navigateToTab(route: String) {
+        navController.navigate(route) {
+            popUpTo(navController.graph.findStartDestination().id) {
+                saveState = true
+            }
+            launchSingleTop = true
+            restoreState = true
+        }
+    }
 
     NavHost(
         navController = navController,
@@ -50,45 +61,45 @@ fun AppNavigation(
                     navController.navigate(NavRoutes.SETTINGS)
                 },
                 onNavigateToRoute = { route ->
-                    navController.navigate(route)
+                    navigateToTab(route)
                 }
             )
         }
 
-        composable(NavRoutes.SETTINGS) {
-            SettingsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
+        composable(NavRoutes.RUTINES) {
+            RutinesScreen(
+                onNavigateToRoute = { route ->
+                    navigateToTab(route)
                 }
             )
         }
 
         composable(NavRoutes.HOME) {
             HomeScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        composable(NavRoutes.EMOTIONS) {
-            EmotionsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
+                onNavigateToRoute = { route ->
+                    navigateToTab(route)
                 }
             )
         }
 
         composable(NavRoutes.PROFESSIONALS) {
             ProfessionalsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
+                onNavigateToRoute = { route ->
+                    navigateToTab(route)
                 }
             )
         }
 
-        composable(NavRoutes.COMMUNITY) {
-            CommunityScreen(
+        composable(NavRoutes.SCHEDULING) {
+            SchedulingScreen(
+                onNavigateToRoute = { route ->
+                    navigateToTab(route)
+                }
+            )
+        }
+
+        composable(NavRoutes.SETTINGS) {
+            SettingsScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
