@@ -147,4 +147,9 @@
     <string name="scheduling_feature_3">Sync with personal calendar</string>
     <string name="scheduling_feature_4">Appointment history and preparation notes</string>
 
+    <!-- Offline & Sync Strings -->
+    <string name="chat_offline_indicator">Offline</string>
+    <string name="chat_offline_pending_notice">Offline: will be sent when you\'re back online</string>
+    <string name="chat_message_pending">Pending</string>
+
 </resources>

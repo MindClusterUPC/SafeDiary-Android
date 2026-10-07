@@ -18,19 +18,40 @@ import com.mindcluster.safediary.assistantai.domain.repository.ConversationHisto
 import com.mindcluster.safediary.assistantai.domain.repository.ConversationRepository
 import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 import com.mindcluster.safediary.shared.infrastructure.eventbus.InMemoryDomainEventBus
-
+import com.mindcluster.safediary.assistantai.infrastructure.local.CacheFirstConversationHistoryGateway
+import com.mindcluster.safediary.assistantai.infrastructure.local.ChatPreferences
+import com.mindcluster.safediary.assistantai.infrastructure.local.OfflineFirstConversationRepository
+import com.mindcluster.safediary.assistantai.infrastructure.local.SafeDiaryDatabase
 import com.mindcluster.safediary.assistantai.infrastructure.remote.RetrofitAssistantResponder
 import com.mindcluster.safediary.assistantai.infrastructure.remote.RetrofitConversationHistoryGateway
+import com.mindcluster.safediary.shared.infrastructure.network.NetworkMonitor
 
 class AssistantAiModule(context: Context) {
+    val database: SafeDiaryDatabase by lazy { SafeDiaryDatabase.getInstance(context) }
+    val networkMonitor: NetworkMonitor by lazy { NetworkMonitor.getInstance(context) }
+    val chatPreferences: ChatPreferences by lazy { ChatPreferences(context) }
+
     val eventBus: DomainEventPublisher by lazy { InMemoryDomainEventBus() }
-    val repository: ConversationRepository by lazy { InMemoryConversationRepository() }
+    val repository: ConversationRepository by lazy {
+        OfflineFirstConversationRepository(
+            database.conversationDao(),
+            database.messageDao(),
+            chatPreferences
+        )
+    }
     val responder: AssistantResponder by lazy { RetrofitAssistantResponder(context.applicationContext) }
 
-    val historyGateway: ConversationHistoryGateway by lazy { RetrofitConversationHistoryGateway() }
+    val historyGateway: ConversationHistoryGateway by lazy {
+        CacheFirstConversationHistoryGateway(
+            database.conversationDao(),
+            database.messageDao(),
+            RetrofitConversationHistoryGateway(),
+            networkMonitor
+        )
+    }
 
     val sendPromptHandler: SendPromptHandler by lazy {
-        SendPromptHandler(repository, responder, eventBus, historyGateway)
+        SendPromptHandler(repository, responder, eventBus, historyGateway, networkMonitor)
     }
 
     val retryLastPromptHandler: RetryLastPromptHandler by lazy {

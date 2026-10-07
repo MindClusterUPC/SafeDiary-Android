@@ -19,6 +19,9 @@ class RetrofitConversationHistoryGateway(
 
     private val tag = "ConversationHistory"
 
+    override fun observeConversations(): kotlinx.coroutines.flow.Flow<List<ConversationSummary>> =
+        kotlinx.coroutines.flow.emptyFlow()
+
     override suspend fun listConversations(): List<ConversationSummary> = remote {
         apiService.listConversations().map {
             ConversationSummary(
