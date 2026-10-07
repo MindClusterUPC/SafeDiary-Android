@@ -1,6 +1,7 @@
 package com.mindcluster.safediary.shared.presentation.navigation
 
 import android.app.Activity
+import androidx.compose.ui.geometry.Offset
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -10,7 +11,6 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +34,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import kotlin.math.abs
+import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -137,11 +140,39 @@ fun MainTabPagerScreen(
         }
     }
 
-    // Resolve drawer vs pager gestures so they don't fight:
-    // On page 0, if touch starts in the left 50dp edge, disable pager scroll during that gesture
-    // so ModalNavigationDrawer receives the swipe-to-open gesture smoothly.
-    var allowPagerSwipe by remember { mutableStateOf(true) }
-    val edgeThresholdPx = with(density) { 50.dp.toPx() }
+    // On the first page (Diarito) a swipe to the right opens the history drawer. The gesture is
+    // read before the pager sees it, and only claimed once it is clearly a rightward drag, so
+    // taps, vertical scrolling and swipes to the next tab keep working.
+    val openDrawerThresholdPx = with(density) { 48.dp.toPx() }
+    val openDrawerOnSwipe = Modifier.pointerInput(pagerState, drawerState, isImeVisible) {
+        if (isImeVisible) return@pointerInput
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
+            if (pagerState.currentPage != 0 || drawerState.isOpen) return@awaitEachGesture
+            var totalX = 0f
+            var totalY = 0f
+            var claimed = false
+            while (true) {
+                val event = awaitPointerEvent(PointerEventPass.Initial)
+                val change = event.changes.firstOrNull { it.id == down.id } ?: break
+                if (!change.pressed) break
+                val delta = change.positionChange()
+                totalX += delta.x
+                totalY += delta.y
+                if (!claimed) {
+                    if (totalX < -viewConfiguration.touchSlop || abs(totalY) > viewConfiguration.touchSlop) break
+                    if (totalX > viewConfiguration.touchSlop && totalX > abs(totalY)) claimed = true
+                }
+                if (claimed) {
+                    change.consume()
+                    if (totalX > openDrawerThresholdPx) {
+                        coroutineScope.launch { drawerState.open() }
+                        break
+                    }
+                }
+            }
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -201,24 +232,11 @@ fun MainTabPagerScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(bottom = innerPadding.calculateBottomPadding())
-                    .pointerInput(pagerState.currentPage) {
-                        if (pagerState.currentPage == 0) {
-                            awaitEachGesture {
-                                val down = awaitFirstDown(requireUnconsumed = false)
-                                if (down.position.x < edgeThresholdPx) {
-                                    allowPagerSwipe = false
-                                }
-                                waitForUpOrCancellation()
-                                allowPagerSwipe = true
-                            }
-                        } else {
-                            allowPagerSwipe = true
-                        }
-                    }
+                    .then(openDrawerOnSwipe)
             ) {
                 HorizontalPager(
                     state = pagerState,
-                    userScrollEnabled = allowPagerSwipe && !isImeVisible,
+                    userScrollEnabled = !isImeVisible,
                     beyondViewportPageCount = 4,
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
