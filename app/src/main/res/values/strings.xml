@@ -151,4 +151,9 @@
     <string name="scheduling_feature_3">Sincronización con calendario personal</string>
     <string name="scheduling_feature_4">Historial de citas y notas de preparación</string>
 
+    <!-- Offline & Sync Strings -->
+    <string name="chat_offline_indicator">Sin conexión</string>
+    <string name="chat_offline_pending_notice">Sin conexión: se enviará cuando vuelvas a estar en línea</string>
+    <string name="chat_message_pending">Pendiente</string>
+
 </resources>

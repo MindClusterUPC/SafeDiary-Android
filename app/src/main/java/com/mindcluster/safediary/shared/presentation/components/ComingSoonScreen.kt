@@ -62,7 +62,8 @@ fun ComingSoonScreen(
     description: String,
     plannedFeatures: List<String>,
     currentRoute: String,
-    onNavigateToRoute: (String) -> Unit,
+    onNavigateToRoute: (String) -> Unit = {},
+    showBottomBar: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -89,10 +90,12 @@ fun ComingSoonScreen(
             )
         },
         bottomBar = {
-            SafeDiaryBottomNavBar(
-                currentRoute = currentRoute,
-                onNavigateToRoute = onNavigateToRoute
-            )
+            if (showBottomBar) {
+                SafeDiaryBottomNavBar(
+                    currentRoute = currentRoute,
+                    onNavigateToRoute = onNavigateToRoute
+                )
+            }
         }
     ) { innerPadding ->
         Column(

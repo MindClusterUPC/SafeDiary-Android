@@ -25,11 +25,16 @@ import com.mindcluster.safediary.assistantai.domain.model.ChatMessage
 import com.mindcluster.safediary.assistantai.domain.model.ConversationSummary
 import com.mindcluster.safediary.assistantai.domain.model.CrisisResource
 import com.mindcluster.safediary.assistantai.domain.model.MessageAuthor
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+
+import com.mindcluster.safediary.assistantai.application.commands.OfflineException
+import com.mindcluster.safediary.assistantai.infrastructure.local.ChatPreferences
+import com.mindcluster.safediary.shared.infrastructure.network.NetworkMonitor
 
 data class AssistantUiState(
     val messages: List<ChatMessage> = emptyList(),
@@ -41,7 +46,9 @@ data class AssistantUiState(
     val isHistoryLoading: Boolean = false,
     val historyFailed: Boolean = false,
     val activeConversationId: String? = null,
-    val editingMessageRemoteId: Long? = null
+    val editingMessageRemoteId: Long? = null,
+    val isOnline: Boolean = true,
+    val showOfflinePendingNotice: Boolean = false
 )
 
 class AssistantViewModel(
@@ -56,21 +63,59 @@ class AssistantViewModel(
     private val editMessageHandler: EditMessageHandler,
     private val regenerateReplyHandler: RegenerateReplyHandler,
     private val renameConversationHandler: RenameConversationHandler,
-    private val deleteConversationHandler: DeleteConversationHandler
+    private val deleteConversationHandler: DeleteConversationHandler,
+    private val networkMonitor: NetworkMonitor? = null,
+    private val chatPreferences: ChatPreferences? = null
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(AssistantUiState())
+    private val _uiState = MutableStateFlow(
+        AssistantUiState(
+            isOnline = networkMonitor?.isCurrentlyOnline() ?: true
+        )
+    )
     val uiState: StateFlow<AssistantUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             getChatHistoryHandler.handle().collect { list ->
-                _uiState.update { it.copy(messages = list) }
+                _uiState.update { state ->
+                    val hasPending = list.any { it.isPending }
+                    state.copy(
+                        messages = list,
+                        showOfflinePendingNotice = if (!hasPending) false else state.showOfflinePendingNotice
+                    )
+                }
+                // Messages left pending from a previous session are sent as soon as we are online.
+                if (list.any { it.isPending } && networkMonitor?.isCurrentlyOnline() != false) {
+                    retryPendingMessages()
+                }
             }
         }
         viewModelScope.launch {
             getCrisisSupportHandler.handle().collect { resources ->
                 _uiState.update { it.copy(crisisResources = resources) }
+            }
+        }
+        viewModelScope.launch {
+            getConversationListHandler.observe().collect { list ->
+                if (list.isNotEmpty() || !_uiState.value.isHistoryLoading) {
+                    _uiState.update { it.copy(conversations = list) }
+                }
+            }
+        }
+        chatPreferences?.getLastOpenedConversationId()?.let { lastId ->
+            _uiState.update { it.copy(activeConversationId = lastId) }
+        }
+        networkMonitor?.let { monitor ->
+            viewModelScope.launch {
+                monitor.isOnline.collect { online ->
+                    val wasOffline = !_uiState.value.isOnline
+                    _uiState.update { it.copy(isOnline = online) }
+                    if (online && wasOffline) {
+                        retryPendingMessages()
+                        refreshHistory()
+                    }
+                }
             }
         }
     }
@@ -93,6 +138,7 @@ class AssistantViewModel(
     fun openConversation(remoteId: String) {
         if (_uiState.value.isTyping) return
         _uiState.update { it.copy(isTyping = true, replyFailed = false, input = "", editingMessageRemoteId = null) }
+        chatPreferences?.setLastOpenedConversationId(remoteId)
         viewModelScope.launch {
             val result = openConversationHandler.handle(OpenConversationCommand(remoteId))
             _uiState.update {
@@ -109,6 +155,10 @@ class AssistantViewModel(
         viewModelScope.launch {
             dismissCrisisSupportHandler.handle()
         }
+    }
+
+    fun dismissPendingNotice() {
+        _uiState.update { it.copy(showOfflinePendingNotice = false) }
     }
 
     fun onInputChanged(newInput: String) {
@@ -139,6 +189,8 @@ class AssistantViewModel(
         val prompt = _uiState.value.input.trim()
         if (prompt.isBlank() || _uiState.value.isTyping) return
 
+        val isOffline = networkMonitor?.isCurrentlyOnline() == false
+
         val editingId = _uiState.value.editingMessageRemoteId
         if (editingId != null) {
             _uiState.update {
@@ -160,16 +212,38 @@ class AssistantViewModel(
                 }
             }
         } else {
-            _uiState.update { it.copy(input = "", isTyping = true, replyFailed = false) }
+            _uiState.update {
+                it.copy(
+                    input = "",
+                    isTyping = !isOffline,
+                    replyFailed = false,
+                    showOfflinePendingNotice = isOffline
+                )
+            }
             viewModelScope.launch {
                 val result = sendPromptHandler.handle(SendPromptCommand(prompt))
+                val isOfflineFailure = result.exceptionOrNull() is OfflineException
                 _uiState.update {
                     it.copy(
                         isTyping = false,
-                        replyFailed = result.isFailure,
+                        replyFailed = result.isFailure && !isOfflineFailure,
+                        showOfflinePendingNotice = isOfflineFailure,
                         activeConversationId = result.getOrNull() ?: it.activeConversationId
                     )
                 }
+            }
+        }
+    }
+
+    private var pendingRetryJob: Job? = null
+
+    fun retryPendingMessages() {
+        // The history flow emits on every save, so only one retry may run at a time.
+        if (pendingRetryJob?.isActive == true) return
+        pendingRetryJob = viewModelScope.launch {
+            val result = sendPromptHandler.sendPending()
+            if (result.isSuccess) {
+                _uiState.update { it.copy(showOfflinePendingNotice = false) }
             }
         }
     }
@@ -210,11 +284,14 @@ class AssistantViewModel(
     }
 
     fun deleteConversation(remoteId: String) {
+        val isDeletingActive = _uiState.value.activeConversationId == remoteId
+        if (isDeletingActive) {
+            chatPreferences?.setLastOpenedConversationId(null)
+        }
         viewModelScope.launch {
             val result = deleteConversationHandler.handle(DeleteConversationCommand(remoteId))
             if (result.isSuccess) {
                 _uiState.update { state ->
-                    val isDeletingActive = state.activeConversationId == remoteId
                     state.copy(
                         conversations = state.conversations.filterNot { it.remoteId == remoteId },
                         activeConversationId = if (isDeletingActive) null else state.activeConversationId,
@@ -247,6 +324,7 @@ class AssistantViewModel(
     }
 
     fun newChat() {
+        chatPreferences?.setLastOpenedConversationId(null)
         viewModelScope.launch {
             startNewChatHandler.handle()
             _uiState.update {
@@ -255,7 +333,8 @@ class AssistantViewModel(
                     isTyping = false,
                     replyFailed = false,
                     activeConversationId = null,
-                    editingMessageRemoteId = null
+                    editingMessageRemoteId = null,
+                    showOfflinePendingNotice = false
                 )
             }
         }
@@ -273,7 +352,9 @@ class AssistantViewModel(
         private val editMessageHandler: EditMessageHandler,
         private val regenerateReplyHandler: RegenerateReplyHandler,
         private val renameConversationHandler: RenameConversationHandler,
-        private val deleteConversationHandler: DeleteConversationHandler
+        private val deleteConversationHandler: DeleteConversationHandler,
+        private val networkMonitor: NetworkMonitor? = null,
+        private val chatPreferences: ChatPreferences? = null
     ) : ViewModelProvider.Factory {
         @Suppress("UNCHECKED_CAST")
         override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -289,7 +370,9 @@ class AssistantViewModel(
                 editMessageHandler,
                 regenerateReplyHandler,
                 renameConversationHandler,
-                deleteConversationHandler
+                deleteConversationHandler,
+                networkMonitor,
+                chatPreferences
             ) as T
         }
     }
