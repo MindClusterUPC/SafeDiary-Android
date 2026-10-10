@@ -21,22 +21,33 @@ class AiConversationAggregate(
     var crisisResources: List<CrisisResource> = emptyList()
         private set
 
-    fun addUserMessage(content: String): ChatMessage {
+    fun addUserMessage(content: String, isPending: Boolean = false): ChatMessage {
         val trimmed = content.trim()
         require(trimmed.isNotBlank()) { "Prompt cannot be empty" }
         val message = ChatMessage(
             author = MessageAuthor.USER,
-            content = trimmed
+            content = trimmed,
+            isPending = isPending
         )
         _messages.add(message)
-        raise(
-            PromptSentEvent(
-                conversationId = id,
-                messageId = message.id,
-                userPrompt = trimmed
+        if (!isPending) {
+            raise(
+                PromptSentEvent(
+                    conversationId = id,
+                    messageId = message.id,
+                    userPrompt = trimmed
+                )
             )
-        )
+        }
         return message
+    }
+
+    fun markPendingSent(messageId: String, remoteId: Long? = null) {
+        val index = _messages.indexOfFirst { it.id == messageId }
+        if (index != -1) {
+            val old = _messages[index]
+            _messages[index] = old.copy(isPending = false, remoteId = remoteId ?: old.remoteId)
+        }
     }
 
     fun addAssistantResponse(reply: AssistantReply): ChatMessage {

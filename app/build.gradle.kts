@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -31,6 +32,8 @@ android {
             val releaseApiBaseUrl = (project.findProperty("safediary.releaseApiBaseUrl") as String?)
                 ?: "https://safediary-platform.onrender.com/"
             buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
+            // Course project: sign with the debug key so the release APK can be installed directly.
+            signingConfig = signingConfigs.getByName("debug")
             optimization {
                 enable = false
             }
@@ -66,6 +69,11 @@ dependencies {
     implementation(libs.retrofit.converter.gson)
     implementation(libs.okhttp)
     implementation(libs.okhttp.logging.interceptor)
+
+    // Room Database
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)

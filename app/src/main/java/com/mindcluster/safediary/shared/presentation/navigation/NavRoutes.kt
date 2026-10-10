@@ -5,7 +5,8 @@ object NavRoutes {
     const val AI_CHAT = "ai_chat"
     const val SETTINGS = "settings"
     const val HOME = "home"
-    const val EMOTIONS = "emotions"
+    const val RUTINES = "rutines"
     const val PROFESSIONALS = "professionals"
-    const val COMMUNITY = "community"
+    const val SCHEDULING = "scheduling"
 }
+
