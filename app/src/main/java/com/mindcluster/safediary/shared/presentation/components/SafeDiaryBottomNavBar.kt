@@ -1,7 +1,8 @@
 package com.mindcluster.safediary.shared.presentation.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,6 +33,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,8 +80,7 @@ val bottomNavItems = listOf(
 
 /**
  * Bottom navigation bar matching the Figma Serene Sanctuary specifications.
- * Height 64, white at 95% alpha, top shadow.
- * 5 equal items: Diarito, Rutines, Home, Psychologist, Scheduling.
+ * Five patient destinations, with labels and selection exposed to accessibility.
  * Active: #006B5F with 6dp dot below label; Inactive: #64748B.
  */
 @Composable
@@ -101,7 +103,8 @@ fun SafeDiaryBottomNavBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(64.dp),
+                    .height((72 * LocalDensity.current.fontScale.coerceAtLeast(1f)).dp)
+                    .selectableGroup(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 bottomNavItems.forEach { item ->
@@ -112,27 +115,30 @@ fun SafeDiaryBottomNavBar(
                         modifier = Modifier
                             .weight(1f)
                             .fillMaxHeight()
-                            .clickable(
+                            .selectable(
+                                selected = isSelected,
+                                role = Role.Tab,
                                 indication = null,
-                                interactionSource = remember { MutableInteractionSource() }
-                            ) {
-                                if (!isSelected) {
-                                    onNavigateToRoute(item.route)
+                                interactionSource = remember { MutableInteractionSource() },
+                                onClick = {
+                                    if (!isSelected) {
+                                        onNavigateToRoute(item.route)
+                                    }
                                 }
-                            },
+                            ),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
                     ) {
                         Icon(
                             imageVector = item.icon,
-                            contentDescription = stringResource(item.labelResId),
+                            contentDescription = null,
                             tint = itemColor,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
                             text = stringResource(item.labelResId),
-                            fontSize = 11.sp,
+                            fontSize = 12.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = itemColor,
                             maxLines = 1
