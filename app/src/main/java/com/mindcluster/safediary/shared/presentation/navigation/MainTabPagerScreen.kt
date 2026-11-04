@@ -251,7 +251,9 @@ fun MainTabPagerScreen(
                             showBottomBar = false
                         )
                         1 -> RutinesScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings,
+                            isActive = pagerState.currentPage == 1
                         )
                         2 -> HomeScreen(
                             onNavigateToRoute = { navigateToTab(it) }
