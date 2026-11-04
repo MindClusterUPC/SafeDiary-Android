@@ -1,6 +1,7 @@
 package com.mindcluster.safediary.shared.infrastructure.network
 
 import com.mindcluster.safediary.BuildConfig
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionHolder
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -27,12 +28,17 @@ object RetrofitClientProvider {
             .readTimeout(180, TimeUnit.SECONDS)
             .writeTimeout(25, TimeUnit.SECONDS)
             .addInterceptor { chain ->
-                val request = chain.request().newBuilder()
+                val requestBuilder = chain.request().newBuilder()
                     .addHeader("Accept", "application/json")
                     .addHeader("Content-Type", "application/json")
                     .addHeader("User-Agent", "SafeDiary-Android/1.0.0")
-                    .build()
-                chain.proceed(request)
+
+                val token = AuthSessionHolder.token
+                if (!token.isNullOrBlank()) {
+                    requestBuilder.addHeader("Authorization", "Bearer $token")
+                }
+
+                chain.proceed(requestBuilder.build())
             }
             .addInterceptor(loggingInterceptor)
             .build()

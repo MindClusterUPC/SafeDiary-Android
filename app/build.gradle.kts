@@ -4,6 +4,12 @@ plugins {
     alias(libs.plugins.ksp)
 }
 
+fun getEnvOrProperty(envKey: String, propKey: String, defaultValue: String): String {
+    return System.getenv(envKey)
+        ?: (project.findProperty(propKey) as String?)
+        ?: defaultValue
+}
+
 android {
     namespace = "com.mindcluster.safediary"
     compileSdk {
@@ -18,19 +24,37 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Configurable endpoints from environment variables or gradle properties
+        val endpointAuthSignIn = getEnvOrProperty("SAFEDY_ENDPOINT_AUTH_SIGN_IN", "safediary.endpointAuthSignIn", "api/v1/authentication/sign-in")
+        val endpointPatients = getEnvOrProperty("SAFEDY_ENDPOINT_PATIENTS", "safediary.endpointPatients", "api/v1/patients")
+        val endpointPaymentsCheckout = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_CHECKOUT", "safediary.endpointPaymentsCheckout", "api/v1/payments/subscriptions/checkout")
+        val endpointPaymentsCurrent = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_CURRENT", "safediary.endpointPaymentsCurrent", "api/v1/payments/subscriptions/current")
+        val endpointPaymentsCancel = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_CANCEL", "safediary.endpointPaymentsCancel", "api/v1/payments/subscriptions/cancel")
+        val endpointPaymentsHistory = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_HISTORY", "safediary.endpointPaymentsHistory", "api/v1/payments/history")
+        val endpointPaymentsMethods = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_METHODS", "safediary.endpointPaymentsMethods", "api/v1/payments/methods")
+        val stripeDemoUrl = getEnvOrProperty("SAFEDY_STRIPE_DEMO_URL", "safediary.stripeDemoUrl", "https://checkout.stripe.com/pay/demo_session_safediary")
+
+        buildConfigField("String", "ENDPOINT_AUTH_SIGN_IN", "\"$endpointAuthSignIn\"")
+        buildConfigField("String", "ENDPOINT_PATIENTS", "\"$endpointPatients\"")
+        buildConfigField("String", "ENDPOINT_PAYMENTS_CHECKOUT", "\"$endpointPaymentsCheckout\"")
+        buildConfigField("String", "ENDPOINT_PAYMENTS_CURRENT", "\"$endpointPaymentsCurrent\"")
+        buildConfigField("String", "ENDPOINT_PAYMENTS_CANCEL", "\"$endpointPaymentsCancel\"")
+        buildConfigField("String", "ENDPOINT_PAYMENTS_HISTORY", "\"$endpointPaymentsHistory\"")
+        buildConfigField("String", "ENDPOINT_PAYMENTS_METHODS", "\"$endpointPaymentsMethods\"")
+        buildConfigField("String", "STRIPE_DEMO_URL", "\"$stripeDemoUrl\"")
     }
 
     buildTypes {
         debug {
             // Emulator loopback to the local safediary-platform backend.
             // On a physical device run: ./gradlew installDebug -Psafediary.apiBaseUrl=http://<pc-ip>:8080/
-            val debugApiBaseUrl = (project.findProperty("safediary.apiBaseUrl") as String?) ?: "http://10.0.2.2:8080/"
+            val debugApiBaseUrl = getEnvOrProperty("SAFEDY_API_BASE_URL", "safediary.apiBaseUrl", "http://10.0.2.2:8080/")
             buildConfigField("String", "API_BASE_URL", "\"$debugApiBaseUrl\"")
         }
         release {
             // Backend deployed on Render (safediary-platform/render.yaml). Override with -Psafediary.releaseApiBaseUrl=...
-            val releaseApiBaseUrl = (project.findProperty("safediary.releaseApiBaseUrl") as String?)
-                ?: "https://safediary-platform.onrender.com/"
+            val releaseApiBaseUrl = getEnvOrProperty("SAFEDY_RELEASE_API_BASE_URL", "safediary.releaseApiBaseUrl", "https://safediary-platform.onrender.com/")
             buildConfigField("String", "API_BASE_URL", "\"$releaseApiBaseUrl\"")
             // Course project: sign with the debug key so the release APK can be installed directly.
             signingConfig = signingConfigs.getByName("debug")
