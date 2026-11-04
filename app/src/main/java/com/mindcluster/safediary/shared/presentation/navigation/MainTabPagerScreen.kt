@@ -258,7 +258,8 @@ fun MainTabPagerScreen(
                             isActive = pagerState.currentPage == 1
                         )
                         2 -> HomeScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings
                         )
                         3 -> ProfessionalsScreen(
                             onNavigateToRoute = { navigateToTab(it) },
