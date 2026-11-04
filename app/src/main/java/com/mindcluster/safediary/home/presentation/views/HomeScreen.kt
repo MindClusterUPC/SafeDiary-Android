@@ -11,7 +11,8 @@ import com.mindcluster.safediary.shared.presentation.navigation.NavRoutes
 
 @Composable
 fun HomeScreen(
-    onNavigateToRoute: (String) -> Unit,
+    onNavigateToRoute: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     ComingSoonScreen(
@@ -27,6 +28,7 @@ fun HomeScreen(
         ),
         currentRoute = NavRoutes.HOME,
         onNavigateToRoute = onNavigateToRoute,
+        onNavigateToProfile = onNavigateToProfile,
         modifier = modifier
     )
 }

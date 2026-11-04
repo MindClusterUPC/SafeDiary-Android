@@ -8,5 +8,13 @@ object NavRoutes {
     const val RUTINES = "rutines"
     const val PROFESSIONALS = "professionals"
     const val SCHEDULING = "scheduling"
-}
 
+    // Authentication (IAM)
+    const val SIGN_IN = "sign_in"
+
+    // Patient Profile & Payments routes
+    const val PROFILE = "patient_profile"
+    const val EDIT_EMAIL = "patient_edit_email"
+    const val SAFE_CONTACT = "patient_safe_contact"
+    const val PATIENT_PAYMENTS = "patient_payments"
+}

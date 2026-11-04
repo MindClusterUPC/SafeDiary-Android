@@ -1,7 +1,6 @@
 package com.mindcluster.safediary.shared.presentation.navigation
 
 import android.app.Activity
-import androidx.compose.ui.geometry.Offset
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -12,6 +11,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
@@ -28,15 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlin.math.abs
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -50,26 +47,22 @@ import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantVi
 import com.mindcluster.safediary.assistantai.presentation.views.AiChatScreen
 import com.mindcluster.safediary.home.presentation.views.HomeScreen
 import com.mindcluster.safediary.professionals.presentation.views.ProfessionalsScreen
-import com.mindcluster.safediary.rutines.presentation.views.RutinesScreen
-import com.mindcluster.safediary.scheduling.presentation.views.SchedulingScreen
 import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import kotlinx.coroutines.launch
-
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import kotlin.math.abs
 
 private val tabRoutes = listOf(
     NavRoutes.AI_CHAT,
-    NavRoutes.RUTINES,
     NavRoutes.HOME,
-    NavRoutes.PROFESSIONALS,
-    NavRoutes.SCHEDULING
+    NavRoutes.PROFESSIONALS
 )
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainTabPagerScreen(
-    onNavigateToSettings: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -94,7 +87,7 @@ fun MainTabPagerScreen(
     )
 
     val uiState by assistantViewModel.uiState.collectAsStateWithLifecycle()
-    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 5 })
+    val pagerState = rememberPagerState(initialPage = 0, pageCount = { 3 })
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
 
@@ -237,30 +230,26 @@ fun MainTabPagerScreen(
                 HorizontalPager(
                     state = pagerState,
                     userScrollEnabled = !isImeVisible,
-                    beyondViewportPageCount = 4,
+                    beyondViewportPageCount = 2,
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
                     when (page) {
                         0 -> AiChatScreen(
                             viewModel = assistantViewModel,
-                            onNavigateToSettings = onNavigateToSettings,
+                            onNavigateToSettings = onNavigateToProfile,
                             onOpenDrawer = {
                                 coroutineScope.launch { drawerState.open() }
                             },
                             onNavigateToRoute = { navigateToTab(it) },
                             showBottomBar = false
                         )
-                        1 -> RutinesScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                        1 -> HomeScreen(
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToProfile = onNavigateToProfile
                         )
-                        2 -> HomeScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
-                        )
-                        3 -> ProfessionalsScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
-                        )
-                        4 -> SchedulingScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                        2 -> ProfessionalsScreen(
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToProfile = onNavigateToProfile
                         )
                     }
                 }

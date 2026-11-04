@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
-import androidx.compose.material.icons.outlined.CalendarMonth
-import androidx.compose.material.icons.outlined.Checklist
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Psychology
 import androidx.compose.material3.HorizontalDivider
@@ -54,11 +52,6 @@ val bottomNavItems = listOf(
         icon = Icons.Default.AutoAwesome
     ),
     BottomNavItem(
-        route = NavRoutes.RUTINES,
-        labelResId = R.string.nav_tab_rutines,
-        icon = Icons.Outlined.Checklist
-    ),
-    BottomNavItem(
         route = NavRoutes.HOME,
         labelResId = R.string.nav_tab_home,
         icon = Icons.Outlined.Home
@@ -67,18 +60,12 @@ val bottomNavItems = listOf(
         route = NavRoutes.PROFESSIONALS,
         labelResId = R.string.nav_tab_psychologist,
         icon = Icons.Outlined.Psychology
-    ),
-    BottomNavItem(
-        route = NavRoutes.SCHEDULING,
-        labelResId = R.string.nav_tab_scheduling,
-        icon = Icons.Outlined.CalendarMonth
     )
 )
 
 /**
- * Bottom navigation bar matching the Figma Serene Sanctuary specifications.
- * Height 64, white at 95% alpha, top shadow.
- * 5 equal items: Diarito, Rutines, Home, Psychologist, Scheduling.
+ * Bottom navigation bar with 3 items (Clash Royale style pager navigation):
+ * Diarito (AI Chat), Home, Psychologist.
  * Active: #006B5F with 6dp dot below label; Inactive: #64748B.
  */
 @Composable
@@ -127,7 +114,7 @@ fun SafeDiaryBottomNavBar(
                             imageVector = item.icon,
                             contentDescription = stringResource(item.labelResId),
                             tint = itemColor,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(22.dp)
                         )
                         Spacer(modifier = Modifier.height(2.dp))
                         Text(
