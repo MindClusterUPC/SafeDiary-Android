@@ -52,6 +52,7 @@ import com.mindcluster.safediary.home.presentation.views.HomeScreen
 import com.mindcluster.safediary.professionals.presentation.views.ProfessionalsScreen
 import com.mindcluster.safediary.rutines.presentation.views.RutinesScreen
 import com.mindcluster.safediary.scheduling.presentation.views.SchedulingScreen
+import com.mindcluster.safediary.scheduling.presentation.viewmodels.SchedulingViewModel
 import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import kotlinx.coroutines.launch
@@ -97,6 +98,7 @@ fun MainTabPagerScreen(
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 5 })
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val coroutineScope = rememberCoroutineScope()
+    val schedulingViewModel: SchedulingViewModel = viewModel()
 
     val density = LocalDensity.current
     val imeBottom = WindowInsets.ime.getBottom(density)
@@ -251,16 +253,28 @@ fun MainTabPagerScreen(
                             showBottomBar = false
                         )
                         1 -> RutinesScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings,
+                            isActive = pagerState.currentPage == 1
                         )
                         2 -> HomeScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings
                         )
                         3 -> ProfessionalsScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings,
+                            isActive = pagerState.currentPage == 3,
+                            onContactProfessional = { id, message ->
+                                schedulingViewModel.startConversation(id, message)
+                                navigateToTab(NavRoutes.SCHEDULING)
+                            }
                         )
                         4 -> SchedulingScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings,
+                            isActive = pagerState.currentPage == 4,
+                            viewModel = schedulingViewModel
                         )
                     }
                 }

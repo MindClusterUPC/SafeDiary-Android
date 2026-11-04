@@ -69,10 +69,10 @@
 
     <!-- Bottom Navigation Tabs (Figma) -->
     <string name="nav_tab_diarito">Diarito</string>
-    <string name="nav_tab_rutines">Rutines</string>
-    <string name="nav_tab_home">Home</string>
-    <string name="nav_tab_psychologist">Psychologist</string>
-    <string name="nav_tab_scheduling">Scheduling</string>
+    <string name="nav_tab_rutines">Rutinas</string>
+    <string name="nav_tab_home">Inicio</string>
+    <string name="nav_tab_psychologist">Psicólogos</string>
+    <string name="nav_tab_scheduling">Agenda</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_tab_diary">Diario</string>
