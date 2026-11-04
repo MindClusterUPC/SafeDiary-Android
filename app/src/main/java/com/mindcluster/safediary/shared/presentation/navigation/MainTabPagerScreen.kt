@@ -259,7 +259,9 @@ fun MainTabPagerScreen(
                             onNavigateToRoute = { navigateToTab(it) }
                         )
                         3 -> ProfessionalsScreen(
-                            onNavigateToRoute = { navigateToTab(it) }
+                            onNavigateToRoute = { navigateToTab(it) },
+                            onNavigateToSettings = onNavigateToSettings,
+                            isActive = pagerState.currentPage == 3
                         )
                         4 -> SchedulingScreen(
                             onNavigateToRoute = { navigateToTab(it) }
