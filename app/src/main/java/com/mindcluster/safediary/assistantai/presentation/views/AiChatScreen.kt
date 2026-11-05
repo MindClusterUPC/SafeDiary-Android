@@ -5,6 +5,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
@@ -34,6 +35,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.outlined.CloudOff
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalNavigationDrawer
@@ -45,6 +47,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +55,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
@@ -74,6 +78,7 @@ import com.mindcluster.safediary.assistantai.presentation.components.MessageBubb
 import com.mindcluster.safediary.assistantai.presentation.components.ReplyErrorNotice
 import com.mindcluster.safediary.assistantai.presentation.components.TypingIndicator
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
+import com.mindcluster.safediary.profiles.infrastructure.local.ProfilePreferences
 import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
 import com.mindcluster.safediary.shared.presentation.navigation.NavRoutes
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
@@ -95,11 +100,20 @@ fun AiChatScreen(
     showBottomBar: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
+
+    val profilePreferences = remember { ProfilePreferences(context) }
+    val userInitials = remember(profilePreferences.firstName, profilePreferences.lastName) {
+        val f = profilePreferences.firstName.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+        val l = profilePreferences.lastName.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+        val combined = "$f$l"
+        if (combined.isNotBlank()) combined else "SD"
+    }
 
     val internalDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val useInternalDrawer = onOpenDrawer == null
@@ -191,7 +205,7 @@ fun AiChatScreen(
                                         focusManager.clearFocus()
                                         keyboardController?.hide()
                                         if (onOpenDrawer != null) {
-                                            onOpenDrawer()
+                                             onOpenDrawer()
                                         } else {
                                             coroutineScope.launch { drawerState.open() }
                                         }
@@ -258,11 +272,36 @@ fun AiChatScreen(
                                 }
                             }
 
+                            // Notification bell with unread badge dot
                             Box(
                                 modifier = Modifier
                                     .size(36.dp)
                                     .clip(CircleShape)
-                                    .background(SurfaceContainer)
+                                    .clickable { /* Notifications */ },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Notifications,
+                                    contentDescription = stringResource(R.string.shared_cd_notifications),
+                                    tint = PrimaryNavy,
+                                    modifier = Modifier.size(24.dp)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .align(Alignment.TopEnd)
+                                        .padding(top = 4.dp, end = 4.dp)
+                                        .size(8.dp)
+                                        .clip(CircleShape)
+                                        .background(Color(0xFF0F766E))
+                                )
+                            }
+                            // Profile circular avatar
+                            Box(
+                                modifier = Modifier
+                                    .size(36.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFFD1E3D4))
+                                    .border(1.dp, Color(0xFFCBD5E1), CircleShape)
                                     .clickable {
                                         focusManager.clearFocus()
                                         keyboardController?.hide()
@@ -270,11 +309,11 @@ fun AiChatScreen(
                                     },
                                 contentAlignment = Alignment.Center
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Person,
-                                    contentDescription = stringResource(R.string.shared_cd_user_avatar),
-                                    tint = PrimaryNavy,
-                                    modifier = Modifier.size(20.dp)
+                                Text(
+                                    text = userInitials,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF1E3A2F)
                                 )
                             }
                         }

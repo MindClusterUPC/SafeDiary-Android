@@ -11,6 +11,7 @@
     <string name="shared_cd_settings">Configuración</string>
     <string name="shared_cd_menu">Menú</string>
     <string name="shared_cd_user_avatar">Avatar de usuario</string>
+    <string name="shared_cd_notifications">Notificaciones</string>
 
     <!-- Shared Buttons & Actions -->
     <string name="shared_button_continue">Continuar</string>
@@ -156,4 +157,138 @@
     <string name="chat_offline_pending_notice">Sin conexión: se enviará cuando vuelvas a estar en línea</string>
     <string name="chat_message_pending">Pendiente</string>
 
+    <!-- Patient Profile Strings (Spanish) -->
+    <string name="profile_title">Mi perfil y privacidad</string>
+    <string name="profile_subtitle">Miembro del Santuario</string>
+    <string name="profile_encrypted_badge">Santuario con cifrado de extremo a extremo</string>
+    <string name="profile_streak_count">Días de racha</string>
+    <string name="profile_reflections">Reflexiones</string>
+    <string name="profile_frequent_mood">Ánimo frecuente</string>
+    <string name="profile_section_personal">Información personal</string>
+    <string name="profile_full_name">Nombre completo</string>
+    <string name="profile_email_address">Correo electrónico</string>
+    <string name="profile_verified">Verificado ✓</string>
+    <string name="profile_safe_contact">Contacto de apoyo seguro (Red de emergencia)</string>
+    <string name="profile_payment_methods">Métodos de pago y billetera digital</string>
+    <string name="profile_wallet_escrow">Protección Escrow 24h Zero-Knowledge activa en todas las sesiones.</string>
+    <string name="profile_topics_title">Temas terapéuticos de interés</string>
+    <string name="profile_topics_desc">Temas seleccionados para personalizar preguntas del diario y coincidencias:</string>
+    <string name="profile_security_privacy">Seguridad y privacidad</string>
+    <string name="profile_face_id">Bloqueo biométrico FaceID</string>
+    <string name="profile_face_id_desc">Requerir biometría al reanudar la app</string>
+    <string name="profile_daily_reminder">Recordatorio diario</string>
+    <string name="profile_daily_reminder_desc">Chequeo consciente a las 8:30 AM</string>
+    <string name="profile_export_journal">Exportar diario cifrado (PDF/JSON)</string>
+    <string name="profile_save_changes">Guardar cambios</string>
+    <string name="profile_logout">Cerrar sesión de forma segura</string>
+    <string name="profile_btn_edit">Editar</string>
+    <string name="profile_btn_change">Cambiar</string>
+    <string name="profile_btn_manage">Administrar</string>
+    <string name="profile_btn_wallet">Billetera</string>
+
+    <!-- Topics -->
+    <string name="topic_anxiety_stress">Ansiedad y estrés</string>
+    <string name="topic_mindfulness">Mindfulness</string>
+    <string name="topic_grief_recovery">Recuperación de duelo</string>
+    <string name="topic_personal_growth">Crecimiento personal</string>
+
+    <!-- Avatar Change Sheet -->
+    <string name="avatar_sheet_title">Foto de perfil</string>
+    <string name="avatar_sheet_subtitle">Elige cómo aparecer en tu santuario privado</string>
+    <string name="avatar_rejected_error">Imagen rechazada (Supera los 5MB)\nPor favor selecciona un archivo JPG o PNG menor a 5MB o elige un avatar.</string>
+    <string name="avatar_take_photo">Tomar nueva foto</string>
+    <string name="avatar_take_photo_desc">Usa la cámara de tu dispositivo</string>
+    <string name="avatar_choose_gallery">Elegir de la galería</string>
+    <string name="avatar_choose_gallery_desc">Explora tu biblioteca de fotos</string>
+    <string name="avatar_choose_preset">Elegir avatar ilustrado</string>
+    <string name="avatar_choose_preset_desc">Diseños serenos, botánicos y abstractos</string>
+    <string name="avatar_remove_photo">Eliminar foto (Usar iniciales predeterminadas)</string>
+
+    <!-- Edit Email -->
+    <string name="email_title">Editar correo electrónico</string>
+    <string name="email_header">Cambiar correo de la cuenta</string>
+    <string name="email_header_desc">Tu correo se usa para recuperar tu cuenta y tus claves de cifrado</string>
+    <string name="email_current">CORREO ACTUAL</string>
+    <string name="email_validate_badge">Validar ✓</string>
+    <string name="email_new">NUEVO CORREO ELECTRÓNICO *</string>
+    <string name="email_invalid_error">Por favor ingresa un correo electrónico válido</string>
+    <string name="email_password">CONFIRMAR CONTRASEÑA MAESTRA</string>
+    <string name="email_sec_title">Verificación de seguridad requerida</string>
+    <string name="email_sec_desc">Se enviará un PIN de confirmación de 6 dígitos a tu nueva bandeja.</string>
+    <string name="email_btn_send">Enviar código de verificación</string>
+    <string name="email_btn_send_desc">Corrige los errores anteriores para habilitar la verificación</string>
+    <string name="email_btn_discard">Descartar y conservar correo actual</string>
+
+    <!-- Safe Support Contact -->
+    <string name="safe_contact_title">Contacto de apoyo seguro</string>
+    <string name="safe_contact_net_title">Tu red de seguridad emocional</string>
+    <string name="safe_contact_net_desc">Una persona de confianza que puede ser notificada en momentos de crisis o inactividad prolongada.</string>
+    <string name="safe_contact_info">Información del contacto</string>
+    <string name="safe_contact_name">NOMBRE COMPLETO</string>
+    <string name="safe_contact_rel">PARENTESCO</string>
+    <string name="safe_contact_phone">NÚMERO TELEFÓNICO</string>
+    <string name="safe_contact_sms_ready">Listo para SMS</string>
+    <string name="safe_contact_email">CORREO DE EMERGENCIA</string>
+    <string name="safe_contact_notify_inactivity">Notificar por inactividad prolongada (48h)</string>
+    <string name="safe_contact_notify_desc">Enviar una solicitud de bienestar si no tienes actividad</string>
+    <string name="safe_contact_remove_title">¿Eliminar contacto seguro?</string>
+    <string name="safe_contact_remove_desc">Perderás el protocolo de alcance en emergencia. Si experimentas una crisis emocional, no se podrá contactar a nadie automáticamente.</string>
+    <string name="safe_contact_remove_confirm">Sí, eliminar</string>
+    <string name="safe_contact_remove_cancel">Conservar contacto seguro</string>
+    <string name="safe_contact_save_btn">Guardar cambios del contacto</string>
+    <string name="safe_contact_encrypted_foot">Los datos del contacto se guardan con cifrado zero-knowledge</string>
+
+    <!-- Relationships -->
+    <string name="relationship_parent">Padre / Madre</string>
+    <string name="relationship_spouse">Cónyuge</string>
+    <string name="relationship_partner">Pareja</string>
+    <string name="relationship_sibling">Hermano(a) / Familia directa</string>
+    <string name="relationship_child">Hijo(a)</string>
+    <string name="relationship_friend">Amigo(a) cercano(a)</string>
+    <string name="relationship_guardian">Tutor(a)</string>
+    <string name="relationship_doctor">Médico / Terapeuta</string>
+    <string name="relationship_other">Otro</string>
+
+    <!-- Payments & Digital Wallet -->
+    <string name="payments_title">Pagos y billetera digital</string>
+    <string name="payments_saved_methods">Métodos de pago guardados</string>
+    <string name="payments_add_method">+ Agregar método</string>
+    <string name="payments_health_wallet">SafeDiary Health Wallet</string>
+    <string name="payments_default_badge">PREDETERMINADA</string>
+    <string name="payments_add_new_card">+ Agregar nueva tarjeta o billetera digital</string>
+    <string name="payments_checkout_prefs">Preferencias de pago de consultas</string>
+    <string name="payments_auto_debit">Auto-débito de sesión con un toque</string>
+    <string name="payments_auto_debit_desc">Cobra a la tarjeta predeterminada solo tras finalizar la sesión</string>
+    <string name="payments_face_id">Requerir autorización FaceID para cobros</string>
+    <string name="payments_history_title">Historial reciente de pagos</string>
+    <string name="payments_filter_all">Todos</string>
+    <string name="payments_filter_consultations">Consultas</string>
+    <string name="payments_filter_subscriptions">Suscripciones</string>
+    <string name="payments_set_default">Predeterminar</string>
+    <string name="payments_verified_invoice">Verificado ✓</string>
+    <string name="payments_paid_receipt">Pagado ✓</string>
+
+    <!-- IAM Strings (Spanish) -->
+    <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_login_subtitle">Tu santuario seguro para el bienestar emocional</string>
+    <string name="auth_email_label">Correo electrónico</string>
+    <string name="auth_password_label">Contraseña</string>
+    <string name="auth_login_button">Iniciar sesión</string>
+    <string name="auth_toggle_password">Mostrar contraseña</string>
+
+    <!-- Additional Spanish Strings for Profile and Contacts -->
+    <string name="safe_contact_dialog_title">¿Confirmar eliminación?</string>
+    <string name="safe_contact_dialog_desc">¿Estás seguro de que deseas eliminar tu contacto de emergencia? Dejarás de tener un contacto de apoyo asignado para emergencias.</string>
+    <string name="safe_contact_dialog_confirm">Sí, eliminar contacto</string>
+    <string name="safe_contact_removed_toast">Contacto de emergencia eliminado</string>
+    <string name="safe_contact_saved_toast">Contacto guardado correctamente</string>
+    <string name="profile_no_emergency_contact">Sin contacto configurado</string>
+    <string name="profile_edit_name_title">Editar Información Personal</string>
+    <string name="profile_first_name_label">Nombre</string>
+    <string name="profile_last_name_label">Apellidos</string>
+    <string name="profile_name_updated_toast">Información personal actualizada</string>
+    <string name="payments_cardholder_label">TITULAR</string>
+    <string name="payments_expires_label">VENCE</string>
+    <string name="payments_no_methods">No tienes métodos de pago guardados</string>
+    <string name="payments_no_history">No hay transacciones registradas</string>
 </resources>

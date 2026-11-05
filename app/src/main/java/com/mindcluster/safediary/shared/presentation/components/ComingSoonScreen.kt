@@ -1,6 +1,10 @@
 package com.mindcluster.safediary.shared.presentation.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,6 +24,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,17 +35,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mindcluster.safediary.R
+import com.mindcluster.safediary.profiles.infrastructure.local.ProfilePreferences
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import com.mindcluster.safediary.shared.presentation.theme.OnSurface
 import com.mindcluster.safediary.shared.presentation.theme.OnSurfaceVariant
@@ -52,7 +62,8 @@ import com.mindcluster.safediary.shared.presentation.theme.SurfaceContainerLowes
 
 /**
  * Reusable placeholder tab screen.
- * Shows title in TopAppBar without a back arrow, and displays SafeDiaryBottomNavBar at bottom.
+ * Shows title in TopAppBar with SafeDiary branding and profile navigation,
+ * and displays SafeDiaryBottomNavBar at bottom when needed.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,9 +74,19 @@ fun ComingSoonScreen(
     plannedFeatures: List<String>,
     currentRoute: String,
     onNavigateToRoute: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
     showBottomBar: Boolean = false,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val profilePreferences = remember { ProfilePreferences(context) }
+    val userInitials = remember(profilePreferences.firstName, profilePreferences.lastName) {
+        val f = profilePreferences.firstName.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+        val l = profilePreferences.lastName.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
+        val combined = "$f$l"
+        if (combined.isNotBlank()) combined else "SD"
+    }
+
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = BackgroundSanctuary,
@@ -73,13 +94,88 @@ fun ComingSoonScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.SemiBold,
-                            color = PrimaryNavy
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.safediary_logo),
+                            contentDescription = stringResource(R.string.shared_cd_logo),
+                            modifier = Modifier
+                                .size(32.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
                         )
-                    )
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = stringResource(R.string.shared_topbar_title_prefix),
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PrimaryNavy
+                            )
+                            Text(
+                                text = " / ",
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = SlatePlaceholder
+                            )
+                            Text(
+                                text = title,
+                                fontSize = 17.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = PrimaryNavy
+                            )
+                        }
+                    }
+                },
+                actions = {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.padding(end = 12.dp)
+                    ) {
+                        // Notification bell with unread badge dot
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .clickable { },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Outlined.Notifications,
+                                contentDescription = stringResource(R.string.shared_cd_notifications),
+                                tint = PrimaryNavy,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .align(Alignment.TopEnd)
+                                    .padding(top = 4.dp, end = 4.dp)
+                                    .size(8.dp)
+                                    .clip(CircleShape)
+                                    .background(Color(0xFF0F766E))
+                            )
+                        }
+
+                        // Profile Avatar
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFFD1E3D4))
+                                .border(1.dp, Color(0xFFCBD5E1), CircleShape)
+                                .clickable { onNavigateToProfile() },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = userInitials,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color(0xFF1E3A2F)
+                            )
+                        }
+                    }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = BackgroundSanctuary

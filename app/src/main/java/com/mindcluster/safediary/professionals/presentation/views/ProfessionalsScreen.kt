@@ -21,9 +21,10 @@ import com.mindcluster.safediary.shared.presentation.theme.*
 
 @Composable
 fun ProfessionalsScreen(
-    onNavigateToRoute: (String) -> Unit,
+    onNavigateToRoute: (String) -> Unit = {},
     modifier: Modifier = Modifier,
-    onNavigateToSettings: () -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    onNavigateToSettings: () -> Unit = onNavigateToProfile,
     isActive: Boolean = true,
     onContactProfessional: (String, String) -> Unit = { _, _ -> },
     viewModel: ProfessionalsViewModel = viewModel()
@@ -41,7 +42,7 @@ fun ProfessionalsScreen(
     fun back() { page = if (page == "contact" || page == "reviews") "profile" else "directory" }
     BackHandler(isActive && page != "directory") { back() }
 
-    PatientScreen("Psicólogos", modifier, onBack = if (page != "directory") ({ back() }) else null, onSettings = onNavigateToSettings, contentKey = page) {
+    PatientScreen("Psicólogos", modifier, onBack = if (page != "directory") ({ back() }) else null, onSettings = onNavigateToProfile, contentKey = page) {
         when (page) {
             "profile" -> {
                 PatientHeading("Perfil profesional", "Información para elegir con confianza.")

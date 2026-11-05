@@ -30,9 +30,14 @@ private val moods = listOf(
 )
 
 @Composable
-fun HomeScreen(onNavigateToRoute: (String) -> Unit, modifier: Modifier = Modifier, onNavigateToSettings: () -> Unit = {}, viewModel: HomeViewModel = viewModel()) {
+fun HomeScreen(
+    onNavigateToRoute: (String) -> Unit = {},
+    onNavigateToProfile: () -> Unit = {},
+    modifier: Modifier = Modifier,
+    viewModel: HomeViewModel = viewModel()
+) {
     val selected by viewModel.mood.collectAsStateWithLifecycle()
-    PatientScreen("Inicio", modifier, onSettings = onNavigateToSettings) {
+    PatientScreen("Inicio", modifier, onSettings = onNavigateToProfile) {
         PatientHeading("Un momento para ti", "¿Cómo se siente tu corazón hoy?")
         PatientCard {
             Text("Tu estado de ánimo", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)

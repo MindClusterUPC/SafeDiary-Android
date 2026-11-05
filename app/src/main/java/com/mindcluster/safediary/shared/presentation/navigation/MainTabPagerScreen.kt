@@ -1,7 +1,6 @@
 package com.mindcluster.safediary.shared.presentation.navigation
 
 import android.app.Activity
-import androidx.compose.ui.geometry.Offset
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
@@ -12,6 +11,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
@@ -28,15 +28,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.pointerInput
-import kotlin.math.abs
-import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
@@ -56,8 +53,7 @@ import com.mindcluster.safediary.scheduling.presentation.viewmodels.SchedulingVi
 import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import kotlinx.coroutines.launch
-
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import kotlin.math.abs
 
 private val tabRoutes = listOf(
     NavRoutes.AI_CHAT,
@@ -70,7 +66,8 @@ private val tabRoutes = listOf(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MainTabPagerScreen(
-    onNavigateToSettings: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit = onNavigateToProfile,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -239,13 +236,13 @@ fun MainTabPagerScreen(
                 HorizontalPager(
                     state = pagerState,
                     userScrollEnabled = !isImeVisible,
-                    beyondViewportPageCount = 4,
+                    beyondViewportPageCount = 2,
                     modifier = Modifier.fillMaxSize()
                 ) { page ->
                     when (page) {
                         0 -> AiChatScreen(
                             viewModel = assistantViewModel,
-                            onNavigateToSettings = onNavigateToSettings,
+                            onNavigateToSettings = onNavigateToProfile,
                             onOpenDrawer = {
                                 coroutineScope.launch { drawerState.open() }
                             },
@@ -254,16 +251,16 @@ fun MainTabPagerScreen(
                         )
                         1 -> RutinesScreen(
                             onNavigateToRoute = { navigateToTab(it) },
-                            onNavigateToSettings = onNavigateToSettings,
+                            onNavigateToSettings = onNavigateToProfile,
                             isActive = pagerState.currentPage == 1
                         )
                         2 -> HomeScreen(
                             onNavigateToRoute = { navigateToTab(it) },
-                            onNavigateToSettings = onNavigateToSettings
+                            onNavigateToProfile = onNavigateToProfile
                         )
                         3 -> ProfessionalsScreen(
                             onNavigateToRoute = { navigateToTab(it) },
-                            onNavigateToSettings = onNavigateToSettings,
+                            onNavigateToProfile = onNavigateToProfile,
                             isActive = pagerState.currentPage == 3,
                             onContactProfessional = { id, message ->
                                 schedulingViewModel.startConversation(id, message)
@@ -272,7 +269,7 @@ fun MainTabPagerScreen(
                         )
                         4 -> SchedulingScreen(
                             onNavigateToRoute = { navigateToTab(it) },
-                            onNavigateToSettings = onNavigateToSettings,
+                            onNavigateToSettings = onNavigateToProfile,
                             isActive = pagerState.currentPage == 4,
                             viewModel = schedulingViewModel
                         )

@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import com.mindcluster.safediary.shared.infrastructure.locale.AppLocaleManager
 import com.mindcluster.safediary.shared.infrastructure.network.LocalNetworkAccess
 import com.mindcluster.safediary.shared.presentation.navigation.AppNavigation
 import com.mindcluster.safediary.shared.presentation.theme.SafeDiaryTheme
@@ -15,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { /* chat falls back to mock if denied */ }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        AppLocaleManager.ensureDefault(this)
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         if (LocalNetworkAccess.needsRuntimeGrant(this)) {
