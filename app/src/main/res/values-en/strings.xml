@@ -271,11 +271,25 @@
 
     <!-- IAM Strings (English) -->
     <string name="auth_login_title">Sign In</string>
+    <string name="auth_register_title">Create your Sanctuary Account</string>
+    <string name="auth_tab_login">Sign In</string>
+    <string name="auth_tab_register">Sign Up</string>
     <string name="auth_login_subtitle">Your safe sanctuary for emotional wellbeing</string>
+    <string name="auth_role_label">Account type</string>
+    <string name="auth_role_patient">Patient</string>
+    <string name="auth_role_psychologist">Psychologist</string>
+    <string name="auth_full_name_label">Full name</string>
+    <string name="auth_full_name_placeholder">Elena Rostova</string>
     <string name="auth_email_label">Email address</string>
     <string name="auth_password_label">Password</string>
+    <string name="auth_confirm_password_label">Confirm password</string>
+    <string name="auth_password_hint">Minimum 8 characters and at least one number or symbol</string>
     <string name="auth_login_button">Sign In</string>
+    <string name="auth_register_button">Create Account</string>
     <string name="auth_toggle_password">Toggle password visibility</string>
+    <string name="auth_switch_to_register">Don\'t have an account? Sign up here</string>
+    <string name="auth_switch_to_login">Already have an account? Sign in</string>
+    <string name="auth_error_passwords_mismatch">Passwords do not match</string>
 
     <!-- Additional English Strings for Profile and Contacts -->
     <string name="safe_contact_dialog_title">Confirm deletion?</string>
