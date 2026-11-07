@@ -84,6 +84,7 @@ fun SafeSupportContactScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .imePadding()
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
@@ -229,7 +230,7 @@ fun SafeSupportContactScreen(
                                     DropdownMenuItem(
                                         text = { Text(label) },
                                         onClick = {
-                                             viewModel.onRelationshipChanged(rel)
+                                            viewModel.onRelationshipChanged(rel)
                                             isRelDropdownExpanded = false
                                         }
                                     )

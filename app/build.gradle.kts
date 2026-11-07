@@ -27,6 +27,7 @@ android {
 
         // Configurable endpoints from environment variables or gradle properties
         val endpointAuthSignIn = getEnvOrProperty("SAFEDY_ENDPOINT_AUTH_SIGN_IN", "safediary.endpointAuthSignIn", "api/v1/authentication/sign-in")
+        val endpointAuthSignUp = getEnvOrProperty("SAFEDY_ENDPOINT_AUTH_SIGN_UP", "safediary.endpointAuthSignUp", "api/v1/authentication/sign-up")
         val endpointPatients = getEnvOrProperty("SAFEDY_ENDPOINT_PATIENTS", "safediary.endpointPatients", "api/v1/patients")
         val endpointPaymentsCheckout = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_CHECKOUT", "safediary.endpointPaymentsCheckout", "api/v1/payments/subscriptions/checkout")
         val endpointPaymentsCurrent = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_CURRENT", "safediary.endpointPaymentsCurrent", "api/v1/payments/subscriptions/current")
@@ -36,6 +37,7 @@ android {
         val stripeDemoUrl = getEnvOrProperty("SAFEDY_STRIPE_DEMO_URL", "safediary.stripeDemoUrl", "https://checkout.stripe.com/pay/demo_session_safediary")
 
         buildConfigField("String", "ENDPOINT_AUTH_SIGN_IN", "\"$endpointAuthSignIn\"")
+        buildConfigField("String", "ENDPOINT_AUTH_SIGN_UP", "\"$endpointAuthSignUp\"")
         buildConfigField("String", "ENDPOINT_PATIENTS", "\"$endpointPatients\"")
         buildConfigField("String", "ENDPOINT_PAYMENTS_CHECKOUT", "\"$endpointPaymentsCheckout\"")
         buildConfigField("String", "ENDPOINT_PAYMENTS_CURRENT", "\"$endpointPaymentsCurrent\"")

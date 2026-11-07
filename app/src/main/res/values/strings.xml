@@ -271,11 +271,25 @@
 
     <!-- IAM Strings (Spanish) -->
     <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_register_title">Crear cuenta en el Santuario</string>
+    <string name="auth_tab_login">Iniciar sesión</string>
+    <string name="auth_tab_register">Crear cuenta</string>
     <string name="auth_login_subtitle">Tu santuario seguro para el bienestar emocional</string>
+    <string name="auth_role_label">Tipo de cuenta</string>
+    <string name="auth_role_patient">Paciente</string>
+    <string name="auth_role_psychologist">Psicólogo</string>
+    <string name="auth_full_name_label">Nombre completo</string>
+    <string name="auth_full_name_placeholder">Elena Rostova</string>
     <string name="auth_email_label">Correo electrónico</string>
     <string name="auth_password_label">Contraseña</string>
+    <string name="auth_confirm_password_label">Confirmar contraseña</string>
+    <string name="auth_password_hint">Mínimo 8 caracteres e incluye al menos un número o símbolo</string>
     <string name="auth_login_button">Iniciar sesión</string>
+    <string name="auth_register_button">Crear cuenta</string>
     <string name="auth_toggle_password">Mostrar contraseña</string>
+    <string name="auth_switch_to_register">¿No tienes una cuenta? Regístrate aquí</string>
+    <string name="auth_switch_to_login">¿Ya tienes una cuenta? Inicia sesión</string>
+    <string name="auth_error_passwords_mismatch">Las contraseñas no coinciden</string>
 
     <!-- Additional Spanish Strings for Profile and Contacts -->
     <string name="safe_contact_dialog_title">¿Confirmar eliminación?</string>
