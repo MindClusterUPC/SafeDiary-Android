@@ -4,15 +4,18 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.mindcluster.safediary.diary.infrastructure.local.dao.DiaryEntryDao
+import com.mindcluster.safediary.diary.infrastructure.local.entity.DiaryEntryEntity
 
 @Database(
-    entities = [ConversationEntity::class, MessageEntity::class],
-    version = 1,
+    entities = [ConversationEntity::class, MessageEntity::class, DiaryEntryEntity::class],
+    version = 2,
     exportSchema = false
 )
 abstract class SafeDiaryDatabase : RoomDatabase() {
     abstract fun conversationDao(): ConversationDao
     abstract fun messageDao(): MessageDao
+    abstract fun diaryEntryDao(): DiaryEntryDao
 
     companion object {
         @Volatile
