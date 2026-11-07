@@ -9,3 +9,8 @@
 .cxx
 local.properties
 .archify/
+
+# Documentation and design assets
+/docs/
+**/docs/
+
