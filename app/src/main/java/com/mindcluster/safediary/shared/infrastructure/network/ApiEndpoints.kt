@@ -9,6 +9,7 @@ object ApiEndpoints {
     val baseUrl: String = BuildConfig.API_BASE_URL
 
     val authSignIn: String = BuildConfig.ENDPOINT_AUTH_SIGN_IN
+    val authSignUp: String = BuildConfig.ENDPOINT_AUTH_SIGN_UP
     val patients: String = BuildConfig.ENDPOINT_PATIENTS
 
     val paymentsCheckout: String = BuildConfig.ENDPOINT_PAYMENTS_CHECKOUT

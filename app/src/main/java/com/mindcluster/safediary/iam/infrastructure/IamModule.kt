@@ -3,6 +3,7 @@ package com.mindcluster.safediary.iam.infrastructure
 import android.content.Context
 import com.mindcluster.safediary.iam.application.commands.SignInHandler
 import com.mindcluster.safediary.iam.application.commands.SignOutHandler
+import com.mindcluster.safediary.iam.application.commands.SignUpHandler
 import com.mindcluster.safediary.iam.domain.repository.AuthRepository
 import com.mindcluster.safediary.iam.infrastructure.remote.RetrofitIamGateway
 import com.mindcluster.safediary.profiles.infrastructure.local.ProfilePreferences
@@ -26,6 +27,10 @@ class IamModule(context: Context) {
 
     val signInHandler: SignInHandler by lazy {
         SignInHandler(authRepository)
+    }
+
+    val signUpHandler: SignUpHandler by lazy {
+        SignUpHandler(authRepository)
     }
 
     val signOutHandler: SignOutHandler by lazy {
