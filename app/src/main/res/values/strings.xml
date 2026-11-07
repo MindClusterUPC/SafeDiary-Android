@@ -1,15 +1,15 @@
-<resources>
+﻿<resources>
     <string name="app_name">SafeDiary</string>
 
     <!-- Shared TopBar & Navigation -->
     <string name="shared_topbar_title_prefix">SafeDiary</string>
     <string name="shared_topbar_section_assistant">Asistente</string>
-    <string name="shared_topbar_section_settings">Configuración</string>
+    <string name="shared_topbar_section_settings">ConfiguraciÃ³n</string>
     <string name="shared_topbar_section_home">Inicio</string>
     <string name="shared_cd_logo">Logo de SafeDiary</string>
-    <string name="shared_cd_back">Atrás</string>
-    <string name="shared_cd_settings">Configuración</string>
-    <string name="shared_cd_menu">Menú</string>
+    <string name="shared_cd_back">AtrÃ¡s</string>
+    <string name="shared_cd_settings">ConfiguraciÃ³n</string>
+    <string name="shared_cd_menu">MenÃº</string>
     <string name="shared_cd_user_avatar">Avatar de usuario</string>
     <string name="shared_cd_notifications">Notificaciones</string>
 
@@ -20,24 +20,24 @@
 
     <!-- Shared Placeholder Welcome -->
     <string name="shared_welcome_title">Bienvenido a SafeDiary</string>
-    <string name="shared_welcome_desc">Tu santuario seguro para la reflexión y el bienestar emocional.</string>
+    <string name="shared_welcome_desc">Tu santuario seguro para la reflexiÃ³n y el bienestar emocional.</string>
 
     <!-- AI Chat Strings (Spanish) -->
     <string name="chat_header_diarito">Diarito</string>
-    <string name="chat_input_placeholder">Escribe cómo te sientes hoy…</string>
+    <string name="chat_input_placeholder">Escribe cÃ³mo te sientes hoyâ€¦</string>
     <string name="chat_disclaimer">Diarito es una IA de apoyo reflexivo y no reemplaza a un profesional.</string>
     <string name="chat_empty_title">Tu espacio seguro para reflexionar</string>
-    <string name="chat_empty_subtitle">Escribe lo que sientes. Te escucho y te acompaño sin juicios.</string>
-    <string name="chat_typing">SafeDiary está escribiendo…</string>
+    <string name="chat_empty_subtitle">Escribe lo que sientes. Te escucho y te acompaÃ±o sin juicios.</string>
+    <string name="chat_typing">SafeDiary estÃ¡ escribiendoâ€¦</string>
     <string name="chat_cd_send">Enviar mensaje</string>
     <string name="chat_cd_copy">Copiar respuesta</string>
-    <string name="chat_cd_new_chat">Nueva conversación</string>
-    <string name="chat_status_online">En línea • Espacio seguro</string>
-    <string name="chat_error_generic">Ocurrió un error al procesar tu mensaje. Por favor intenta de nuevo.</string>
-    <string name="chat_reply_error">No pude responder ahora. Revisa tu conexión e inténtalo de nuevo.</string>
+    <string name="chat_cd_new_chat">Nueva conversaciÃ³n</string>
+    <string name="chat_status_online">En lÃ­nea â€¢ Espacio seguro</string>
+    <string name="chat_error_generic">OcurriÃ³ un error al procesar tu mensaje. Por favor intenta de nuevo.</string>
+    <string name="chat_reply_error">No pude responder ahora. Revisa tu conexiÃ³n e intÃ©ntalo de nuevo.</string>
     <string name="chat_retry">Reintentar</string>
     <string name="chat_crisis_title">Apoyo inmediato disponible</string>
-    <string name="chat_crisis_body">No tienes que pasar por esto en soledad. Estas líneas son gratuitas y atienden las 24 horas.</string>
+    <string name="chat_crisis_body">No tienes que pasar por esto en soledad. Estas lÃ­neas son gratuitas y atienden las 24 horas.</string>
     <string name="chat_crisis_call">Llamar al %1$s</string>
     <string name="chat_crisis_dismiss">Cerrar aviso</string>
 
@@ -54,48 +54,48 @@
     <!-- Conversation Management (Spanish) -->
     <string name="chat_conversation_rename">Renombrar</string>
     <string name="chat_conversation_delete">Eliminar</string>
-    <string name="chat_rename_dialog_title">Renombrar conversación</string>
-    <string name="chat_rename_dialog_hint">Título de la conversación</string>
-    <string name="chat_delete_dialog_title">¿Eliminar conversación?</string>
-    <string name="chat_delete_dialog_body">Esta acción no se puede deshacer.</string>
+    <string name="chat_rename_dialog_title">Renombrar conversaciÃ³n</string>
+    <string name="chat_rename_dialog_hint">TÃ­tulo de la conversaciÃ³n</string>
+    <string name="chat_delete_dialog_title">Â¿Eliminar conversaciÃ³n?</string>
+    <string name="chat_delete_dialog_body">Esta acciÃ³n no se puede deshacer.</string>
     <string name="chat_delete_dialog_confirm">Eliminar</string>
-    <string name="chat_cd_more_options">Más opciones</string>
+    <string name="chat_cd_more_options">MÃ¡s opciones</string>
 
     <!-- Navigation Drawer & Header (Spanish) -->
     <string name="nav_home">Inicio</string>
     <string name="nav_professionals">Profesionales</string>
-    <string name="nav_settings">Configuración</string>
+    <string name="nav_settings">ConfiguraciÃ³n</string>
     <string name="chat_drawer_recent">Recientes</string>
-    <string name="chat_cd_new_chat_button">Nueva conversación</string>
+    <string name="chat_cd_new_chat_button">Nueva conversaciÃ³n</string>
 
     <!-- Bottom Navigation Tabs (Figma) -->
     <string name="nav_tab_diarito">Diarito</string>
     <string name="nav_tab_rutines">Rutinas</string>
     <string name="nav_tab_home">Inicio</string>
-    <string name="nav_tab_psychologist">Psicólogos</string>
+    <string name="nav_tab_psychologist">PsicÃ³logos</string>
     <string name="nav_tab_scheduling">Agenda</string>
 
     <!-- AI Voice Diary & History Drawer (Spanish) -->
     <string name="chat_tab_diary">Diario</string>
     <string name="chat_tab_help">Ayuda</string>
     <string name="chat_tab_community">Comunidad</string>
-    <string name="chat_greeting_title">Hola, soy Diarito 👋</string>
+    <string name="chat_greeting_title">Hola, soy Diarito ðŸ‘‹</string>
     <string name="chat_drawer_title">Historial de chats</string>
-    <string name="chat_drawer_search_hint">Buscar chats…</string>
+    <string name="chat_drawer_search_hint">Buscar chatsâ€¦</string>
     <string name="chat_drawer_new_chat">Nuevo chat</string>
     <string name="chat_drawer_group_older">Anteriores</string>
-    <string name="chat_drawer_empty">Aún no tienes conversaciones. Escribe tu primer mensaje para empezar.</string>
+    <string name="chat_drawer_empty">AÃºn no tienes conversaciones. Escribe tu primer mensaje para empezar.</string>
     <string name="chat_drawer_error">No se pudo cargar tu historial.</string>
-    <string name="chat_drawer_untitled">Conversación sin título</string>
+    <string name="chat_drawer_untitled">ConversaciÃ³n sin tÃ­tulo</string>
     <string name="chat_drawer_group_today">Hoy</string>
     <string name="chat_drawer_group_yesterday">Ayer</string>
 
     <!-- Settings Screen (Spanish) -->
-    <string name="settings_title">Configuración</string>
+    <string name="settings_title">ConfiguraciÃ³n</string>
     <string name="settings_section_diarito">Diarito</string>
-    <string name="settings_personality_sol_desc">Cálido y cercano, te acompaña</string>
-    <string name="settings_personality_luma_desc">Te ayuda a ver las cosas desde otro ángulo</string>
-    <string name="settings_personality_kai_desc">Práctico: ordena y propone pasos</string>
+    <string name="settings_personality_sol_desc">CÃ¡lido y cercano, te acompaÃ±a</string>
+    <string name="settings_personality_luma_desc">Te ayuda a ver las cosas desde otro Ã¡ngulo</string>
+    <string name="settings_personality_kai_desc">PrÃ¡ctico: ordena y propone pasos</string>
     <string name="settings_personality_nara_desc">Sereno y pausado, baja la intensidad</string>
     <string name="personality_sol_name" translatable="false">Sol</string>
     <string name="personality_luma_name" translatable="false">Luma</string>
@@ -106,41 +106,41 @@
     <string name="settings_item_language">Idioma</string>
 
     <string name="settings_section_help">Ayuda inmediata</string>
-    <string name="settings_help_body">Si estás en peligro o sientes que no puedes más, llama ahora. Es gratuito y confidencial, 24/7.</string>
-    <string name="settings_crisis_call_btn">Llamar a la Línea 113 (opción 5)</string>
+    <string name="settings_help_body">Si estÃ¡s en peligro o sientes que no puedes mÃ¡s, llama ahora. Es gratuito y confidencial, 24/7.</string>
+    <string name="settings_crisis_call_btn">Llamar a la LÃ­nea 113 (opciÃ³n 5)</string>
 
-    <string name="settings_version">SafeDiary · versión %1$s</string>
+    <string name="settings_version">SafeDiary Â· versiÃ³n %1$s</string>
 
     <string name="settings_lang_title">Seleccionar idioma de la app</string>
-    <string name="settings_lang_es">Español (Predeterminado)</string>
+    <string name="settings_lang_es">EspaÃ±ol (Predeterminado)</string>
     <string name="settings_lang_en">English</string>
 
     <!-- Suggestions -->
     <string name="chat_suggestion_1">Me siento un poco abrumado hoy</string>
-    <string name="chat_suggestion_2">Tuve un buen día y quiero registrarlo</string>
-    <string name="chat_suggestion_3">Me cuesta conciliar el sueño últimamente</string>
-    <string name="chat_suggestion_4">¿Cómo puedo calmar mi respiración ahora?</string>
+    <string name="chat_suggestion_2">Tuve un buen dÃ­a y quiero registrarlo</string>
+    <string name="chat_suggestion_3">Me cuesta conciliar el sueÃ±o Ãºltimamente</string>
+    <string name="chat_suggestion_4">Â¿CÃ³mo puedo calmar mi respiraciÃ³n ahora?</string>
 
     <!-- Coming Soon Placeholder Screens (Spanish) -->
-    <string name="coming_soon_badge">Próximamente</string>
+    <string name="coming_soon_badge">PrÃ³ximamente</string>
     <string name="home_title">Home</string>
-    <string name="home_subtitle">Tu resumen del día</string>
-    <string name="home_feature_1">Saludo y resumen de tu día</string>
-    <string name="home_feature_2">Registro rápido de ánimo</string>
+    <string name="home_subtitle">Tu resumen del dÃ­a</string>
+    <string name="home_feature_1">Saludo y resumen de tu dÃ­a</string>
+    <string name="home_feature_2">Registro rÃ¡pido de Ã¡nimo</string>
     <string name="home_feature_3">Racha de escritura</string>
-    <string name="home_feature_4">Última entrada del diario</string>
-    <string name="home_feature_5">Accesos rápidos a Diarito y ejercicios SOS</string>
+    <string name="home_feature_4">Ãšltima entrada del diario</string>
+    <string name="home_feature_5">Accesos rÃ¡pidos a Diarito y ejercicios SOS</string>
 
     <string name="rutines_title">Rutines</string>
-    <string name="rutines_subtitle">Rutinas de bienestar y hábitos saludables</string>
+    <string name="rutines_subtitle">Rutinas de bienestar y hÃ¡bitos saludables</string>
     <string name="rutines_feature_1">Rutinas matutinas y nocturnas guiadas</string>
-    <string name="rutines_feature_2">Seguimiento de hábitos diarios</string>
+    <string name="rutines_feature_2">Seguimiento de hÃ¡bitos diarios</string>
     <string name="rutines_feature_3">Recordatorios conscientes y pausas activas</string>
-    <string name="rutines_feature_4">Integración con tu diario reflexivo</string>
+    <string name="rutines_feature_4">IntegraciÃ³n con tu diario reflexivo</string>
 
     <string name="professionals_title">Psychologist</string>
     <string name="professionals_subtitle">Encuentra apoyo profesional</string>
-    <string name="professionals_feature_1">Directorio de psicólogos verificados</string>
+    <string name="professionals_feature_1">Directorio de psicÃ³logos verificados</string>
     <string name="professionals_feature_2">Perfiles con especialidades y disponibilidad</string>
     <string name="professionals_feature_3">Guardar especialistas</string>
     <string name="professionals_feature_4">Compartir tu historial con consentimiento</string>
@@ -149,146 +149,167 @@
     <string name="scheduling_subtitle">Agenda tus sesiones y momentos de calma</string>
     <string name="scheduling_feature_1">Reserva de sesiones con especialistas</string>
     <string name="scheduling_feature_2">Recordatorios de citas y confirmaciones</string>
-    <string name="scheduling_feature_3">Sincronización con calendario personal</string>
-    <string name="scheduling_feature_4">Historial de citas y notas de preparación</string>
+    <string name="scheduling_feature_3">SincronizaciÃ³n con calendario personal</string>
+    <string name="scheduling_feature_4">Historial de citas y notas de preparaciÃ³n</string>
 
     <!-- Offline & Sync Strings -->
-    <string name="chat_offline_indicator">Sin conexión</string>
-    <string name="chat_offline_pending_notice">Sin conexión: se enviará cuando vuelvas a estar en línea</string>
+    <string name="chat_offline_indicator">Sin conexiÃ³n</string>
+    <string name="chat_offline_pending_notice">Sin conexiÃ³n: se enviarÃ¡ cuando vuelvas a estar en lÃ­nea</string>
     <string name="chat_message_pending">Pendiente</string>
 
     <!-- Patient Profile Strings (Spanish) -->
     <string name="profile_title">Mi perfil y privacidad</string>
     <string name="profile_subtitle">Miembro del Santuario</string>
     <string name="profile_encrypted_badge">Santuario con cifrado de extremo a extremo</string>
-    <string name="profile_streak_count">Días de racha</string>
+    <string name="profile_streak_count">DÃ­as de racha</string>
     <string name="profile_reflections">Reflexiones</string>
-    <string name="profile_frequent_mood">Ánimo frecuente</string>
-    <string name="profile_section_personal">Información personal</string>
+    <string name="profile_frequent_mood">Ãnimo frecuente</string>
+    <string name="profile_section_personal">InformaciÃ³n personal</string>
     <string name="profile_full_name">Nombre completo</string>
-    <string name="profile_email_address">Correo electrónico</string>
-    <string name="profile_verified">Verificado ✓</string>
+    <string name="profile_email_address">Correo electrÃ³nico</string>
+    <string name="profile_verified">Verificado âœ“</string>
     <string name="profile_safe_contact">Contacto de apoyo seguro (Red de emergencia)</string>
-    <string name="profile_payment_methods">Métodos de pago y billetera digital</string>
-    <string name="profile_wallet_escrow">Protección Escrow 24h Zero-Knowledge activa en todas las sesiones.</string>
-    <string name="profile_topics_title">Temas terapéuticos de interés</string>
+    <string name="profile_payment_methods">MÃ©todos de pago y billetera digital</string>
+    <string name="profile_wallet_escrow">ProtecciÃ³n Escrow 24h Zero-Knowledge activa en todas las sesiones.</string>
+    <string name="profile_topics_title">Temas terapÃ©uticos de interÃ©s</string>
     <string name="profile_topics_desc">Temas seleccionados para personalizar preguntas del diario y coincidencias:</string>
     <string name="profile_security_privacy">Seguridad y privacidad</string>
-    <string name="profile_face_id">Bloqueo biométrico FaceID</string>
-    <string name="profile_face_id_desc">Requerir biometría al reanudar la app</string>
+    <string name="profile_face_id">Bloqueo biomÃ©trico FaceID</string>
+    <string name="profile_face_id_desc">Requerir biometrÃ­a al reanudar la app</string>
     <string name="profile_daily_reminder">Recordatorio diario</string>
     <string name="profile_daily_reminder_desc">Chequeo consciente a las 8:30 AM</string>
     <string name="profile_export_journal">Exportar diario cifrado (PDF/JSON)</string>
     <string name="profile_save_changes">Guardar cambios</string>
-    <string name="profile_logout">Cerrar sesión de forma segura</string>
+    <string name="profile_logout">Cerrar sesiÃ³n de forma segura</string>
     <string name="profile_btn_edit">Editar</string>
     <string name="profile_btn_change">Cambiar</string>
     <string name="profile_btn_manage">Administrar</string>
     <string name="profile_btn_wallet">Billetera</string>
 
     <!-- Topics -->
-    <string name="topic_anxiety_stress">Ansiedad y estrés</string>
+    <string name="topic_anxiety_stress">Ansiedad y estrÃ©s</string>
     <string name="topic_mindfulness">Mindfulness</string>
-    <string name="topic_grief_recovery">Recuperación de duelo</string>
+    <string name="topic_grief_recovery">RecuperaciÃ³n de duelo</string>
     <string name="topic_personal_growth">Crecimiento personal</string>
 
     <!-- Avatar Change Sheet -->
     <string name="avatar_sheet_title">Foto de perfil</string>
-    <string name="avatar_sheet_subtitle">Elige cómo aparecer en tu santuario privado</string>
+    <string name="avatar_sheet_subtitle">Elige cÃ³mo aparecer en tu santuario privado</string>
     <string name="avatar_rejected_error">Imagen rechazada (Supera los 5MB)\nPor favor selecciona un archivo JPG o PNG menor a 5MB o elige un avatar.</string>
     <string name="avatar_take_photo">Tomar nueva foto</string>
-    <string name="avatar_take_photo_desc">Usa la cámara de tu dispositivo</string>
-    <string name="avatar_choose_gallery">Elegir de la galería</string>
+    <string name="avatar_take_photo_desc">Usa la cÃ¡mara de tu dispositivo</string>
+    <string name="avatar_choose_gallery">Elegir de la galerÃ­a</string>
     <string name="avatar_choose_gallery_desc">Explora tu biblioteca de fotos</string>
     <string name="avatar_choose_preset">Elegir avatar ilustrado</string>
-    <string name="avatar_choose_preset_desc">Diseños serenos, botánicos y abstractos</string>
+    <string name="avatar_choose_preset_desc">DiseÃ±os serenos, botÃ¡nicos y abstractos</string>
     <string name="avatar_remove_photo">Eliminar foto (Usar iniciales predeterminadas)</string>
 
     <!-- Edit Email -->
-    <string name="email_title">Editar correo electrónico</string>
+    <string name="email_title">Editar correo electrÃ³nico</string>
     <string name="email_header">Cambiar correo de la cuenta</string>
     <string name="email_header_desc">Tu correo se usa para recuperar tu cuenta y tus claves de cifrado</string>
     <string name="email_current">CORREO ACTUAL</string>
-    <string name="email_validate_badge">Validar ✓</string>
-    <string name="email_new">NUEVO CORREO ELECTRÓNICO *</string>
-    <string name="email_invalid_error">Por favor ingresa un correo electrónico válido</string>
-    <string name="email_password">CONFIRMAR CONTRASEÑA MAESTRA</string>
-    <string name="email_sec_title">Verificación de seguridad requerida</string>
-    <string name="email_sec_desc">Se enviará un PIN de confirmación de 6 dígitos a tu nueva bandeja.</string>
-    <string name="email_btn_send">Enviar código de verificación</string>
-    <string name="email_btn_send_desc">Corrige los errores anteriores para habilitar la verificación</string>
+    <string name="email_validate_badge">Validar âœ“</string>
+    <string name="email_new">NUEVO CORREO ELECTRÃ“NICO *</string>
+    <string name="email_invalid_error">Por favor ingresa un correo electrÃ³nico vÃ¡lido</string>
+    <string name="email_password">CONFIRMAR CONTRASEÃ‘A MAESTRA</string>
+    <string name="email_sec_title">VerificaciÃ³n de seguridad requerida</string>
+    <string name="email_sec_desc">Se enviarÃ¡ un PIN de confirmaciÃ³n de 6 dÃ­gitos a tu nueva bandeja.</string>
+    <string name="email_btn_send">Enviar cÃ³digo de verificaciÃ³n</string>
+    <string name="email_btn_send_desc">Corrige los errores anteriores para habilitar la verificaciÃ³n</string>
     <string name="email_btn_discard">Descartar y conservar correo actual</string>
 
     <!-- Safe Support Contact -->
     <string name="safe_contact_title">Contacto de apoyo seguro</string>
     <string name="safe_contact_net_title">Tu red de seguridad emocional</string>
     <string name="safe_contact_net_desc">Una persona de confianza que puede ser notificada en momentos de crisis o inactividad prolongada.</string>
-    <string name="safe_contact_info">Información del contacto</string>
+    <string name="safe_contact_info">InformaciÃ³n del contacto</string>
     <string name="safe_contact_name">NOMBRE COMPLETO</string>
     <string name="safe_contact_rel">PARENTESCO</string>
-    <string name="safe_contact_phone">NÚMERO TELEFÓNICO</string>
+    <string name="safe_contact_phone">NÃšMERO TELEFÃ“NICO</string>
     <string name="safe_contact_sms_ready">Listo para SMS</string>
     <string name="safe_contact_email">CORREO DE EMERGENCIA</string>
     <string name="safe_contact_notify_inactivity">Notificar por inactividad prolongada (48h)</string>
     <string name="safe_contact_notify_desc">Enviar una solicitud de bienestar si no tienes actividad</string>
-    <string name="safe_contact_remove_title">¿Eliminar contacto seguro?</string>
-    <string name="safe_contact_remove_desc">Perderás el protocolo de alcance en emergencia. Si experimentas una crisis emocional, no se podrá contactar a nadie automáticamente.</string>
-    <string name="safe_contact_remove_confirm">Sí, eliminar</string>
+    <string name="safe_contact_remove_title">Â¿Eliminar contacto seguro?</string>
+    <string name="safe_contact_remove_desc">PerderÃ¡s el protocolo de alcance en emergencia. Si experimentas una crisis emocional, no se podrÃ¡ contactar a nadie automÃ¡ticamente.</string>
+    <string name="safe_contact_remove_confirm">SÃ­, eliminar</string>
     <string name="safe_contact_remove_cancel">Conservar contacto seguro</string>
     <string name="safe_contact_save_btn">Guardar cambios del contacto</string>
     <string name="safe_contact_encrypted_foot">Los datos del contacto se guardan con cifrado zero-knowledge</string>
 
     <!-- Relationships -->
     <string name="relationship_parent">Padre / Madre</string>
-    <string name="relationship_spouse">Cónyuge</string>
+    <string name="relationship_spouse">CÃ³nyuge</string>
     <string name="relationship_partner">Pareja</string>
     <string name="relationship_sibling">Hermano(a) / Familia directa</string>
     <string name="relationship_child">Hijo(a)</string>
     <string name="relationship_friend">Amigo(a) cercano(a)</string>
     <string name="relationship_guardian">Tutor(a)</string>
-    <string name="relationship_doctor">Médico / Terapeuta</string>
+    <string name="relationship_doctor">MÃ©dico / Terapeuta</string>
     <string name="relationship_other">Otro</string>
 
     <!-- Payments & Digital Wallet -->
     <string name="payments_title">Pagos y billetera digital</string>
-    <string name="payments_saved_methods">Métodos de pago guardados</string>
-    <string name="payments_add_method">+ Agregar método</string>
+    <string name="payments_saved_methods">MÃ©todos de pago guardados</string>
+    <string name="payments_add_method">+ Agregar mÃ©todo</string>
     <string name="payments_health_wallet">SafeDiary Health Wallet</string>
     <string name="payments_default_badge">PREDETERMINADA</string>
     <string name="payments_add_new_card">+ Agregar nueva tarjeta o billetera digital</string>
     <string name="payments_checkout_prefs">Preferencias de pago de consultas</string>
-    <string name="payments_auto_debit">Auto-débito de sesión con un toque</string>
-    <string name="payments_auto_debit_desc">Cobra a la tarjeta predeterminada solo tras finalizar la sesión</string>
-    <string name="payments_face_id">Requerir autorización FaceID para cobros</string>
+    <string name="payments_auto_debit">Auto-dÃ©bito de sesiÃ³n con un toque</string>
+    <string name="payments_auto_debit_desc">Cobra a la tarjeta predeterminada solo tras finalizar la sesiÃ³n</string>
+    <string name="payments_face_id">Requerir autorizaciÃ³n FaceID para cobros</string>
     <string name="payments_history_title">Historial reciente de pagos</string>
     <string name="payments_filter_all">Todos</string>
     <string name="payments_filter_consultations">Consultas</string>
     <string name="payments_filter_subscriptions">Suscripciones</string>
     <string name="payments_set_default">Predeterminar</string>
-    <string name="payments_verified_invoice">Verificado ✓</string>
-    <string name="payments_paid_receipt">Pagado ✓</string>
+    <string name="payments_verified_invoice">Verificado âœ“</string>
+    <string name="payments_paid_receipt">Pagado âœ“</string>
 
     <!-- IAM Strings (Spanish) -->
-    <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_login_title">Iniciar sesiÃ³n</string>
     <string name="auth_login_subtitle">Tu santuario seguro para el bienestar emocional</string>
-    <string name="auth_email_label">Correo electrónico</string>
-    <string name="auth_password_label">Contraseña</string>
-    <string name="auth_login_button">Iniciar sesión</string>
-    <string name="auth_toggle_password">Mostrar contraseña</string>
+    <string name="auth_email_label">Correo electrÃ³nico</string>
+    <string name="auth_password_label">ContraseÃ±a</string>
+    <string name="auth_login_button">Iniciar sesiÃ³n</string>
+    <string name="auth_toggle_password">Mostrar contraseÃ±a</string>
 
     <!-- Additional Spanish Strings for Profile and Contacts -->
-    <string name="safe_contact_dialog_title">¿Confirmar eliminación?</string>
-    <string name="safe_contact_dialog_desc">¿Estás seguro de que deseas eliminar tu contacto de emergencia? Dejarás de tener un contacto de apoyo asignado para emergencias.</string>
-    <string name="safe_contact_dialog_confirm">Sí, eliminar contacto</string>
+    <string name="safe_contact_dialog_title">Â¿Confirmar eliminaciÃ³n?</string>
+    <string name="safe_contact_dialog_desc">Â¿EstÃ¡s seguro de que deseas eliminar tu contacto de emergencia? DejarÃ¡s de tener un contacto de apoyo asignado para emergencias.</string>
+    <string name="safe_contact_dialog_confirm">SÃ­, eliminar contacto</string>
     <string name="safe_contact_removed_toast">Contacto de emergencia eliminado</string>
     <string name="safe_contact_saved_toast">Contacto guardado correctamente</string>
     <string name="profile_no_emergency_contact">Sin contacto configurado</string>
-    <string name="profile_edit_name_title">Editar Información Personal</string>
+    <string name="profile_edit_name_title">Editar InformaciÃ³n Personal</string>
     <string name="profile_first_name_label">Nombre</string>
     <string name="profile_last_name_label">Apellidos</string>
-    <string name="profile_name_updated_toast">Información personal actualizada</string>
+    <string name="profile_name_updated_toast">InformaciÃ³n personal actualizada</string>
     <string name="payments_cardholder_label">TITULAR</string>
     <string name="payments_expires_label">VENCE</string>
-    <string name="payments_no_methods">No tienes métodos de pago guardados</string>
+    <string name="payments_no_methods">No tienes mÃ©todos de pago guardados</string>
     <string name="payments_no_history">No hay transacciones registradas</string>
+    <!-- Diary Markdown & Grok Switch -->
+    <string name="switch_diarito_mode">Diarito</string>
+    <string name="switch_diary_mode">Diario</string>
+    <string name="cd_create_new_diary_note">Crear nueva nota en el diario</string>
+    <string name="dialog_delete_note_title">¿Eliminar nota?</string>
+    <string name="dialog_delete_note_message">¿Estás seguro de que deseas eliminar \"%1$s\"? Esta acción no se puede deshacer.</string>
+    <string name="dialog_delete_note_prompt">¿Estás seguro de que deseas eliminar esta nota? Esta acción no se puede deshacer.</string>
+    <string name="action_delete">Eliminar</string>
+    <string name="action_cancel">Cancelar</string>
+    <string name="action_delete_note">Eliminar nota</string>
+    <string name="cd_note_options">Opciones de la nota</string>
+    <string name="note_empty_snippet">Sin contenido...</string>
+    <string name="empty_diary_title">Tu diario íntimo está vacío</string>
+    <string name="empty_diary_subtitle">Un espacio seguro para plasmar tus pensamientos, reflexiones y vivencias cotidianas.</string>
+    <string name="action_create_first_note">Escribir mi primera nota</string>
+    <string name="action_back">Volver</string>
+    <string name="tab_edit">Editar</string>
+    <string name="tab_preview">Vista previa</string>
+    <string name="hint_note_title">Título de la nota...</string>
+    <string name="hint_note_content">Escribe tu reflexión aquí en Markdown...</string>
+    <string name="untitled_note">Nota sin título</string>
 </resources>

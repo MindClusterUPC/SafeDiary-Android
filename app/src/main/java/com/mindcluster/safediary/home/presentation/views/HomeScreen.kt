@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -33,6 +32,7 @@ private val moods = listOf(
 fun HomeScreen(
     onNavigateToRoute: (String) -> Unit = {},
     onNavigateToProfile: () -> Unit = {},
+    onOpenDiary: () -> Unit = { onNavigateToRoute(NavRoutes.AI_CHAT) },
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = viewModel()
 ) {
@@ -77,7 +77,7 @@ fun HomeScreen(
                     PatientInfo("Dale espacio a lo que sientes, a tu ritmo.")
                 }
             }
-            PatientButton("Abrir Diarito", { onNavigateToRoute(NavRoutes.AI_CHAT) }, Modifier.fillMaxWidth())
+            PatientButton("Abrir Diario", onOpenDiary, Modifier.fillMaxWidth())
         }
         PatientCard(color = SurfaceContainerLow) {
             PatientBadge("✧ INSPIRACIÓN DEL DÍA", SurfaceContainerHigh, PrimaryNavy)
