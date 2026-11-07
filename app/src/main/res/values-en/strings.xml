@@ -1,4 +1,5 @@
-﻿<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <string name="app_name">SafeDiary</string>
 
     <!-- Shared TopBar & Navigation -->
@@ -24,15 +25,15 @@
 
     <!-- AI Chat Strings (English) -->
     <string name="chat_header_diarito">Diarito</string>
-    <string name="chat_input_placeholder">Write how you are feeling todayâ€¦</string>
+    <string name="chat_input_placeholder">Write how you are feeling today…</string>
     <string name="chat_disclaimer">Diarito is a reflective AI companion and does not replace a professional.</string>
     <string name="chat_empty_title">Your safe space to reflect</string>
     <string name="chat_empty_subtitle">Write what you feel. I will listen and support you without judgment.</string>
-    <string name="chat_typing">SafeDiary is typingâ€¦</string>
+    <string name="chat_typing">SafeDiary is typing…</string>
     <string name="chat_cd_send">Send message</string>
     <string name="chat_cd_copy">Copy reply</string>
     <string name="chat_cd_new_chat">New conversation</string>
-    <string name="chat_status_online">Online â€¢ Safe Sanctuary</string>
+    <string name="chat_status_online">Online • Safe Sanctuary</string>
     <string name="chat_error_generic">An error occurred while processing your message. Please try again.</string>
     <string name="chat_reply_error">I could not answer right now. Check your connection and try again.</string>
     <string name="chat_retry">Retry</string>
@@ -79,12 +80,12 @@
     <string name="chat_tab_diary">Diary</string>
     <string name="chat_tab_help">Help</string>
     <string name="chat_tab_community">Community</string>
-    <string name="chat_greeting_title">Hi, I\'m Diarito ðŸ‘‹</string>
+    <string name="chat_greeting_title">Hi, I\'m Diarito 👋</string>
     <string name="chat_drawer_title">Chat history</string>
-    <string name="chat_drawer_search_hint">Search chatsâ€¦</string>
+    <string name="chat_drawer_search_hint">Search chats…</string>
     <string name="chat_drawer_new_chat">New chat</string>
     <string name="chat_drawer_group_older">Older</string>
-    <string name="chat_drawer_empty">You have no conversations yet. Type your first message to begin.</string>
+    <string name="chat_drawer_empty">You don\'t have any conversations yet. Send your first message to begin.</string>
     <string name="chat_drawer_error">Could not load your history.</string>
     <string name="chat_drawer_untitled">Untitled conversation</string>
     <string name="chat_drawer_group_today">Today</string>
@@ -93,10 +94,10 @@
     <!-- Settings Screen (English) -->
     <string name="settings_title">Settings</string>
     <string name="settings_section_diarito">Diarito</string>
-    <string name="settings_personality_sol_desc">Warm and supportive, stays close</string>
-    <string name="settings_personality_luma_desc">Helps you see things from another angle</string>
-    <string name="settings_personality_kai_desc">Practical: structures and proposes steps</string>
-    <string name="settings_personality_nara_desc">Serene and calm, slows down intensity</string>
+    <string name="settings_personality_sol_desc">Warm and close, stays with you</string>
+    <string name="settings_personality_luma_desc">Helps you look from another perspective</string>
+    <string name="settings_personality_kai_desc">Practical: clarifies and suggests steps</string>
+    <string name="settings_personality_nara_desc">Calm and slow, eases the intensity</string>
     <string name="personality_sol_name" translatable="false">Sol</string>
     <string name="personality_luma_name" translatable="false">Luma</string>
     <string name="personality_kai_name" translatable="false">Kai</string>
@@ -106,81 +107,81 @@
     <string name="settings_item_language">Language</string>
 
     <string name="settings_section_help">Immediate help</string>
-    <string name="settings_help_body">If you are in danger or feel you can\'t go on, call now. It\'s free and confidential, 24/7.</string>
-    <string name="settings_crisis_call_btn">Call LÃ­nea 113 (option 5)</string>
+    <string name="settings_help_body">If you are in danger or overwhelmed, call now. It is free and confidential, 24/7.</string>
+    <string name="settings_crisis_call_btn">Call Line 113 (option 5)</string>
 
-    <string name="settings_version">SafeDiary Â· version %1$s</string>
+    <string name="settings_version">SafeDiary · version %1$s</string>
 
     <string name="settings_lang_title">Select app language</string>
-    <string name="settings_lang_es">EspaÃ±ol (Default)</string>
+    <string name="settings_lang_es">Español (Default)</string>
     <string name="settings_lang_en">English</string>
 
     <!-- Suggestions -->
     <string name="chat_suggestion_1">I feel a bit overwhelmed today</string>
     <string name="chat_suggestion_2">I had a good day and want to log it</string>
-    <string name="chat_suggestion_3">I have trouble sleeping lately</string>
-    <string name="chat_suggestion_4">How can I practice calm breathing right now?</string>
+    <string name="chat_suggestion_3">I\'ve been having trouble sleeping lately</string>
+    <string name="chat_suggestion_4">How can I slow down my breathing right now?</string>
 
     <!-- Coming Soon Placeholder Screens (English) -->
     <string name="coming_soon_badge">Coming soon</string>
     <string name="home_title">Home</string>
-    <string name="home_subtitle">Your day at a glance</string>
-    <string name="home_feature_1">Daily greeting and summary</string>
+    <string name="home_subtitle">Your daily summary</string>
+    <string name="home_feature_1">Greeting and day summary</string>
     <string name="home_feature_2">Quick mood check-in</string>
-    <string name="home_feature_3">Writing streak</string>
+    <string name="home_feature_3">Journaling streak</string>
     <string name="home_feature_4">Latest diary entry</string>
     <string name="home_feature_5">Quick access to Diarito and SOS exercises</string>
 
     <string name="rutines_title">Rutines</string>
-    <string name="rutines_subtitle">Wellbeing routines and healthy habits</string>
+    <string name="rutines_subtitle">Wellness routines and healthy habits</string>
     <string name="rutines_feature_1">Guided morning and evening routines</string>
     <string name="rutines_feature_2">Daily habit tracking</string>
-    <string name="rutines_feature_3">Mindful reminders and active pauses</string>
-    <string name="rutines_feature_4">Integration with your reflective diary</string>
+    <string name="rutines_feature_3">Mindful reminders and active breaks</string>
+    <string name="rutines_feature_4">Integration with your reflective journal</string>
 
     <string name="professionals_title">Psychologist</string>
     <string name="professionals_subtitle">Find professional support</string>
-    <string name="professionals_feature_1">Directory of verified psychologists</string>
+    <string name="professionals_feature_1">Verified psychologists directory</string>
     <string name="professionals_feature_2">Profiles with specialties and availability</string>
     <string name="professionals_feature_3">Save specialists</string>
     <string name="professionals_feature_4">Share your history with consent</string>
 
     <string name="scheduling_title">Scheduling</string>
-    <string name="scheduling_subtitle">Schedule your sessions and calm moments</string>
-    <string name="scheduling_feature_1">Session bookings with specialists</string>
+    <string name="scheduling_subtitle">Schedule your sessions and calm breaks</string>
+    <string name="scheduling_feature_1">Book sessions with specialists</string>
     <string name="scheduling_feature_2">Appointment reminders and confirmations</string>
-    <string name="scheduling_feature_3">Sync with personal calendar</string>
-    <string name="scheduling_feature_4">Appointment history and preparation notes</string>
+    <string name="scheduling_feature_3">Personal calendar synchronization</string>
+    <string name="scheduling_feature_4">Appointment history and prep notes</string>
 
     <!-- Offline & Sync Strings -->
     <string name="chat_offline_indicator">Offline</string>
-    <string name="chat_offline_pending_notice">Offline: will be sent when you\'re back online</string>
+    <string name="chat_offline_pending_notice">Offline: will be sent when back online</string>
     <string name="chat_message_pending">Pending</string>
 
     <!-- Patient Profile Strings (English) -->
     <string name="profile_title">My Profile &amp; Privacy</string>
     <string name="profile_subtitle">Sanctuary Member</string>
     <string name="profile_encrypted_badge">End-to-End Encrypted Sanctuary</string>
-    <string name="profile_streak_count">Streak Count</string>
+    <string name="profile_streak_count">Days Streak</string>
     <string name="profile_reflections">Reflections</string>
     <string name="profile_frequent_mood">Frequent Mood</string>
     <string name="profile_section_personal">Personal Information</string>
     <string name="profile_full_name">Full Name</string>
     <string name="profile_email_address">Email Address</string>
-    <string name="profile_verified">Verified âœ“</string>
-    <string name="profile_safe_contact">Safe Support Contact (Emergency Net)</string>
+    <string name="profile_verified">Verified ✓</string>
+    <string name="profile_safe_contact">Safe Support Contact (Emergency Network)</string>
     <string name="profile_payment_methods">Payment Methods &amp; Digital Wallet</string>
-    <string name="profile_wallet_escrow">Zero-Knowledge 24h Escrow Protection enabled on all sessions.</string>
+    <string name="profile_wallet_escrow">Active 24h Zero-Knowledge Escrow Protection on all sessions.</string>
     <string name="profile_topics_title">Therapeutic Topics of Interest</string>
-    <string name="profile_topics_desc">Selected topics to tailor journal prompts &amp; matchings:</string>
+    <string name="profile_topics_desc">Selected topics to personalize diary prompts and matches:</string>
     <string name="profile_security_privacy">Security &amp; Privacy</string>
     <string name="profile_face_id">FaceID Biometric Lock</string>
-    <string name="profile_face_id_desc">Require biometrics on app resume</string>
-    <string name="profile_daily_reminder">Daily Reminder</string>
-    <string name="profile_daily_reminder_desc">Gentle check-in at 8:30 AM</string>
-    <string name="profile_export_journal">Export Encrypted Journal (PDF/JSON)</string>
+    <string name="profile_face_id_desc">Require biometrics when resuming the app</string>
+    <string name="profile_daily_reminder">Daily Check-in Reminder</string>
+    <string name="profile_daily_reminder_desc">Mindful check at 8:30 AM</string>
+    <string name="profile_export_journal">Export Encrypted Diary (PDF/JSON)</string>
     <string name="profile_save_changes">Save Changes</string>
-    <string name="profile_logout">Log Out Securely</string>
+    <string name="profile_logout">Secure Log Out</string>
     <string name="profile_btn_edit">Edit</string>
     <string name="profile_btn_change">Change</string>
     <string name="profile_btn_manage">Manage</string>
@@ -195,48 +196,48 @@
     <!-- Avatar Change Sheet -->
     <string name="avatar_sheet_title">Profile Photo</string>
     <string name="avatar_sheet_subtitle">Choose how you appear in your private sanctuary</string>
-    <string name="avatar_rejected_error">Image upload rejected (Exceeds 5MB)\nPlease select a JPG or PNG under 5MB or pick an avatar.</string>
+    <string name="avatar_rejected_error">Image rejected (Exceeds 5MB)\nPlease select a JPG or PNG file smaller than 5MB or pick an avatar.</string>
     <string name="avatar_take_photo">Take New Photo</string>
     <string name="avatar_take_photo_desc">Use your device camera</string>
     <string name="avatar_choose_gallery">Choose from Gallery</string>
-    <string name="avatar_choose_gallery_desc">Browse photo library</string>
-    <string name="avatar_choose_preset">Choose Illustrated Mood Avatar</string>
-    <string name="avatar_choose_preset_desc">Serene, botanical &amp; abstract presets</string>
-    <string name="avatar_remove_photo">Remove Photo (Use Default Initials)</string>
+    <string name="avatar_choose_gallery_desc">Browse your photo library</string>
+    <string name="avatar_choose_preset">Choose Illustrated Avatar</string>
+    <string name="avatar_choose_preset_desc">Serene, botanical, and abstract designs</string>
+    <string name="avatar_remove_photo">Remove Photo (Use default initials)</string>
 
     <!-- Edit Email -->
-    <string name="email_title">Edit Email Address</string>
+    <string name="email_title">Edit Email</string>
     <string name="email_header">Change Account Email</string>
-    <string name="email_header_desc">Your email is used for account recovery &amp; encryption keys</string>
+    <string name="email_header_desc">Your email is used for account recovery and encryption key verification</string>
     <string name="email_current">CURRENT EMAIL</string>
-    <string name="email_validate_badge">Validate âœ“</string>
+    <string name="email_validate_badge">Verify ✓</string>
     <string name="email_new">NEW EMAIL ADDRESS *</string>
     <string name="email_invalid_error">Please enter a valid email address</string>
     <string name="email_password">CONFIRM MASTER PASSWORD</string>
     <string name="email_sec_title">Security Verification Required</string>
     <string name="email_sec_desc">A 6-digit confirmation PIN will be sent to your new inbox.</string>
     <string name="email_btn_send">Send Verification Code</string>
-    <string name="email_btn_send_desc">Fix errors above to enable verification</string>
+    <string name="email_btn_send_desc">Resolve the errors above to enable verification</string>
     <string name="email_btn_discard">Discard &amp; Keep Current Email</string>
 
     <!-- Safe Support Contact -->
     <string name="safe_contact_title">Safe Support Contact</string>
-    <string name="safe_contact_net_title">Your Emotional Safety Net</string>
-    <string name="safe_contact_net_desc">A trusted person who can be notified in crisis moments or extended inactivity.</string>
+    <string name="safe_contact_net_title">Your Emotional Safety Network</string>
+    <string name="safe_contact_net_desc">A trusted person who can be notified in moments of crisis or prolonged inactivity.</string>
     <string name="safe_contact_info">Contact Information</string>
     <string name="safe_contact_name">FULL NAME</string>
     <string name="safe_contact_rel">RELATIONSHIP</string>
     <string name="safe_contact_phone">PHONE NUMBER</string>
     <string name="safe_contact_sms_ready">SMS Ready</string>
     <string name="safe_contact_email">EMERGENCY EMAIL</string>
-    <string name="safe_contact_notify_inactivity">Notify on Extended Inactivity (48h)</string>
-    <string name="safe_contact_notify_desc">Send a gentle wellness check request if you go silent</string>
+    <string name="safe_contact_notify_inactivity">Notify on Prolonged Inactivity (48h)</string>
+    <string name="safe_contact_notify_desc">Send a check-in request if you haven\'t been active</string>
     <string name="safe_contact_remove_title">Remove Safe Contact?</string>
-    <string name="safe_contact_remove_desc">You will lose your emergency outreach protocol. If you experience an emotional crisis, no automated contact can be reached.</string>
+    <string name="safe_contact_remove_desc">You will lose your emergency reach protocol. If you experience an emotional crisis, no one can be automatically contacted.</string>
     <string name="safe_contact_remove_confirm">Yes, Remove</string>
     <string name="safe_contact_remove_cancel">Keep Safe Contact</string>
     <string name="safe_contact_save_btn">Save Contact Changes</string>
-    <string name="safe_contact_encrypted_foot">Contact data is stored under zero-knowledge encryption</string>
+    <string name="safe_contact_encrypted_foot">Contact information is stored with zero-knowledge encryption</string>
 
     <!-- Relationships -->
     <string name="relationship_parent">Parent</string>
@@ -265,8 +266,8 @@
     <string name="payments_filter_consultations">Consultations</string>
     <string name="payments_filter_subscriptions">Subscriptions</string>
     <string name="payments_set_default">Set Default</string>
-    <string name="payments_verified_invoice">Verified âœ“</string>
-    <string name="payments_paid_receipt">Paid âœ“</string>
+    <string name="payments_verified_invoice">Verified ✓</string>
+    <string name="payments_paid_receipt">Paid ✓</string>
 
     <!-- IAM Strings (English) -->
     <string name="auth_login_title">Sign In</string>
@@ -291,6 +292,7 @@
     <string name="payments_expires_label">EXPIRES</string>
     <string name="payments_no_methods">No saved payment methods</string>
     <string name="payments_no_history">No payment transactions recorded</string>
+
     <!-- Diary Markdown & Grok Switch -->
     <string name="switch_diarito_mode">Diarito</string>
     <string name="switch_diary_mode">Diary</string>
