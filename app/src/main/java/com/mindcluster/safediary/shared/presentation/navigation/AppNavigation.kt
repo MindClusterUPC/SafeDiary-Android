@@ -5,10 +5,14 @@ import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.mindcluster.safediary.diary.infrastructure.DiaryModule
+import com.mindcluster.safediary.diary.presentation.viewmodels.DiaryViewModel
+import com.mindcluster.safediary.diary.presentation.views.DiaryMarkdownEditorScreen
 import com.mindcluster.safediary.iam.presentation.views.SignInScreen
 import com.mindcluster.safediary.payments.presentation.views.PatientPaymentsScreen
 import com.mindcluster.safediary.profiles.presentation.views.EditEmailScreen
@@ -25,6 +29,11 @@ fun AppNavigation(
     val authSessionPreferences = remember { AuthSessionPreferences(context) }
     val startDestination = if (authSessionPreferences.isLoggedIn) NavRoutes.AI_CHAT else NavRoutes.SIGN_IN
 
+    val diaryModule = remember { DiaryModule.getInstance(context) }
+    val diaryViewModel: DiaryViewModel = viewModel(
+        factory = DiaryViewModel.Factory(diaryModule.diaryRepository, authSessionPreferences)
+    )
+
     NavHost(
         navController = navController,
         startDestination = startDestination
@@ -40,7 +49,7 @@ fun AppNavigation(
             )
         }
 
-        // Main Tab Pager (Diarito AI Chat, Home, Psychologist)
+        // Main Tab Pager (Diarito AI Chat, Diary Notes, Home, Psychologist, Scheduling)
         composable(NavRoutes.AI_CHAT) {
             MainTabPagerScreen(
                 onNavigateToProfile = {
@@ -48,6 +57,9 @@ fun AppNavigation(
                 },
                 onNavigateToSettings = {
                     navController.navigate(NavRoutes.SETTINGS)
+                },
+                onOpenDiaryEditor = {
+                    navController.navigate(NavRoutes.DIARY_EDITOR)
                 }
             )
         }
@@ -225,6 +237,40 @@ fun AppNavigation(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
+            )
+        }
+
+        // 6. Diary Markdown Editor
+        composable(
+            route = NavRoutes.DIARY_EDITOR,
+            enterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            exitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            },
+            popEnterTransition = {
+                slideIntoContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                    animationSpec = tween(300)
+                )
+            },
+            popExitTransition = {
+                slideOutOfContainer(
+                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                    animationSpec = tween(300)
+                )
+            }
+        ) {
+            DiaryMarkdownEditorScreen(
+                viewModel = diaryViewModel,
+                onNavigateBack = { navController.popBackStack() }
             )
         }
     }

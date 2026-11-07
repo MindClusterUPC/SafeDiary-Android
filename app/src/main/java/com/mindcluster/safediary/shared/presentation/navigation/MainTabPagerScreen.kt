@@ -28,8 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
@@ -45,11 +47,15 @@ import com.mindcluster.safediary.assistantai.infrastructure.AssistantAiModule
 import com.mindcluster.safediary.assistantai.presentation.components.ConversationHistoryDrawer
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.assistantai.presentation.views.AiChatScreen
+import com.mindcluster.safediary.diary.infrastructure.DiaryModule
+import com.mindcluster.safediary.diary.presentation.viewmodels.DiaryViewModel
 import com.mindcluster.safediary.home.presentation.views.HomeScreen
 import com.mindcluster.safediary.professionals.presentation.views.ProfessionalsScreen
 import com.mindcluster.safediary.rutines.presentation.views.RutinesScreen
 import com.mindcluster.safediary.scheduling.presentation.views.SchedulingScreen
 import com.mindcluster.safediary.scheduling.presentation.viewmodels.SchedulingViewModel
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
+import com.mindcluster.safediary.shared.presentation.components.MainViewMode
 import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import kotlinx.coroutines.launch
@@ -68,9 +74,12 @@ private val tabRoutes = listOf(
 fun MainTabPagerScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToSettings: () -> Unit = onNavigateToProfile,
+    onOpenDiaryEditor: (localId: String?) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
+    val authSessionPreferences = remember { AuthSessionPreferences(context) }
+
     val assistantModule = remember { AssistantAiModule.getInstance(context) }
     val assistantViewModel: AssistantViewModel = viewModel(
         factory = AssistantViewModel.Factory(
@@ -90,6 +99,16 @@ fun MainTabPagerScreen(
             assistantModule.chatPreferences
         )
     )
+
+    val diaryModule = remember { DiaryModule.getInstance(context) }
+    val diaryViewModel: DiaryViewModel = viewModel(
+        factory = DiaryViewModel.Factory(
+            diaryModule.diaryRepository,
+            authSessionPreferences
+        )
+    )
+
+    var mainViewMode by remember { mutableStateOf(MainViewMode.DIARITO) }
 
     val uiState by assistantViewModel.uiState.collectAsStateWithLifecycle()
     val pagerState = rememberPagerState(initialPage = 0, pageCount = { 5 })
@@ -139,12 +158,11 @@ fun MainTabPagerScreen(
         }
     }
 
-    // On the first page (Diarito) a swipe to the right opens the history drawer. The gesture is
-    // read before the pager sees it, and only claimed once it is clearly a rightward drag, so
-    // taps, vertical scrolling and swipes to the next tab keep working.
+    // On the first page (Diarito) a swipe to the right opens the history drawer only in DIARITO mode.
+    // In DIARIO mode, drawer swipe is disabled as the notes gallery is the list.
     val openDrawerThresholdPx = with(density) { 48.dp.toPx() }
-    val openDrawerOnSwipe = Modifier.pointerInput(pagerState, drawerState, isImeVisible) {
-        if (isImeVisible) return@pointerInput
+    val openDrawerOnSwipe = Modifier.pointerInput(pagerState, drawerState, isImeVisible, mainViewMode) {
+        if (isImeVisible || mainViewMode == MainViewMode.DIARIO) return@pointerInput
         awaitEachGesture {
             val down = awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
             if (pagerState.currentPage != 0 || drawerState.isOpen) return@awaitEachGesture
@@ -175,7 +193,7 @@ fun MainTabPagerScreen(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
-        gesturesEnabled = isDrawerOpen || (pagerState.currentPage == 0 && !isImeVisible),
+        gesturesEnabled = isDrawerOpen || (pagerState.currentPage == 0 && mainViewMode == MainViewMode.DIARITO && !isImeVisible),
         drawerContent = {
             ConversationHistoryDrawer(
                 conversations = uiState.conversations,
@@ -242,6 +260,10 @@ fun MainTabPagerScreen(
                     when (page) {
                         0 -> AiChatScreen(
                             viewModel = assistantViewModel,
+                            diaryViewModel = diaryViewModel,
+                            currentMode = mainViewMode,
+                            onModeChange = { mainViewMode = it },
+                            onOpenDiaryEditor = { localId -> onOpenDiaryEditor(localId) },
                             onNavigateToSettings = onNavigateToProfile,
                             onOpenDrawer = {
                                 coroutineScope.launch { drawerState.open() }
@@ -256,7 +278,11 @@ fun MainTabPagerScreen(
                         )
                         2 -> HomeScreen(
                             onNavigateToRoute = { navigateToTab(it) },
-                            onNavigateToProfile = onNavigateToProfile
+                            onNavigateToProfile = onNavigateToProfile,
+                            onOpenDiary = {
+                                mainViewMode = MainViewMode.DIARIO
+                                navigateToTab(NavRoutes.AI_CHAT)
+                            }
                         )
                         3 -> ProfessionalsScreen(
                             onNavigateToRoute = { navigateToTab(it) },

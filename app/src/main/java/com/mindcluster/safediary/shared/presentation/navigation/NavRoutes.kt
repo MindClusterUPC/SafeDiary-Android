@@ -17,4 +17,7 @@ object NavRoutes {
     const val EDIT_EMAIL = "patient_edit_email"
     const val SAFE_CONTACT = "patient_safe_contact"
     const val PATIENT_PAYMENTS = "patient_payments"
+
+    // Diary Markdown Editor
+    const val DIARY_EDITOR = "diary_editor"
 }
