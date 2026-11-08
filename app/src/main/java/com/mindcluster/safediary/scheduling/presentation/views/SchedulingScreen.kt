@@ -1,5 +1,8 @@
 package com.mindcluster.safediary.scheduling.presentation.views
 
+import android.content.ActivityNotFoundException
+import android.content.Intent
+import android.net.Uri
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
@@ -8,12 +11,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mindcluster.safediary.professionals.infrastructure.local.PreviewProfessionals
 import com.mindcluster.safediary.scheduling.domain.model.*
 import com.mindcluster.safediary.scheduling.presentation.components.*
+import com.mindcluster.safediary.scheduling.presentation.viewmodels.AgendaMode
 import com.mindcluster.safediary.scheduling.presentation.viewmodels.SchedulingViewModel
 import com.mindcluster.safediary.shared.presentation.components.*
 import com.mindcluster.safediary.shared.presentation.navigation.NavRoutes
@@ -29,78 +33,74 @@ fun SchedulingScreen(
     viewModel: SchedulingViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
     var page by rememberSaveable { mutableStateOf("list") }
-    var appointmentId by rememberSaveable { mutableStateOf("") }
-    var chatId by rememberSaveable { mutableStateOf("") }
+    var appointmentId by rememberSaveable { mutableLongStateOf(-1L) }
+    var chatId by rememberSaveable { mutableLongStateOf(-1L) }
     var tab by rememberSaveable { mutableStateOf("Próximas") }
     var cancelDialog by rememberSaveable { mutableStateOf(false) }
-    var receiptDialog by rememberSaveable { mutableStateOf(false) }
     var draftConsent by rememberSaveable { mutableStateOf(false) }
     val appointment = state.appointments.find { it.id == appointmentId }
-    val chat = state.conversations.find { it.id == chatId }
+    val chat = state.contactRequest(chatId)
 
     LaunchedEffect(isActive) {
-        if (isActive) while (true) { viewModel.tick(); delay(1000) }
+        if (isActive) {
+            viewModel.refresh()
+            while (true) { viewModel.tick(); delay(1000) }
+        }
     }
     LaunchedEffect(state.activeConversationId) {
         state.activeConversationId?.let { chatId = it; page = "chat" }
     }
-    LaunchedEffect(appointment?.status) {
-        if (appointment?.status == AppointmentStatus.EXPIRED && page in listOf("payment", "failed")) page = "reservation"
-    }
-    fun back() {
-        page = when (page) {
-            "payment", "failed" -> "reservation"
-            "waiting", "rating", "consent", "call" -> "detail"
-            else -> "list"
+    LaunchedEffect(state.joinUrl) {
+        state.joinUrl?.let { url ->
+            try {
+                context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+            } catch (e: ActivityNotFoundException) {
+                viewModel.showError("No encontramos una aplicación para abrir la videollamada.")
+            }
+            viewModel.consumeJoinUrl()
         }
+    }
+    fun openChat(id: Long) { chatId = id; page = "chat"; viewModel.openConversation(id) }
+    fun back() {
+        page = if (page == "consent") "detail" else "list"
         viewModel.closeConversation()
+    }
+    val ownClinicianId = state.ownClinicianId
+    if (state.mode == AgendaMode.PSYCHOLOGIST && ownClinicianId != null) {
+        ClinicianAgendaScreen(ownClinicianId, modifier, onNavigateToSettings, isActive)
+        return
     }
     BackHandler(isActive && page != "list") { back() }
     fun openAppointment(item: Appointment) {
         appointmentId = item.id
-        page = when (item.status) {
-            AppointmentStatus.RESERVED, AppointmentStatus.EXPIRED -> "reservation"
-            AppointmentStatus.COMPLETED -> if (item.rating == null) "rating" else "detail"
-            else -> "detail"
-        }
+        page = if (item.status == AppointmentStatus.HELD || item.status == AppointmentStatus.EXPIRED) "reservation" else "detail"
     }
     PatientScreen("Agenda", modifier, onBack = if (page != "list") ({ back() }) else null, onSettings = onNavigateToSettings, contentKey = page) {
         when {
-            page == "chat" && chat != null -> CoordinationContent(chat, onSend = { viewModel.sendMessage(chat.id, it) }, onAccept = {
-                viewModel.reserve(chat.id)?.let { appointmentId = it; page = "reservation" }
-            })
-            page == "reservation" && appointment != null -> ReservationContent(appointment, state.now,
-                onPay = { viewModel.tick(); page = "payment" },
-                onCancel = { cancelDialog = true },
-                onChat = {
-                    appointment.conversationId?.let { chatId = it; page = "chat" } ?: run { page = "list" }
-                }
+            page == "chat" && chat != null -> CoordinationContent(
+                request = chat,
+                clinician = state.clinician(chat.clinicianId),
+                messages = state.messages[chat.id].orEmpty(),
+                proposal = state.proposalFor(chat.id),
+                held = state.heldFor(chat.id),
+                isWorking = state.isWorking,
+                onSend = { viewModel.sendMessage(chat.id, it) },
+                onAccept = { proposalId -> viewModel.accept(proposalId) { heldId -> appointmentId = heldId; page = "reservation"; viewModel.closeConversation() } },
+                onRefresh = { viewModel.refreshConversation(chat.id) },
+                onOpenReservation = { heldId -> appointmentId = heldId; page = "reservation"; viewModel.closeConversation() }
             )
-            page in listOf("payment", "failed") && appointment != null -> PaymentContent(appointment, page == "failed", onSuccess = {
-                page = if (viewModel.simulatePayment(appointment.id)) "detail" else "reservation"
-            }, onFailure = { page = "failed" }, onBack = { page = "reservation" })
-            page == "detail" && appointment != null -> AppointmentDetailContent(appointment, state.now,
-                onJoin = { page = "waiting" },
-                onConsent = { draftConsent = appointment.shareContext; page = "consent" },
-                onCancel = { cancelDialog = true },
-                onRate = { page = "rating" },
-                onReceipt = { receiptDialog = true }
-            )
-            page == "waiting" && appointment != null -> {
-                if (appointment.canJoin(state.now)) WaitingRoomContent(appointment, onJoin = { page = "call" })
-                else {
-                    PatientHeading("Acceso fuera de horario", "Puedes entrar desde diez minutos antes y durante la sesión.")
-                    PatientButton("Volver a la cita", { page = "detail" }, Modifier.fillMaxWidth())
-                }
-            }
-            page == "call" && appointment != null -> CallPreviewContent(appointment) { viewModel.completePreview(appointment.id); page = "detail" }
-            page == "rating" && appointment != null -> RatingContent { rating, review -> viewModel.rate(appointment.id, rating, review); page = "detail" }
+            page == "reservation" && appointment != null &&
+                (appointment.status == AppointmentStatus.HELD || appointment.status == AppointmentStatus.EXPIRED) ->
+                ReservationContent(appointment, state.clinician(appointment.clinicianId), state.now,
+                    onCancel = { cancelDialog = true },
+                    onChat = { openChat(appointment.contactRequestId) }
+                )
             page == "consent" && appointment != null -> {
-                val professional = PreviewProfessionals.find(appointment.professionalId)
                 PatientHeading("Tú decides qué compartir", "El consentimiento es opcional.")
                 PatientCard {
-                    Text("Contexto para ${professional.name}", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
+                    Text("Contexto para ${state.clinician(appointment.clinicianId).name}", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
                     PatientInfo("Compartir un resumen emocional para preparar esta sesión. No incluye las conversaciones completas ni grabaciones.", Icons.Outlined.Lock)
                     Row {
                         Checkbox(draftConsent, { draftConsent = it })
@@ -112,9 +112,39 @@ fun SchedulingScreen(
                 PatientButton("Guardar preferencia", { viewModel.shareContext(appointment.id, draftConsent); page = "detail" }, Modifier.fillMaxWidth())
                 PatientButton("Continuar sin cambios", { page = "detail" }, Modifier.fillMaxWidth(), secondary = true)
             }
+            (page == "detail" || page == "reservation") && appointment != null -> AppointmentDetailContent(
+                appointment, state.clinician(appointment.clinicianId), state.now,
+                sharedContext = appointment.id in state.sharedContext,
+                isWorking = state.isWorking,
+                onJoin = { viewModel.join(appointment.id) },
+                onConsent = { draftConsent = appointment.id in state.sharedContext; page = "consent" },
+                onCancel = { cancelDialog = true },
+                onChat = { openChat(appointment.contactRequestId) }
+            )
+            state.mode == AgendaMode.PSYCHOLOGIST_WITHOUT_PROFILE -> {
+                PatientHeading("Mi agenda")
+                PatientCard {
+                    PatientHeading("Completa tu ficha profesional", "Para recibir solicitudes y proponer horarios necesitas una ficha en el directorio de psicólogos.")
+                    PatientInfo("Tu ficha debe estar verificada y publicada para que los pacientes puedan contactarte.", Icons.Outlined.Info)
+                    PatientButton("Actualizar", viewModel::refresh, Modifier.fillMaxWidth(), secondary = true)
+                }
+            }
+            state.mode != AgendaMode.PATIENT -> {
+                PatientHeading("Agenda")
+                PatientCard {
+                    PatientHeading("Agenda no disponible para esta cuenta", "La agenda es para pacientes y psicólogos.")
+                    PatientButton("Actualizar", viewModel::refresh, Modifier.fillMaxWidth(), secondary = true)
+                }
+            }
             else -> {
                 PatientHeading("Mis citas", "Coordina, reserva y asiste a tus sesiones.")
-                PatientBadge("Vista previa · datos de ejemplo", SurfaceContainerLow, PrimaryNavy)
+                if (state.isLoading) LinearProgressIndicator(Modifier.fillMaxWidth(), color = SecondaryTeal)
+                state.loadError?.let { error ->
+                    PatientCard(color = ErrorContainer) {
+                        Text(error, color = ErrorRed)
+                        PatientButton("Reintentar", viewModel::refresh, Modifier.fillMaxWidth(), secondary = true)
+                    }
+                }
                 SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
                     listOf("Próximas", "Pendientes", "Historial").forEachIndexed { index, label ->
                         SegmentedButton(selected = tab == label, onClick = { tab = label }, shape = SegmentedButtonDefaults.itemShape(index, 3)) { Text(label, style = MaterialTheme.typography.labelMedium) }
@@ -122,8 +152,8 @@ fun SchedulingScreen(
                 }
                 val filtered = state.appointments.filter { item ->
                     when (tab) {
-                        "Próximas" -> item.status == AppointmentStatus.RESERVED || item.status == AppointmentStatus.CONFIRMED
-                        "Pendientes" -> item.status == AppointmentStatus.RESERVED
+                        "Próximas" -> item.status == AppointmentStatus.HELD || item.status == AppointmentStatus.CONFIRMED
+                        "Pendientes" -> item.status == AppointmentStatus.HELD
                         else -> item.status in listOf(AppointmentStatus.COMPLETED, AppointmentStatus.CANCELLED, AppointmentStatus.EXPIRED)
                     }
                 }.sortedBy { it.startsAt }
@@ -132,20 +162,27 @@ fun SchedulingScreen(
                     PatientButton("Explorar psicólogos", { onNavigateToRoute(NavRoutes.PROFESSIONALS) }, Modifier.fillMaxWidth())
                 }
                 filtered.forEach { item ->
-                    AppointmentCard(item, state.now, onDetail = { openAppointment(item) }, onPay = { appointmentId = item.id; page = "payment" }, onJoin = { appointmentId = item.id; page = "waiting" })
+                    AppointmentCard(item, state.clinician(item.clinicianId), state.now, onDetail = { openAppointment(item) }, onJoin = { viewModel.join(item.id) })
                 }
-                Text("Conversaciones activas", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
-                state.conversations.forEach { conversation ->
-                    val professional = PreviewProfessionals.find(conversation.professionalId)
+                Text("Conversaciones", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
+                if (state.contactRequests.isEmpty()) PatientInfo("Cuando solicites contacto con un especialista, la conversación aparecerá aquí.")
+                state.contactRequests.forEach { conversation ->
+                    val clinician = state.clinician(conversation.clinicianId)
                     PatientCard {
                         Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                            PatientAvatar(professional.initials)
+                            PatientAvatar(clinician.initials)
                             Column(Modifier.weight(1f)) {
-                                Text(professional.name, color = PrimaryNavy, style = MaterialTheme.typography.titleMedium)
-                                PatientInfo(conversation.messages.lastOrNull()?.text ?: "Coordina tu próxima sesión")
+                                Text(clinician.name, color = PrimaryNavy, style = MaterialTheme.typography.titleMedium)
+                                PatientInfo(conversation.lastMessage?.text ?: "Coordina tu próxima sesión")
                             }
                         }
-                        TextButton(onClick = { chatId = conversation.id; page = "chat" }) { Text("Abrir conversación") }
+                        when {
+                            conversation.isOpen && state.proposalFor(conversation.id) != null -> PatientBadge("◷ Nueva propuesta de horario")
+                            conversation.status == ContactRequestStatus.PENDING -> PatientBadge("Esperando respuesta", SurfaceContainerLow, PrimaryNavy)
+                            conversation.status == ContactRequestStatus.REJECTED -> PatientBadge("Solicitud no aceptada", ErrorContainer, ErrorRed)
+                            conversation.status == ContactRequestStatus.CLOSED -> PatientBadge("Conversación cerrada", SurfaceContainerLow, PrimaryNavy)
+                        }
+                        TextButton(onClick = { openChat(conversation.id) }) { Text("Abrir conversación") }
                     }
                 }
             }
@@ -153,15 +190,22 @@ fun SchedulingScreen(
     }
     if (cancelDialog && appointment != null) AlertDialog(
         onDismissRequest = { cancelDialog = false },
-        title = { Text(if (appointment.status == AppointmentStatus.RESERVED) "¿Cancelar la reserva?" else "¿Cancelar la cita?") },
-        text = { Text(if (appointment.status == AppointmentStatus.RESERVED) "Se liberará el horario. La cita aún no está confirmada y no se ha realizado ningún cargo." else "Se liberará el horario de esta cita de ejemplo. No se procesan cargos ni devoluciones reales.") },
+        title = { Text(if (appointment.status == AppointmentStatus.HELD) "¿Cancelar la reserva?" else "¿Cancelar la cita?") },
+        text = {
+            Text(
+                if (appointment.status == AppointmentStatus.HELD) "Se liberará el horario. La cita aún no está confirmada y no se registrará ningún cobro."
+                else "Se liberará el horario. El estado del cobro y la devolución que corresponda se reflejarán en tus pagos."
+            )
+        },
         confirmButton = { TextButton(onClick = { viewModel.cancel(appointment.id); cancelDialog = false; page = "detail" }) { Text("Sí, cancelar", color = ErrorRed) } },
         dismissButton = { TextButton(onClick = { cancelDialog = false }) { Text("Conservar") } }
     )
-    if (receiptDialog && appointment != null) AlertDialog(
-        onDismissRequest = { receiptDialog = false },
-        title = { Text("Comprobante de ejemplo") },
-        text = { Text("${PreviewProfessionals.find(appointment.professionalId).name}\n${appointmentDate(appointment.startsAt)}\nS/ ${PreviewProfessionals.find(appointment.professionalId).price}.00\n\nEsta vista no representa una transacción real.") },
-        confirmButton = { TextButton(onClick = { receiptDialog = false }) { Text("Cerrar") } }
-    )
+    state.actionError?.let { error ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissError,
+            title = { Text("No se pudo completar") },
+            text = { Text(error) },
+            confirmButton = { TextButton(onClick = viewModel::dismissError) { Text("Entendido") } }
+        )
+    }
 }

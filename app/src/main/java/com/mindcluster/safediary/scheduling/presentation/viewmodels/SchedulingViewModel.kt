@@ -1,85 +1,233 @@
 package com.mindcluster.safediary.scheduling.presentation.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.mindcluster.safediary.scheduling.domain.model.*
+import com.mindcluster.safediary.scheduling.infrastructure.remote.RetrofitCareSchedulingGateway
+import com.mindcluster.safediary.scheduling.infrastructure.remote.SchedulingResult
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import java.util.UUID
+import kotlinx.coroutines.launch
+
+enum class AgendaMode { PATIENT, PSYCHOLOGIST, PSYCHOLOGIST_WITHOUT_PROFILE, UNSUPPORTED }
 
 data class SchedulingUiState(
-    val appointments: List<Appointment>,
-    val conversations: List<CoordinationConversation>,
+    val appointments: List<Appointment> = emptyList(),
+    val contactRequests: List<ContactRequest> = emptyList(),
+    val clinicians: Map<Long, ClinicianSummary> = emptyMap(),
+    val messages: Map<Long, List<CoordinationMessage>> = emptyMap(),
     val now: Long = System.currentTimeMillis(),
-    val activeConversationId: String? = null
-)
+    val activeConversationId: Long? = null,
+    val isLoading: Boolean = false,
+    val isWorking: Boolean = false,
+    /** Which agenda the signed-in account can use, deduced from what the backend allows. */
+    val mode: AgendaMode = AgendaMode.PATIENT,
+    /** Clinician Directory profile id of a signed-in psychologist. */
+    val ownClinicianId: Long? = null,
+    val loadError: String? = null,
+    val actionError: String? = null,
+    /** Video call URL waiting to be opened by the screen. */
+    val joinUrl: String? = null,
+    /** Local consent preference: nothing is shared with the clinician from this screen yet. */
+    val sharedContext: Set<Long> = emptySet()
+) {
+    fun clinician(id: Long) = clinicians[id] ?: ClinicianSummary(id, "Psicólogo", "PS")
+    fun contactRequest(id: Long) = contactRequests.firstOrNull { it.id == id }
+    /** Latest proposal of a chat that the patient can still accept. */
+    fun proposalFor(contactRequestId: Long) = appointments
+        .filter { it.contactRequestId == contactRequestId && it.status == AppointmentStatus.REQUESTED }
+        .maxByOrNull { it.id }
+    fun heldFor(contactRequestId: Long) = appointments
+        .firstOrNull { it.contactRequestId == contactRequestId && it.status == AppointmentStatus.HELD }
+}
 
-/** A local UI preview. Nothing here sends messages, takes payments or starts a call. */
-class SchedulingViewModel : ViewModel() {
-    private val initialNow = System.currentTimeMillis()
-    private val _uiState = MutableStateFlow(SchedulingUiState(
-        appointments = listOf(
-            Appointment("reservation", "laura", initialNow + 86_400_000, AppointmentStatus.RESERVED, initialNow + 2_538_000, "laura"),
-            Appointment("confirmed", "andres", initialNow + 5 * 60_000, AppointmentStatus.CONFIRMED),
-            Appointment("completed", "sarah", initialNow - 7 * 86_400_000, AppointmentStatus.COMPLETED)
-        ),
-        conversations = listOf(CoordinationConversation("laura", "laura", initialNow + 86_400_000, listOf(
-            CoordinationMessage("Hola, me gustaría coordinar una sesión para hablar de cómo me he sentido.", true),
-            CoordinationMessage("Hola. Podemos conversar con calma en este horario. ¿Te funciona?", false)
-        )))
-    ))
+/** Patient side of Care Scheduling: contact, coordination chat, proposal acceptance, hold, cancellation and video call. */
+class SchedulingViewModel(
+    private val gateway: RetrofitCareSchedulingGateway = RetrofitCareSchedulingGateway()
+) : ViewModel() {
+    private val _uiState = MutableStateFlow(SchedulingUiState())
     val uiState = _uiState.asStateFlow()
 
+    /** A hold past its expiry is shown as expired right away; the backend releases the slot on its own. */
     fun tick(now: Long = System.currentTimeMillis()) {
-        _uiState.update { state -> state.copy(now = now, appointments = state.appointments.map {
-            if (it.status == AppointmentStatus.RESERVED && (it.expiresAt ?: Long.MAX_VALUE) <= now) it.copy(status = AppointmentStatus.EXPIRED) else it
-        }) }
+        _uiState.update { state -> state.copy(now = now, appointments = state.appointments.map { it.expiredLocally(now) }) }
     }
 
-    fun startConversation(professionalId: String, message: String) {
-        val id = professionalId
-        _uiState.update { state ->
-            val existing = state.conversations.find { it.id == id }
-            val conversation = existing?.copy(messages = existing.messages + CoordinationMessage(message, true))
-                ?: CoordinationConversation(id, professionalId, state.now + 86_400_000, listOf(
-                    CoordinationMessage(message, true), CoordinationMessage("Gracias por escribirme. Te comparto un horario de ejemplo para coordinar nuestra sesión.", false)
-                ))
-            state.copy(conversations = state.conversations.filterNot { it.id == id } + conversation, activeConversationId = id)
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, loadError = null) }
+            val appointmentsCall = async { gateway.getAppointments() }
+            val requestsCall = async { gateway.getContactRequests() }
+            val appointments = appointmentsCall.await()
+            val requests = requestsCall.await()
+            if ((appointments as? SchedulingResult.Failure)?.status == 403) {
+                // Only patients list appointments; a psychologist manages the agenda of their directory profile.
+                val own = gateway.getOwnClinicianId()
+                val mode = when {
+                    own is SchedulingResult.Success -> AgendaMode.PSYCHOLOGIST
+                    (own as? SchedulingResult.Failure)?.status == 404 -> AgendaMode.PSYCHOLOGIST_WITHOUT_PROFILE
+                    else -> AgendaMode.UNSUPPORTED
+                }
+                _uiState.update {
+                    it.copy(isLoading = false, mode = mode, ownClinicianId = (own as? SchedulingResult.Success)?.value,
+                        loadError = null, appointments = emptyList(), contactRequests = emptyList())
+                }
+                return@launch
+            }
+            _uiState.update { state ->
+                state.copy(
+                    appointments = (appointments as? SchedulingResult.Success)?.value?.map { it.expiredLocally(state.now) } ?: state.appointments,
+                    contactRequests = (requests as? SchedulingResult.Success)?.value?.sortedByDescending { it.id } ?: state.contactRequests,
+                    isLoading = false,
+                    mode = AgendaMode.PATIENT,
+                    ownClinicianId = null,
+                    loadError = (appointments as? SchedulingResult.Failure)?.message ?: (requests as? SchedulingResult.Failure)?.message
+                )
+            }
+            loadMissingClinicians()
         }
     }
-    fun openConversation(id: String) { _uiState.update { it.copy(activeConversationId = id) } }
+
+    /** US-048: opens the private chat with a verified clinician, or reuses the open one. */
+    fun startConversation(professionalId: String, message: String) {
+        val clinicianId = professionalId.toLongOrNull() ?: return
+        working {
+            when (val result = gateway.sendContactRequest(clinicianId, message)) {
+                is SchedulingResult.Success -> {
+                    val request = result.value
+                    _uiState.update { state ->
+                        state.copy(activeConversationId = request.id,
+                            contactRequests = listOf(request) + state.contactRequests.filterNot { it.id == request.id })
+                    }
+                    refresh()
+                    loadMessages(request.id)
+                }
+                is SchedulingResult.Failure -> fail(
+                    when (result.status) {
+                        422 -> "Este psicólogo ya no está disponible para nuevos contactos."
+                        403 -> "Solo las cuentas de paciente pueden solicitar contacto con un especialista."
+                        else -> result.message
+                    }
+                )
+            }
+        }
+    }
+
+    fun openConversation(id: Long) {
+        _uiState.update { it.copy(activeConversationId = id) }
+        loadMessages(id)
+    }
+
     fun closeConversation() { _uiState.update { it.copy(activeConversationId = null) } }
-    fun sendMessage(id: String, text: String) {
+
+    /** Reloads the chat and the proposals the clinician may have sent meanwhile. */
+    fun refreshConversation(id: Long) {
+        loadMessages(id)
+        refresh()
+    }
+
+    fun sendMessage(id: Long, text: String) {
         if (text.isBlank()) return
-        _uiState.update { it.copy(conversations = it.conversations.map { chat -> if (chat.id == id) chat.copy(messages = chat.messages + CoordinationMessage(text.trim(), true)) else chat }) }
+        working {
+            when (val result = gateway.sendMessage(id, text.trim())) {
+                is SchedulingResult.Success -> loadMessages(id)
+                is SchedulingResult.Failure -> fail(result.message)
+            }
+        }
     }
-    fun reserve(conversationId: String): String? {
-        tick()
+
+    /** US-049 / US-014: accepting the proposal holds the slot for one hour; the appointment is not confirmed yet. */
+    fun accept(appointmentId: Long, onHeld: (Long) -> Unit) {
+        working {
+            when (val result = gateway.acceptProposal(appointmentId)) {
+                is SchedulingResult.Success -> {
+                    replace(result.value)
+                    onHeld(result.value.id)
+                }
+                is SchedulingResult.Failure -> {
+                    fail(
+                        if (result.status == 409 || result.status == 422)
+                            "Este horario ya no está disponible o la propuesta cambió. Puedes seguir coordinando por el chat."
+                        else result.message
+                    )
+                    refresh()
+                }
+            }
+        }
+    }
+
+    /** US-050: cancels a proposal, a hold or a confirmed appointment and releases the slot. */
+    fun cancel(id: Long) {
+        working {
+            when (val result = gateway.cancelAppointment(id)) {
+                is SchedulingResult.Success -> replace(result.value)
+                is SchedulingResult.Failure -> {
+                    fail(result.message)
+                    refresh()
+                }
+            }
+        }
+    }
+
+    /** US-038: the backend validates the participant and the access window before returning the call URL. */
+    fun join(id: Long) {
+        working {
+            when (val result = gateway.joinSession(id)) {
+                is SchedulingResult.Success -> _uiState.update { it.copy(joinUrl = result.value) }
+                is SchedulingResult.Failure -> fail(
+                    if (result.status == 409 || result.status == 422)
+                        "La videollamada solo está disponible para una cita confirmada y dentro de su horario de acceso."
+                    else result.message
+                )
+            }
+        }
+    }
+
+    fun consumeJoinUrl() { _uiState.update { it.copy(joinUrl = null) } }
+    fun showError(message: String) = fail(message)
+    fun dismissError() { _uiState.update { it.copy(actionError = null) } }
+    fun shareContext(id: Long, enabled: Boolean) {
+        _uiState.update { it.copy(sharedContext = if (enabled) it.sharedContext + id else it.sharedContext - id) }
+    }
+
+    private fun loadMessages(id: Long) {
+        viewModelScope.launch {
+            val patientAccountId = _uiState.value.contactRequest(id)?.patientAccountId
+            when (val result = gateway.getMessages(id, patientAccountId)) {
+                is SchedulingResult.Success -> _uiState.update { it.copy(messages = it.messages + (id to result.value)) }
+                is SchedulingResult.Failure -> fail(result.message)
+            }
+        }
+    }
+
+    private suspend fun loadMissingClinicians() {
         val state = _uiState.value
-        val existing = state.appointments.firstOrNull { it.conversationId == conversationId && it.status in listOf(AppointmentStatus.RESERVED, AppointmentStatus.CONFIRMED) }
-        if (existing != null) return existing.id
-        val chat = state.conversations.firstOrNull { it.id == conversationId } ?: return null
-        val appointment = Appointment(UUID.randomUUID().toString(), chat.professionalId, chat.proposedAt, AppointmentStatus.RESERVED, state.now + 3_600_000, chat.id)
-        _uiState.update { it.copy(appointments = it.appointments + appointment, activeConversationId = null) }
-        return appointment.id
+        val missing = (state.appointments.map { it.clinicianId } + state.contactRequests.map { it.clinicianId })
+            .distinct().filterNot { it in state.clinicians }
+        missing.forEach { id ->
+            gateway.getClinician(id)?.let { clinician -> _uiState.update { it.copy(clinicians = it.clinicians + (id to clinician)) } }
+        }
     }
-    fun simulatePayment(id: String): Boolean {
-        tick()
-        val appointment = _uiState.value.appointments.find { it.id == id } ?: return false
-        if (appointment.status != AppointmentStatus.RESERVED) return false
-        change(id) { it.copy(status = AppointmentStatus.CONFIRMED, expiresAt = null) }
-        return true
+
+    private fun replace(appointment: Appointment) {
+        _uiState.update { state ->
+            val others = state.appointments.filterNot { it.id == appointment.id }
+            state.copy(appointments = listOf(appointment.expiredLocally(state.now)) + others)
+        }
     }
-    fun cancel(id: String) {
-        change(id) { if (it.status in listOf(AppointmentStatus.RESERVED, AppointmentStatus.CONFIRMED)) it.copy(status = AppointmentStatus.CANCELLED, expiresAt = null) else it }
+
+    private fun working(block: suspend () -> Unit) {
+        if (_uiState.value.isWorking) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isWorking = true) }
+            try { block() } finally { _uiState.update { it.copy(isWorking = false) } }
+        }
     }
-    fun shareContext(id: String, enabled: Boolean) { change(id) { it.copy(shareContext = enabled) } }
-    fun completePreview(id: String) { change(id) { if (it.status == AppointmentStatus.CONFIRMED) it.copy(status = AppointmentStatus.COMPLETED) else it } }
-    fun rate(id: String, rating: Int, review: String) {
-        if (rating !in 1..5) return
-        change(id) { if (it.status == AppointmentStatus.COMPLETED && it.rating == null) it.copy(rating = rating, review = review.trim()) else it }
-    }
-    private fun change(id: String, transform: (Appointment) -> Appointment) {
-        _uiState.update { state -> state.copy(appointments = state.appointments.map { if (it.id == id) transform(it) else it }) }
-    }
+
+    private fun fail(message: String) { _uiState.update { it.copy(actionError = message) } }
 }
+
+internal fun Appointment.expiredLocally(now: Long) =
+    if (status == AppointmentStatus.HELD && holdExpiresAt != null && holdExpiresAt <= now) copy(status = AppointmentStatus.EXPIRED) else this
