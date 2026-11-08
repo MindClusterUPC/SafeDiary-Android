@@ -3,6 +3,7 @@ package com.mindcluster.safediary.diary.presentation.views
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -35,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +44,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
@@ -75,6 +79,13 @@ fun DiaryMarkdownEditorScreen(
     var selectedTab by remember { mutableStateOf(EditorTab.EDIT) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
+    val contentFocusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        if (viewModel.currentDraft.value == null) {
+            viewModel.openNewDraft()
+        }
+    }
 
     // Auto-save on exit/back navigation
     val onBack: () -> Unit = {
@@ -177,7 +188,11 @@ fun DiaryMarkdownEditorScreen(
             if (selectedTab == EditorTab.EDIT) {
                 MarkdownFormattingToolbar(
                     onInsertSymbol = { prefix, suffix ->
-                        val updated = "$currentContent\n$prefix$suffix"
+                        val updated = if (currentContent.isEmpty()) {
+                            "$prefix$suffix"
+                        } else {
+                            "$currentContent\n$prefix$suffix"
+                        }
                         viewModel.onContentChanged(updated)
                     }
                 )
@@ -195,6 +210,12 @@ fun DiaryMarkdownEditorScreen(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(16.dp)
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = null
+                            ) {
+                                contentFocusRequester.requestFocus()
+                            }
                     ) {
                         // Title Input Field
                         BasicTextField(
@@ -207,16 +228,22 @@ fun DiaryMarkdownEditorScreen(
                             ),
                             cursorBrush = SolidColor(SecondaryTeal),
                             modifier = Modifier.fillMaxWidth(),
+                            singleLine = true,
                             decorationBox = { innerTextField ->
-                                if (currentTitle.isEmpty()) {
-                                    Text(
-                                        text = stringResource(R.string.hint_note_title),
-                                        fontSize = 22.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = SlatePlaceholder
-                                    )
+                                Box(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    contentAlignment = Alignment.CenterStart
+                                ) {
+                                    if (currentTitle.isEmpty()) {
+                                        Text(
+                                            text = stringResource(R.string.hint_note_title),
+                                            fontSize = 22.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = SlatePlaceholder
+                                        )
+                                    }
+                                    innerTextField()
                                 }
-                                innerTextField()
                             }
                         )
 
@@ -234,17 +261,23 @@ fun DiaryMarkdownEditorScreen(
                             cursorBrush = SolidColor(SecondaryTeal),
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .weight(1f),
+                                .weight(1f)
+                                .focusRequester(contentFocusRequester),
                             decorationBox = { innerTextField ->
-                                if (currentContent.isEmpty()) {
-                                    Text(
-                                        text = stringResource(R.string.hint_note_content),
-                                        fontSize = 16.sp,
-                                        lineHeight = 24.sp,
-                                        color = SlatePlaceholder
-                                    )
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.TopStart
+                                ) {
+                                    if (currentContent.isEmpty()) {
+                                        Text(
+                                            text = stringResource(R.string.hint_note_content),
+                                            fontSize = 16.sp,
+                                            lineHeight = 24.sp,
+                                            color = SlatePlaceholder
+                                        )
+                                    }
+                                    innerTextField()
                                 }
-                                innerTextField()
                             }
                         )
                     }

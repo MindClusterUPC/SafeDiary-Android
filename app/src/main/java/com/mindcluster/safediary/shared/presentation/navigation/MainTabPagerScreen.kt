@@ -75,6 +75,7 @@ fun MainTabPagerScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToSettings: () -> Unit = onNavigateToProfile,
     onOpenDiaryEditor: (localId: String?) -> Unit = {},
+    diaryViewModel: DiaryViewModel? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -101,7 +102,7 @@ fun MainTabPagerScreen(
     )
 
     val diaryModule = remember { DiaryModule.getInstance(context) }
-    val diaryViewModel: DiaryViewModel = viewModel(
+    val effectiveDiaryViewModel: DiaryViewModel = diaryViewModel ?: viewModel(
         factory = DiaryViewModel.Factory(
             diaryModule.diaryRepository,
             authSessionPreferences
@@ -141,11 +142,8 @@ fun MainTabPagerScreen(
         }
     }
 
-    LaunchedEffect(drawerState.isOpen) {
-        if (drawerState.isOpen) assistantViewModel.refreshHistory()
-    }
-
-    BackHandler(enabled = isDrawerOpen) {
+    // Handle back button when drawer is open
+    BackHandler(enabled = drawerState.isOpen) {
         coroutineScope.launch { drawerState.close() }
     }
 
@@ -260,7 +258,7 @@ fun MainTabPagerScreen(
                     when (page) {
                         0 -> AiChatScreen(
                             viewModel = assistantViewModel,
-                            diaryViewModel = diaryViewModel,
+                            diaryViewModel = effectiveDiaryViewModel,
                             currentMode = mainViewMode,
                             onModeChange = { mainViewMode = it },
                             onOpenDiaryEditor = { localId -> onOpenDiaryEditor(localId) },
