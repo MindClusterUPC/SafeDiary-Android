@@ -21,10 +21,23 @@ import com.mindcluster.safediary.scheduling.presentation.viewmodels.agendaDate
 import com.mindcluster.safediary.scheduling.presentation.viewmodels.expiredLocally
 import com.mindcluster.safediary.scheduling.presentation.viewmodels.startOfDay
 import com.mindcluster.safediary.scheduling.presentation.viewmodels.weekDays
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Assert.*
+import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class PatientPreviewTest {
+    // The routines view model starts a backend load on creation; a dispatcher that is never advanced keeps the test offline.
+    @Before fun setUpMainDispatcher() = Dispatchers.setMain(StandardTestDispatcher())
+
+    @After fun tearDownMainDispatcher() = Dispatchers.resetMain()
+
     private val now = 1_800_000_000_000L
     private fun appointment(id: Long, status: AppointmentStatus, contactRequestId: Long = 1L) = Appointment(
         id = id, contactRequestId = contactRequestId, clinicianId = 7L, startsAt = now + 3_600_000, endsAt = now + 6_600_000,
