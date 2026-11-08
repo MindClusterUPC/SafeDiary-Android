@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -25,6 +26,7 @@ import com.mindcluster.safediary.rutines.domain.model.Routine
 import com.mindcluster.safediary.rutines.domain.model.RoutineKind
 import com.mindcluster.safediary.rutines.presentation.components.BreathingExercise
 import com.mindcluster.safediary.rutines.presentation.viewmodels.RutinesViewModel
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
 import com.mindcluster.safediary.shared.presentation.components.*
 import com.mindcluster.safediary.shared.presentation.navigation.NavRoutes
 import com.mindcluster.safediary.shared.presentation.theme.*
@@ -33,7 +35,23 @@ private val dayLabels = listOf("L", "M", "X", "J", "V", "S", "D")
 private val dayNames = listOf("Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo")
 
 @Composable
-fun RutinesScreen(onNavigateToRoute: (String) -> Unit, modifier: Modifier = Modifier, onNavigateToSettings: () -> Unit = {}, isActive: Boolean = true, viewModel: RutinesViewModel = viewModel()) {
+fun RutinesScreen(
+    onNavigateToRoute: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    onNavigateToSettings: () -> Unit = {},
+    isActive: Boolean = true,
+    viewModel: RutinesViewModel = viewModel()
+) {
+    val context = LocalContext.current
+    val authSessionPreferences = remember { AuthSessionPreferences(context) }
+    val patientId = authSessionPreferences.patientAccountId
+
+    LaunchedEffect(isActive, patientId) {
+        if (isActive) {
+            viewModel.loadRoutines(patientId)
+        }
+    }
+
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var page by rememberSaveable { mutableStateOf("list") }
     var routineId by rememberSaveable { mutableStateOf("morning") }
