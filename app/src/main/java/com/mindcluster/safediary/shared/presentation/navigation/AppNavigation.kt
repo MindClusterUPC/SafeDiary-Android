@@ -52,13 +52,19 @@ fun AppNavigation(
         // Main Tab Pager (Diarito AI Chat, Diary Notes, Home, Psychologist, Scheduling)
         composable(NavRoutes.AI_CHAT) {
             MainTabPagerScreen(
+                diaryViewModel = diaryViewModel,
                 onNavigateToProfile = {
                     navController.navigate(NavRoutes.PROFILE)
                 },
                 onNavigateToSettings = {
                     navController.navigate(NavRoutes.SETTINGS)
                 },
-                onOpenDiaryEditor = {
+                onOpenDiaryEditor = { localId ->
+                    if (localId != null) {
+                        diaryViewModel.openExistingEntry(localId)
+                    } else {
+                        diaryViewModel.openNewDraft()
+                    }
                     navController.navigate(NavRoutes.DIARY_EDITOR)
                 }
             )

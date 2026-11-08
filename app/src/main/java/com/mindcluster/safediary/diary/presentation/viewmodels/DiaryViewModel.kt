@@ -49,13 +49,13 @@ class DiaryViewModel(
     }
 
     fun onTitleChanged(newTitle: String) {
-        val current = _currentDraft.value ?: return
+        val current = _currentDraft.value ?: DiaryEntryAggregate.createDraft(currentPatientId)
         _currentDraft.value = current.copy(title = newTitle)
         scheduleAutoSave()
     }
 
     fun onContentChanged(newContent: String) {
-        val current = _currentDraft.value ?: return
+        val current = _currentDraft.value ?: DiaryEntryAggregate.createDraft(currentPatientId)
         _currentDraft.value = current.copy(content = newContent)
         scheduleAutoSave()
     }
@@ -78,7 +78,15 @@ class DiaryViewModel(
 
         viewModelScope.launch {
             val saved = repository.saveEntry(toSave)
-            _currentDraft.value = saved
+            _currentDraft.value?.let { current ->
+                if (current.localId == saved.localId) {
+                    _currentDraft.value = current.copy(
+                        remoteId = saved.remoteId,
+                        isSynced = saved.isSynced,
+                        updatedAt = saved.updatedAt
+                    )
+                }
+            }
         }
     }
 
