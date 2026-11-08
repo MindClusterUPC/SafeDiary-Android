@@ -23,7 +23,8 @@ class ProfilesModule(context: Context) {
             profilePreferences,
             remoteGateway,
             networkMonitor,
-            eventBus
+            eventBus,
+            authSessionPreferences
         )
     }
 
