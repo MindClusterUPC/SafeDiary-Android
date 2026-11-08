@@ -350,8 +350,9 @@ fun PatientProfileScreen(
                 modifier = Modifier
                     .padding(bottom = 24.dp)
                     .clickable {
+                        profilesModule.profilePreferences.clear()
                         profilesModule.authSessionPreferences.clear()
-                        Toast.makeText(context, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.profile_logged_out_success), Toast.LENGTH_SHORT).show()
                         onLogout()
                     }
             )

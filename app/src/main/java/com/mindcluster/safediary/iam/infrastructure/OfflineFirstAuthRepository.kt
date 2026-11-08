@@ -38,6 +38,11 @@ class OfflineFirstAuthRepository(
 
         // Also update local profile email if different
         profilePreferences.email = email
+        if (profilePreferences.firstName.isBlank()) {
+            val fallbackName = email.substringBefore('@')
+                .replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }
+            profilePreferences.firstName = fallbackName
+        }
 
         return UserSession(
             accountId = accountId,
@@ -102,6 +107,7 @@ class OfflineFirstAuthRepository(
     override suspend fun signOut() {
         authSessionPreferences.clear()
         authSessionPreferences.isLoggedIn = false
+        profilePreferences.clear()
     }
 
     override fun isLoggedIn(): Boolean = authSessionPreferences.isLoggedIn
