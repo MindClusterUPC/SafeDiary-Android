@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.mindcluster.safediary.professionals.infrastructure.local.PreviewProfessionals
 import com.mindcluster.safediary.professionals.presentation.components.ProfessionalCard
 import com.mindcluster.safediary.professionals.presentation.viewmodels.ProfessionalsViewModel
 import com.mindcluster.safediary.shared.presentation.components.*
@@ -31,41 +30,44 @@ fun ProfessionalsScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var page by rememberSaveable { mutableStateOf("directory") }
-    var professionalId by rememberSaveable { mutableStateOf("laura") }
+    var professionalId by rememberSaveable { mutableStateOf("") }
     var contactMessage by rememberSaveable { mutableStateOf("") }
     var showFilters by rememberSaveable { mutableStateOf(false) }
     var helpful by rememberSaveable { mutableStateOf(false) }
     var report by rememberSaveable { mutableStateOf(false) }
     var reportReason by rememberSaveable { mutableStateOf("") }
     var reportSent by rememberSaveable { mutableStateOf(false) }
-    val professional = PreviewProfessionals.find(professionalId)
+    val professional = state.find(professionalId)
     fun back() { page = if (page == "contact" || page == "reviews") "profile" else "directory" }
     BackHandler(isActive && page != "directory") { back() }
 
     PatientScreen("Psicólogos", modifier, onBack = if (page != "directory") ({ back() }) else null, onSettings = onNavigateToProfile, contentKey = page) {
-        when (page) {
-            "profile" -> {
+        when {
+            professional == null && page != "directory" -> {
+                PatientHeading("Perfil no disponible", "Esta ficha ya no está publicada en el directorio.")
+                PatientButton("Volver al directorio", { page = "directory" }, Modifier.fillMaxWidth())
+            }
+            page == "profile" && professional != null -> {
                 PatientHeading("Perfil profesional", "Información para elegir con confianza.")
                 PatientCard {
                     PatientAvatar(professional.initials)
                     Text(professional.name, style = MaterialTheme.typography.headlineSmall, color = PrimaryNavy)
                     PatientInfo(professional.specialty)
                     PatientBadge("✓ Licencia profesional verificada")
-                    PatientInfo("★ ${professional.rating} · ${professional.reviewCount} reseñas")
+                    PatientInfo(professional.rating?.let { "★ $it · ${professional.reviewCount} reseñas" } ?: "Aún sin reseñas")
                     Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                         professional.tags.forEach { PatientBadge(it, SurfaceContainerLow, PrimaryNavy) }
                     }
-                    Text("S/ ${professional.price} por sesión de 50 min", style = MaterialTheme.typography.titleMedium, color = PrimaryNavy)
+                    Text("${professional.priceLabel} por sesión de ${professional.durationMinutes} min", style = MaterialTheme.typography.titleMedium, color = PrimaryNavy)
                 }
                 Text("Sobre su enfoque", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
                 PatientCard { Text(professional.approach, color = PrimaryNavy) }
                 PatientCard {
                     PatientInfo("Credenciales revisadas antes de publicar la ficha.", Icons.Outlined.VerifiedUser)
-                    PatientInfo("Atiende en ${professional.languages.lowercase()}.")
                 }
                 Text("Valoraciones", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
                 PatientCard {
-                    Text("★ ${professional.rating} de 5 · ${professional.reviewCount} reseñas", color = PrimaryNavy)
+                    Text(professional.rating?.let { "★ $it de 5 · ${professional.reviewCount} reseñas" } ?: "Aún sin reseñas", color = PrimaryNavy)
                     Text("«Me sentí escuchada y con un plan claro.»", color = PrimaryNavy)
                     PatientInfo("Reseña anónima de una sesión completada")
                     TextButton(onClick = { page = "reviews" }) { Text("Ver todas las reseñas") }
@@ -73,7 +75,7 @@ fun ProfessionalsScreen(
                 PatientButton("Solicitar contacto", { page = "contact" }, Modifier.fillMaxWidth())
                 PatientInfo("Inicia una coordinación privada; no crea una cita ni un cobro.")
             }
-            "contact" -> {
+            page == "contact" && professional != null -> {
                 PatientHeading("Solicitar contacto", "Cuéntale brevemente qué apoyo estás buscando.")
                 PatientCard {
                     PatientAvatar(professional.initials)
@@ -82,18 +84,17 @@ fun ProfessionalsScreen(
                     OutlinedTextField(contactMessage, { contactMessage = it }, label = { Text("Motivo de consulta") }, placeholder = { Text("Hola, me gustaría coordinar una primera sesión…") }, modifier = Modifier.fillMaxWidth(), minLines = 5)
                     PatientInfo("Comparte solo lo que te resulte cómodo. Tu diario no se adjunta.", Icons.Outlined.Lock)
                 }
-                PatientBadge("Vista previa · no se envían mensajes reales", SurfaceContainerLow, PrimaryNavy)
-                PatientButton("Continuar al chat", {
+                PatientButton("Enviar solicitud", {
                     onContactProfessional(professional.id, contactMessage.trim())
                     page = "directory"
                     contactMessage = ""
                 }, Modifier.fillMaxWidth(), enabled = contactMessage.isNotBlank())
                 PatientButton("Volver al perfil", { page = "profile" }, Modifier.fillMaxWidth(), secondary = true)
             }
-            "reviews" -> {
+            page == "reviews" && professional != null -> {
                 PatientHeading("Valoraciones y reseñas", professional.name)
                 PatientCard {
-                    Text("★ ${professional.rating} de 5", style = MaterialTheme.typography.headlineMedium, color = PrimaryNavy)
+                    Text(professional.rating?.let { "★ $it de 5" } ?: "Aún sin reseñas", style = MaterialTheme.typography.headlineMedium, color = PrimaryNavy)
                     PatientInfo("${professional.reviewCount} reseñas de sesiones completadas")
                     (5 downTo 1).forEach { stars ->
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
@@ -121,14 +122,27 @@ fun ProfessionalsScreen(
                     IconButton(onClick = { showFilters = true }, modifier = Modifier.padding(top = 4.dp)) { Icon(Icons.Outlined.Tune, "Abrir filtros", tint = PrimaryNavy) }
                 }
                 Row(Modifier.horizontalScroll(rememberScrollState()), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf("Todos", "Ansiedad y estrés", "Atención plena", "Bienestar integral").forEach { category ->
+                    state.categories.forEach { category ->
                         FilterChip(state.category == category, { viewModel.category(category) }, label = { Text(category) })
                     }
                 }
-                PatientInfo("Perfiles de muestra · ${state.results.size} resultados")
-                if (state.results.isEmpty()) PatientCard {
-                    PatientHeading("Sin resultados", "Prueba otro nombre o cambia los filtros.")
-                    PatientButton("Limpiar filtros", viewModel::clearFilters, Modifier.fillMaxWidth(), secondary = true)
+                when {
+                    state.isLoading && state.professionals.isEmpty() -> LinearProgressIndicator(Modifier.fillMaxWidth(), color = SecondaryTeal)
+                    state.loadFailed && state.professionals.isEmpty() -> PatientCard {
+                        PatientHeading("No pudimos cargar el directorio", "Revisa tu conexión e inténtalo de nuevo.")
+                        PatientButton("Reintentar", viewModel::load, Modifier.fillMaxWidth())
+                    }
+                    state.professionals.isEmpty() -> PatientCard {
+                        PatientHeading("Aún no hay psicólogos publicados", "Vuelve más tarde para encontrar especialistas verificados.")
+                        PatientButton("Actualizar", viewModel::load, Modifier.fillMaxWidth(), secondary = true)
+                    }
+                    else -> {
+                        PatientInfo("${state.results.size} resultados")
+                        if (state.results.isEmpty()) PatientCard {
+                            PatientHeading("Sin resultados", "Prueba otro nombre o cambia los filtros.")
+                            PatientButton("Limpiar filtros", viewModel::clearFilters, Modifier.fillMaxWidth(), secondary = true)
+                        }
+                    }
                 }
                 state.results.forEach { item ->
                     ProfessionalCard(item, item.id in state.favorites, { viewModel.toggleFavorite(item.id) }, {
