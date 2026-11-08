@@ -22,17 +22,14 @@ data class RutinesUiState(
 
 class RutinesViewModel @JvmOverloads constructor(
     private val gateway: RetrofitRutinesGateway = RetrofitRutinesGateway(),
-    private var currentPatientId: Long = 1L
+    // Set by the screen from the signed-in account before the first load.
+    private var currentPatientId: Long = 0L
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(RutinesUiState())
     val uiState = _uiState.asStateFlow()
 
     private val dayNames = listOf("MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY")
-
-    init {
-        loadRoutines(currentPatientId)
-    }
 
     fun loadRoutines(patientId: Long = currentPatientId) {
         currentPatientId = patientId

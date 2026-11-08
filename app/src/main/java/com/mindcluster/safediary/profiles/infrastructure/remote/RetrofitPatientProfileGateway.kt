@@ -13,6 +13,20 @@ class RetrofitPatientProfileGateway(
     private val tag = "PatientProfileGateway"
     private val gson = Gson()
 
+    /** Profile of the signed-in patient, resolved by the backend from the access token. */
+    suspend fun fetchCurrentPatientProfile(): PatientResponseDto? = try {
+        val response = apiService.getPatientById(ApiEndpoints.currentPatient)
+        if (response.isSuccessful) {
+            response.body()
+        } else {
+            Log.w(tag, "fetchCurrentPatientProfile returned error code ${response.code()}: ${response.message()}")
+            null
+        }
+    } catch (e: Exception) {
+        Log.w(tag, "fetchCurrentPatientProfile network failure: ${e.message}")
+        null
+    }
+
     suspend fun fetchPatientProfile(patientId: Long): PatientResponseDto? = try {
         val response = apiService.getPatientById(ApiEndpoints.patientById(patientId))
         if (response.isSuccessful) {
