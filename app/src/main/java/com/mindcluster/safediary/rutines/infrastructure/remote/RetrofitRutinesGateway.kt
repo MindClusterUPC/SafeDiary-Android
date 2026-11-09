@@ -14,17 +14,31 @@ import com.mindcluster.safediary.rutines.infrastructure.remote.dto.UpdateDailyRo
 import com.mindcluster.safediary.shared.infrastructure.network.RetrofitClientProvider
 
 class RetrofitRutinesGateway(
-    private val apiService: RutinesApiService = RetrofitClientProvider.createService()
+    private val apiService: RutinesApiService = RetrofitClientProvider.createSessionService(com.mindcluster.safediary.shared.infrastructure.security.AuthSessionHolder.token)
 ) {
     private val tag = "RutinesGateway"
+
+    suspend fun deleteRoutine(id: Long): Boolean = try {
+        apiService.deleteRoutine(id).isSuccessful
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) { false }
+
+    suspend fun completeRoutine(id: Long): DailyRoutineResponseDto? = try {
+        apiService.completeRoutine(id).takeIf { it.isSuccessful }?.body()
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
+    } catch (e: Exception) { null }
+
 
     suspend fun createDailyRoutine(
         patientId: Long,
         title: String,
         frequencyDays: Set<String>,
-        isNotificationActive: Boolean
+        isNotificationActive: Boolean,
+        description: String = "", time: String = "09:00", minutes: Int = 5, kind: String = "GROUNDING"
     ): DailyRoutineResponseDto? = try {
-        val request = CreateDailyRoutineRequestDto(patientId, title, frequencyDays, isNotificationActive)
+        val request = CreateDailyRoutineRequestDto(patientId, title, frequencyDays, isNotificationActive, description, time, minutes, kind)
         val response = apiService.createDailyRoutine(request)
         if (response.isSuccessful) {
             response.body()
@@ -32,6 +46,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "createDailyRoutine error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "createDailyRoutine network error: ${e.message}")
         null
@@ -45,30 +61,36 @@ class RetrofitRutinesGateway(
             Log.w(tag, "getDailyRoutineById error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "getDailyRoutineById network error: ${e.message}")
         null
     }
 
-    suspend fun getRoutinesByPatientId(patientId: Long): List<DailyRoutineResponseDto> = try {
+    suspend fun getRoutinesByPatientId(patientId: Long): List<DailyRoutineResponseDto>? = try {
         val response = apiService.getAllRoutinesByPatientId(patientId)
         if (response.isSuccessful) {
             response.body().orEmpty()
         } else {
             Log.w(tag, "getRoutinesByPatientId error ${response.code()}: ${response.message()}")
-            emptyList()
+            null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "getRoutinesByPatientId network error: ${e.message}")
-        emptyList()
+        null
     }
 
     suspend fun updateDailyRoutine(
         id: Long,
         title: String,
-        isNotificationActive: Boolean
+        isNotificationActive: Boolean,
+        frequencyDays: Set<String>? = null, description: String? = null,
+        time: String? = null, minutes: Int? = null, kind: String? = null
     ): DailyRoutineResponseDto? = try {
-        val request = UpdateDailyRoutineRequestDto(title, isNotificationActive)
+        val request = UpdateDailyRoutineRequestDto(title, isNotificationActive, frequencyDays, description, time, minutes, kind)
         val response = apiService.updateDailyRoutine(id, request)
         if (response.isSuccessful) {
             response.body()
@@ -76,6 +98,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "updateDailyRoutine error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "updateDailyRoutine network error: ${e.message}")
         null
@@ -93,6 +117,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "toggleRoutineNotification error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "toggleRoutineNotification network error: ${e.message}")
         null
@@ -106,6 +132,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "toggleRoutineActive error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "toggleRoutineActive network error: ${e.message}")
         null
@@ -123,6 +151,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "createPromptReflection error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "createPromptReflection network error: ${e.message}")
         null
@@ -136,6 +166,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "getPromptReflectionById error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "getPromptReflectionById network error: ${e.message}")
         null
@@ -149,6 +181,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "getPendingPromptReflection error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "getPendingPromptReflection network error: ${e.message}")
         null
@@ -166,6 +200,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "submitDailyReflection error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "submitDailyReflection network error: ${e.message}")
         null
@@ -184,6 +220,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "startSosExercise error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "startSosExercise network error: ${e.message}")
         null
@@ -197,6 +235,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "getSosExerciseById error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "getSosExerciseById network error: ${e.message}")
         null
@@ -210,6 +250,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "getSosExerciseHistory error ${response.code()}: ${response.message()}")
             emptyList()
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "getSosExerciseHistory network error: ${e.message}")
         emptyList()
@@ -223,6 +265,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "advanceSosStep error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "advanceSosStep network error: ${e.message}")
         null
@@ -236,6 +280,8 @@ class RetrofitRutinesGateway(
             Log.w(tag, "completeSosExercise error ${response.code()}: ${response.message()}")
             null
         }
+    } catch (e: kotlinx.coroutines.CancellationException) {
+        throw e
     } catch (e: Exception) {
         Log.w(tag, "completeSosExercise network error: ${e.message}")
         null

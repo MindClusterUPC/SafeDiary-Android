@@ -11,6 +11,7 @@ import com.mindcluster.safediary.rutines.infrastructure.remote.dto.ToggleRoutine
 import com.mindcluster.safediary.rutines.infrastructure.remote.dto.UpdateDailyRoutineRequestDto
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -18,6 +19,12 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface RutinesApiService {
+    @DELETE("api/v1/daily-routines/{id}")
+    suspend fun deleteRoutine(@Path("id") id: Long): Response<Unit>
+
+    @POST("api/v1/daily-routines/{id}/completion")
+    suspend fun completeRoutine(@Path("id") id: Long): Response<DailyRoutineResponseDto>
+
 
     @POST("api/v1/daily-routines")
     suspend fun createDailyRoutine(
