@@ -42,6 +42,10 @@ fun SchedulingScreen(
     var draftConsent by rememberSaveable { mutableStateOf(false) }
     val appointment = state.appointments.find { it.id == appointmentId }
     val chat = state.contactRequest(chatId)
+    var message by rememberSaveable(chatId) { mutableStateOf("") }
+    ObserveCoordinationUpdates(isActive, chat?.id?.takeIf { page == "chat" }) {
+        if (!state.isWorking && !state.isLoading) viewModel.refreshConversation(chatId, silent = true)
+    }
 
     LaunchedEffect(isActive) {
         if (isActive) {
@@ -77,7 +81,14 @@ fun SchedulingScreen(
         appointmentId = item.id
         page = if (item.status == AppointmentStatus.HELD || item.status == AppointmentStatus.EXPIRED) "reservation" else "detail"
     }
-    PatientScreen("Agenda", modifier, onBack = if (page != "list") ({ back() }) else null, onSettings = onNavigateToSettings, contentKey = page) {
+    PatientScreen("Agenda", modifier, onBack = if (page != "list") ({ back() }) else null, onSettings = onNavigateToSettings, contentKey = page,
+        scrollToBottomKey = if (page == "chat") state.messages[chatId]?.lastOrNull()?.id ?: 0L else null,
+        bottomBar = if (page == "chat" && chat?.isOpen == true) ({
+            CoordinationComposer(message, { message = it }, state.isWorking) {
+                viewModel.sendMessage(chat.id, message); message = ""
+            }
+        }) else null
+    ) {
         when {
             page == "chat" && chat != null -> CoordinationContent(
                 request = chat,
@@ -86,9 +97,8 @@ fun SchedulingScreen(
                 proposal = state.proposalFor(chat.id),
                 held = state.heldFor(chat.id),
                 isWorking = state.isWorking,
-                onSend = { viewModel.sendMessage(chat.id, it) },
+                onMessageChange = { message = it },
                 onAccept = { proposalId -> viewModel.accept(proposalId) { heldId -> appointmentId = heldId; page = "reservation"; viewModel.closeConversation() } },
-                onRefresh = { viewModel.refreshConversation(chat.id) },
                 onOpenReservation = { heldId -> appointmentId = heldId; page = "reservation"; viewModel.closeConversation() }
             )
             page == "reservation" && appointment != null &&
@@ -182,7 +192,7 @@ fun SchedulingScreen(
                             conversation.status == ContactRequestStatus.REJECTED -> PatientBadge("Solicitud no aceptada", ErrorContainer, ErrorRed)
                             conversation.status == ContactRequestStatus.CLOSED -> PatientBadge("Conversación cerrada", SurfaceContainerLow, PrimaryNavy)
                         }
-                        TextButton(onClick = { openChat(conversation.id) }) { Text("Abrir conversación") }
+                        PatientButton("Abrir conversación", { openChat(conversation.id) }, Modifier.fillMaxWidth())
                     }
                 }
             }

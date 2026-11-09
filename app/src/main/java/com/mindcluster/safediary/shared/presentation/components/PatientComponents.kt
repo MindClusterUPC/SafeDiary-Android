@@ -7,12 +7,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,8 +30,11 @@ val PatientBorder = Color(0xFFE3E8F0)
 
 /** The pager owns bottom navigation; each patient tab owns its content and header. */
 @Composable
-fun PatientScreen(section: String, modifier: Modifier = Modifier, onBack: (() -> Unit)? = null, onSettings: () -> Unit = {}, contentKey: Any = section, content: @Composable ColumnScope.() -> Unit) {
+fun PatientScreen(section: String, modifier: Modifier = Modifier, onBack: (() -> Unit)? = null, onSettings: () -> Unit = {}, contentKey: Any = section, bottomBar: (@Composable () -> Unit)? = null, scrollToBottomKey: Any? = null, content: @Composable ColumnScope.() -> Unit) {
     val scrollState = key(contentKey) { rememberScrollState() }
+    LaunchedEffect(scrollToBottomKey, scrollState.maxValue) {
+        if (scrollToBottomKey != null) scrollState.scrollTo(scrollState.maxValue)
+    }
     Column(modifier.fillMaxSize().background(BackgroundSanctuary).statusBarsPadding().displayCutoutPadding().imePadding()) {
         Row(Modifier.fillMaxWidth().heightIn(min = 64.dp).padding(horizontal = 12.dp), verticalAlignment = Alignment.CenterVertically) {
             if (onBack != null) IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Outlined.ArrowBack, "Volver", tint = PrimaryNavy) }
@@ -40,7 +44,8 @@ fun PatientScreen(section: String, modifier: Modifier = Modifier, onBack: (() ->
             Text(" / $section", Modifier.weight(1f), color = SlateSubtle, style = MaterialTheme.typography.bodySmall)
             IconButton(onClick = onSettings) { Icon(Icons.Outlined.Person, "Perfil y configuración", Modifier.size(28.dp), tint = PrimaryNavy) }
         }
-        Column(Modifier.fillMaxSize().verticalScroll(scrollState).padding(horizontal = 16.dp).padding(top = 16.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
+        Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scrollState).padding(horizontal = 16.dp).padding(top = 16.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
+        bottomBar?.invoke()
     }
 }
 

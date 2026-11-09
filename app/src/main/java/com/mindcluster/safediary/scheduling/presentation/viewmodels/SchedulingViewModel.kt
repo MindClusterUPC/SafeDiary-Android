@@ -123,8 +123,8 @@ class SchedulingViewModel(
     fun closeConversation() { _uiState.update { it.copy(activeConversationId = null) } }
 
     /** Reloads the chat and the proposals the clinician may have sent meanwhile. */
-    fun refreshConversation(id: Long) {
-        loadMessages(id)
+    fun refreshConversation(id: Long, silent: Boolean = false) {
+        loadMessages(id, silent)
         refresh()
     }
 
@@ -192,12 +192,12 @@ class SchedulingViewModel(
         _uiState.update { it.copy(sharedContext = if (enabled) it.sharedContext + id else it.sharedContext - id) }
     }
 
-    private fun loadMessages(id: Long) {
+    private fun loadMessages(id: Long, silent: Boolean = false) {
         viewModelScope.launch {
             val patientAccountId = _uiState.value.contactRequest(id)?.patientAccountId
             when (val result = gateway.getMessages(id, patientAccountId)) {
                 is SchedulingResult.Success -> _uiState.update { it.copy(messages = it.messages + (id to result.value)) }
-                is SchedulingResult.Failure -> fail(result.message)
+                is SchedulingResult.Failure -> if (!silent) fail(result.message)
             }
         }
     }

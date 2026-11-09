@@ -161,12 +161,12 @@ class ClinicianAgendaViewModel(
         }
     }
 
-    fun loadMessages(id: Long) {
+    fun loadMessages(id: Long, silent: Boolean = false) {
         viewModelScope.launch {
             val patientAccountId = _uiState.value.request(id)?.patientAccountId
             when (val result = gateway.getMessages(id, patientAccountId)) {
                 is SchedulingResult.Success -> _uiState.update { it.copy(messages = it.messages + (id to result.value)) }
-                is SchedulingResult.Failure -> fail(result.message)
+                is SchedulingResult.Failure -> if (!silent) fail(result.message)
             }
         }
     }
