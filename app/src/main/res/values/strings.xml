@@ -272,6 +272,7 @@
 
     <!-- IAM Strings (Spanish) -->
     <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_session_expired">Tu sesión ya no es válida. Inicia sesión de nuevo para continuar.</string>
     <string name="auth_register_title">Crear cuenta en el Santuario</string>
     <string name="auth_tab_login">Iniciar sesión</string>
     <string name="auth_tab_register">Crear cuenta</string>

@@ -272,6 +272,7 @@
 
     <!-- IAM Strings (English) -->
     <string name="auth_login_title">Sign In</string>
+    <string name="auth_session_expired">Your session is no longer valid. Sign in again to continue.</string>
     <string name="auth_register_title">Create your Sanctuary Account</string>
     <string name="auth_tab_login">Sign In</string>
     <string name="auth_tab_register">Sign Up</string>

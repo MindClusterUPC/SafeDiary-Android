@@ -54,7 +54,8 @@ import com.mindcluster.safediary.shared.presentation.theme.*
 @Composable
 fun SignInScreen(
     onSignInSuccess: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    sessionExpired: Boolean = false
 ) {
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
@@ -122,6 +123,17 @@ fun SignInScreen(
                     }
                 }
 
+                if (sessionExpired) {
+                    Surface(color = SurfaceContainerLow, shape = RoundedCornerShape(16.dp)) {
+                        Text(
+                            stringResource(R.string.auth_session_expired),
+                            Modifier.padding(16.dp),
+                            color = PrimaryNavy,
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
+                }
+
                 // Auth Card Form (Sign In / Sign Up)
                 Surface(
                     modifier = Modifier.fillMaxWidth(),
@@ -172,33 +184,8 @@ fun SignInScreen(
                             )
                         )
 
-                        // Registration Extra Fields (Role Selector & Full Name)
+                        // Patient registration fields
                         if (uiState.isSignUpMode) {
-                            Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
-                                Text(
-                                    text = stringResource(R.string.auth_role_label),
-                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
-                                    color = OnSurfaceVariant
-                                )
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.spacedBy(10.dp)
-                                ) {
-                                    RoleSelectionChip(
-                                        label = stringResource(R.string.auth_role_patient),
-                                        selected = uiState.selectedRole == "PATIENT",
-                                        onClick = { viewModel.onRoleSelected("PATIENT") },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                    RoleSelectionChip(
-                                        label = stringResource(R.string.auth_role_psychologist),
-                                        selected = uiState.selectedRole == "PSYCHOLOGIST",
-                                        onClick = { viewModel.onRoleSelected("PSYCHOLOGIST") },
-                                        modifier = Modifier.weight(1f)
-                                    )
-                                }
-                            }
-
                             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Text(
                                     text = stringResource(R.string.auth_full_name_label),
@@ -467,39 +454,6 @@ private fun AuthModeTab(
                 style = MaterialTheme.typography.bodyMedium.copy(
                     fontWeight = FontWeight.Bold,
                     color = if (selected) Color.White else OnSurfaceVariant
-                )
-            )
-        }
-    }
-}
-
-@Composable
-private fun RoleSelectionChip(
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
-            .clickable(onClick = onClick),
-        shape = RoundedCornerShape(12.dp),
-        color = if (selected) SecondaryTeal.copy(alpha = 0.12f) else Color(0xFFF8FAFC),
-        border = BorderStroke(
-            width = if (selected) 1.5.dp else 1.dp,
-            color = if (selected) SecondaryTeal else Color(0xFFE2E8F0)
-        )
-    ) {
-        Box(
-            modifier = Modifier.padding(vertical = 10.dp, horizontal = 12.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium.copy(
-                    fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
-                    color = if (selected) SecondaryTeal else OnSurfaceVariant
                 )
             )
         }

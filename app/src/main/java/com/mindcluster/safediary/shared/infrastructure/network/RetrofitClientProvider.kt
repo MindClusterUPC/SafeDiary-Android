@@ -15,8 +15,8 @@ object RetrofitClientProvider {
 
     private val loggingInterceptor: HttpLoggingInterceptor by lazy {
         HttpLoggingInterceptor().apply {
-            // Message bodies hold sensitive emotional content: only log them in debug builds.
-            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY else HttpLoggingInterceptor.Level.NONE
+            // Credentials, tokens and emotional messages must never appear in network logs.
+            level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BASIC else HttpLoggingInterceptor.Level.NONE
         }
     }
 
@@ -38,7 +38,13 @@ object RetrofitClientProvider {
                     requestBuilder.addHeader("Authorization", "Bearer $token")
                 }
 
-                chain.proceed(requestBuilder.build())
+                val response = chain.proceed(requestBuilder.build())
+                if (response.code == 401 &&
+                    !response.request.url.encodedPath.startsWith("/api/v1/authentication/")
+                ) {
+                    AuthSessionHolder.rejectToken(token)
+                }
+                response
             }
             .addInterceptor(loggingInterceptor)
             .build()
@@ -59,4 +65,12 @@ object RetrofitClientProvider {
     inline fun <reified T> createService(): T {
         return createService(T::class.java)
     }
+
+    fun <T> createSessionService(token: String?, serviceClass: Class<T>): T = Retrofit.Builder()
+        .baseUrl(baseUrl)
+        .client(okHttpClient.newBuilder().addInterceptor(SessionBoundaryInterceptor(token)).build())
+        .addConverterFactory(GsonConverterFactory.create())
+        .build().create(serviceClass)
+
+    inline fun <reified T> createSessionService(token: String?): T = createSessionService(token, T::class.java)
 }
