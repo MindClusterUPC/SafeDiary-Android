@@ -7,7 +7,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.*
@@ -42,7 +41,7 @@ fun PatientScreen(section: String, modifier: Modifier = Modifier, onBack: (() ->
             Spacer(Modifier.width(8.dp))
             Text("SafeDiary", color = PrimaryNavy, style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
             Text(" / $section", Modifier.weight(1f), color = SlateSubtle, style = MaterialTheme.typography.bodySmall)
-            IconButton(onClick = onSettings) { Icon(Icons.Outlined.Person, "Perfil y configuración", Modifier.size(28.dp), tint = PrimaryNavy) }
+            UserProfileAvatar(onClick = onSettings)
         }
         Column(Modifier.weight(1f).fillMaxWidth().verticalScroll(scrollState).padding(horizontal = 16.dp).padding(top = 16.dp, bottom = 24.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
         bottomBar?.invoke()

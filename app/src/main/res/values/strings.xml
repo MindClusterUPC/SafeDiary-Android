@@ -330,4 +330,6 @@
     <string name="hint_note_title">Título de la nota...</string>
     <string name="hint_note_content">Escribe tu reflexión aquí en Markdown...</string>
     <string name="untitled_note">Nota sin título</string>
+    <string name="avatar_image_error">No se pudo abrir la imagen. Elige otra foto de hasta 5 MB.</string>
+    <string name="avatar_saving">Guardando foto…</string>
 </resources>
