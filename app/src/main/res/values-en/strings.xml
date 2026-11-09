@@ -324,9 +324,17 @@
     <string name="empty_diary_subtitle">A safe space to write your thoughts, reflections, and daily experiences.</string>
     <string name="action_create_first_note">Write my first note</string>
     <string name="action_back">Back</string>
-    <string name="tab_edit">Edit</string>
-    <string name="tab_preview">Preview</string>
     <string name="hint_note_title">Note title...</string>
-    <string name="hint_note_content">Write your reflection here in Markdown...</string>
+    <string name="hint_note_content">Write what you think or feel. This page is only yours.</string>
     <string name="untitled_note">Untitled note</string>
+    <string name="diary_editor_heading">My diary</string>
+    <string name="diary_format_title">Title</string>
+    <string name="diary_format_bold">Bold</string>
+    <string name="diary_format_italic">Italic</string>
+    <string name="diary_format_highlight">Highlight</string>
+    <string name="diary_format_list">List</string>
+    <string name="diary_prompt_today">What happened today?</string>
+    <string name="diary_prompt_feeling">How do I feel right now?</string>
+    <string name="diary_prompt_grateful">Something I am grateful for</string>
+    <string name="diary_prompt_release">Something I want to let go</string>
 </resources>
