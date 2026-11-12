@@ -34,6 +34,10 @@ fun ClinicianAgendaScreen(
     var chatId by rememberSaveable { mutableLongStateOf(-1L) }
     var appointmentId by rememberSaveable { mutableLongStateOf(-1L) }
     val chat = state.request(chatId)
+    var message by rememberSaveable(chatId) { mutableStateOf("") }
+    ObserveCoordinationUpdates(isActive, chat?.id?.takeIf { page == "chat" }) {
+        if (!state.isWorking && !state.isLoading) { viewModel.loadMessages(chatId, silent = true); viewModel.refresh() }
+    }
     val appointment = state.appointment(appointmentId)
 
     LaunchedEffect(clinicianId) { viewModel.start(clinicianId) }
@@ -56,7 +60,14 @@ fun ClinicianAgendaScreen(
     fun back() { page = if (page == "close") "detail" else "agenda" }
     BackHandler(isActive && page != "agenda") { back() }
 
-    PatientScreen("Scheduling", modifier, onBack = if (page != "agenda") ({ back() }) else null, onSettings = onNavigateToSettings, contentKey = page) {
+    PatientScreen("Scheduling", modifier, onBack = if (page != "agenda") ({ back() }) else null, onSettings = onNavigateToSettings, contentKey = page,
+        scrollToBottomKey = if (page == "chat") state.messages[chatId]?.lastOrNull()?.id ?: 0L else null,
+        bottomBar = if (page == "chat" && chat?.isOpen == true) ({
+            CoordinationComposer(message, { message = it }, state.isWorking) {
+                viewModel.sendMessage(chat.id, message); message = ""
+            }
+        }) else null
+    ) {
         state.notice?.let { notice ->
             PatientCard(color = PatientMint) {
                 Text(notice, color = PrimaryNavy)
@@ -69,9 +80,7 @@ fun ClinicianAgendaScreen(
                 messages = state.messages[chat.id].orEmpty(),
                 proposal = state.proposalFor(chat.id),
                 isWorking = state.isWorking,
-                onSend = { viewModel.sendMessage(chat.id, it) },
-                onProposeSchedule = { viewModel.selectRequest(chat.id); page = "agenda" },
-                onRefresh = { viewModel.loadMessages(chat.id); viewModel.refresh() }
+                onProposeSchedule = { viewModel.selectRequest(chat.id); page = "agenda" }
             )
             page == "detail" && appointment != null -> ClinicianAppointmentContent(
                 appointment, state.now, state.isWorking,

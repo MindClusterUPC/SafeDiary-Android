@@ -26,12 +26,10 @@ fun CoordinationContent(
     proposal: Appointment?,
     held: Appointment?,
     isWorking: Boolean,
-    onSend: (String) -> Unit,
+    onMessageChange: (String) -> Unit,
     onAccept: (Long) -> Unit,
-    onRefresh: () -> Unit,
     onOpenReservation: (Long) -> Unit
 ) {
-    var message by rememberSaveable(request.id) { mutableStateOf("") }
     var confirm by rememberSaveable(request.id) { mutableStateOf(false) }
     PatientHeading("Chat de coordinación", clinician.name)
     PatientInfo("Solo tú y el especialista ven esta conversación. Tu diario no se comparte.", Icons.Outlined.Lock)
@@ -63,15 +61,8 @@ fun CoordinationContent(
         HorizontalDivider(color = PatientBorder)
         Text("Tarifa acordada: ${proposal.amountLabel}", fontWeight = FontWeight.Bold, color = PrimaryNavy)
         PatientButton("Aceptar horario", { confirm = true }, Modifier.fillMaxWidth(), enabled = !isWorking)
-        PatientButton("Proponer otro horario", { message = "¿Podríamos coordinar otro horario? Tengo disponibilidad " }, Modifier.fillMaxWidth(), secondary = true)
+        PatientButton("Proponer otro horario", { onMessageChange("¿Podríamos coordinar otro horario? Tengo disponibilidad ") }, Modifier.fillMaxWidth(), secondary = true)
         PatientInfo("Aceptar crea una reserva temporal de una hora. La cita se confirma después del pago aprobado.")
-    }
-    TextButton(onClick = onRefresh) { Text("Actualizar conversación") }
-    if (request.isOpen) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedTextField(message, { if (it.length <= 500) message = it }, modifier = Modifier.weight(1f), placeholder = { Text("Escribe un mensaje…") }, maxLines = 4)
-        IconButton(onClick = { onSend(message); message = "" }, enabled = message.isNotBlank() && !isWorking) {
-            Icon(Icons.AutoMirrored.Outlined.Send, "Enviar mensaje", tint = SecondaryTeal)
-        }
     }
     if (confirm && proposal != null) AlertDialog(
         onDismissRequest = { confirm = false },

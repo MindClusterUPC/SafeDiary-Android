@@ -228,11 +228,8 @@ fun ClinicianChatContent(
     messages: List<CoordinationMessage>,
     proposal: Appointment?,
     isWorking: Boolean,
-    onSend: (String) -> Unit,
-    onProposeSchedule: () -> Unit,
-    onRefresh: () -> Unit
+    onProposeSchedule: () -> Unit
 ) {
-    var message by rememberSaveable(request.id) { mutableStateOf("") }
     PatientHeading("Chat de coordinación", patientLabel(request.patientAccountId))
     PatientInfo("Solo tú y el paciente ven esta conversación. No da acceso a su diario.", Icons.Outlined.Lock)
     when (request.status) {
@@ -255,13 +252,7 @@ fun ClinicianChatContent(
         PatientInfo("Esperando que el paciente la acepte. Aún no hay reserva ni cobro.")
     }
     if (request.isOpen) PatientButton(if (proposal != null) "Proponer otro horario" else "Proponer horario", onProposeSchedule, Modifier.fillMaxWidth())
-    TextButton(onClick = onRefresh) { Text("Actualizar conversación") }
-    if (request.isOpen) Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-        OutlinedTextField(message, { if (it.length <= 500) message = it }, modifier = Modifier.weight(1f), placeholder = { Text("Escribe un mensaje…") }, maxLines = 4)
-        IconButton(onClick = { onSend(message); message = "" }, enabled = message.isNotBlank() && !isWorking) {
-            Icon(Icons.AutoMirrored.Outlined.Send, "Enviar mensaje", tint = SecondaryTeal)
-        }
-    }
+
 }
 
 /** Appointment seen by the psychologist: access to the call and entry to close the attention (US-044). */

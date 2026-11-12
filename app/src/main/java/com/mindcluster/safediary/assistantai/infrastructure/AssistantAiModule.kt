@@ -25,11 +25,17 @@ import com.mindcluster.safediary.assistantai.infrastructure.local.SafeDiaryDatab
 import com.mindcluster.safediary.assistantai.infrastructure.remote.RetrofitAssistantResponder
 import com.mindcluster.safediary.assistantai.infrastructure.remote.RetrofitConversationHistoryGateway
 import com.mindcluster.safediary.shared.infrastructure.network.NetworkMonitor
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
+import com.mindcluster.safediary.shared.infrastructure.network.RetrofitClientProvider
+import com.mindcluster.safediary.assistantai.infrastructure.remote.api.AssistantApiService
 
 class AssistantAiModule(context: Context) {
-    val database: SafeDiaryDatabase by lazy { SafeDiaryDatabase.getInstance(context) }
+    val accountId = AuthSessionPreferences(context).patientAccountId
+    val sessionToken = AuthSessionPreferences(context).authToken
+    private val api: AssistantApiService by lazy { RetrofitClientProvider.createSessionService(sessionToken) }
+    val database: SafeDiaryDatabase by lazy { SafeDiaryDatabase.getInstance(context, accountId) }
     val networkMonitor: NetworkMonitor by lazy { NetworkMonitor.getInstance(context) }
-    val chatPreferences: ChatPreferences by lazy { ChatPreferences(context) }
+    val chatPreferences: ChatPreferences by lazy { ChatPreferences(context, accountId) }
 
     val eventBus: DomainEventPublisher by lazy { InMemoryDomainEventBus() }
     val repository: ConversationRepository by lazy {
@@ -39,13 +45,13 @@ class AssistantAiModule(context: Context) {
             chatPreferences
         )
     }
-    val responder: AssistantResponder by lazy { RetrofitAssistantResponder(context.applicationContext) }
+    val responder: AssistantResponder by lazy { RetrofitAssistantResponder(context.applicationContext, api) }
 
     val historyGateway: ConversationHistoryGateway by lazy {
         CacheFirstConversationHistoryGateway(
             database.conversationDao(),
             database.messageDao(),
-            RetrofitConversationHistoryGateway(),
+            RetrofitConversationHistoryGateway(api),
             networkMonitor
         )
     }
@@ -103,8 +109,10 @@ class AssistantAiModule(context: Context) {
         private var instance: AssistantAiModule? = null
 
         fun getInstance(context: Context): AssistantAiModule {
-            return instance ?: synchronized(this) {
-                instance ?: AssistantAiModule(context.applicationContext).also { instance = it }
+            return synchronized(this) {
+                val session = AuthSessionPreferences(context)
+                instance?.takeIf { it.accountId == session.patientAccountId && it.sessionToken == session.authToken }
+                    ?: AssistantAiModule(context.applicationContext).also { instance = it }
             }
         }
     }

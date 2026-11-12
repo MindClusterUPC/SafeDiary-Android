@@ -1,5 +1,7 @@
 package com.mindcluster.safediary.profiles.presentation.views
 
+import com.mindcluster.safediary.shared.presentation.components.ProfileAvatarContent
+
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -123,13 +125,7 @@ fun PatientProfileScreen(
                             .clickable { viewModel.openAvatarSheet() },
                         contentAlignment = Alignment.Center
                     ) {
-                        val initials = profile?.initials?.ifBlank { "SD" } ?: "SD"
-                        Text(
-                            text = initials,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryNavy
-                        )
+                        ProfileAvatarContent(Modifier.matchParentSize())
                     }
                     Box(
                         modifier = Modifier

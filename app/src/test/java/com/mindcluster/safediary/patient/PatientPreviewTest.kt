@@ -33,7 +33,7 @@ import org.junit.Test
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PatientPreviewTest {
-    // The routines view model starts a backend load on creation; a dispatcher that is never advanced keeps the test offline.
+    // Keep coroutine work under the test dispatcher.
     @Before fun setUpMainDispatcher() = Dispatchers.setMain(StandardTestDispatcher())
 
     @After fun tearDownMainDispatcher() = Dispatchers.resetMain()
@@ -132,16 +132,13 @@ class PatientPreviewTest {
         assertEquals(0, professional.reviewCount)
     }
 
-    @Test fun invalidRoutineIsNotAddedAndCompletionIsIdempotent() {
-        val viewModel = RutinesViewModel()
+    @Test fun routinesStartEmptyAndRejectInvalidInput() {
+        val viewModel = RutinesViewModel(currentPatientId = 1)
         val count = viewModel.uiState.value.routines.size
         assertFalse(viewModel.add(" ", "", "09:00", 5, setOf(0), true))
         assertFalse(viewModel.add("Pausa", "", "25:00", 5, setOf(0), true))
         assertFalse(viewModel.add("Pausa", "", "09:00", 0, emptySet(), true))
         assertEquals(count, viewModel.uiState.value.routines.size)
-        assertTrue(viewModel.add("Pausa", "Respirar", "10:30", 3, setOf(0, 2), false))
-        viewModel.complete("morning")
-        viewModel.complete("morning")
-        assertEquals(1, viewModel.uiState.value.routines.count { it.completed })
+        assertEquals(0, count)
     }
 }

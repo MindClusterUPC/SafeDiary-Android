@@ -65,7 +65,7 @@ fun HomeScreen(
             if (selected != null) Surface(color = SurfaceContainerLow, shape = RoundedCornerShape(14.dp)) {
                 Row(Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Outlined.CheckCircle, null, tint = SecondaryTeal)
-                    Text("Ánimo registrado: $selected. Este espacio es solo tuyo.", color = PrimaryNavy, style = MaterialTheme.typography.bodySmall)
+                    Text("Ánimo seleccionado: $selected.", color = PrimaryNavy, style = MaterialTheme.typography.bodySmall)
                 }
             }
         }
@@ -83,11 +83,6 @@ fun HomeScreen(
             PatientBadge("✧ INSPIRACIÓN DEL DÍA", SurfaceContainerHigh, PrimaryNavy)
             Text("Cada pequeña pausa también es una forma de cuidarte.", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
             Text("No tienes que resolverlo todo hoy.", style = MaterialTheme.typography.bodySmall, color = SlateSubtle)
-        }
-        Text("Continúa cuidándote", style = MaterialTheme.typography.titleLarge, color = PrimaryNavy)
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            PatientButton("Mis rutinas", { onNavigateToRoute(NavRoutes.RUTINES) }, Modifier.weight(1f), secondary = true)
-            PatientButton("Mis citas", { onNavigateToRoute(NavRoutes.SCHEDULING) }, Modifier.weight(1f), secondary = true)
         }
     }
 }

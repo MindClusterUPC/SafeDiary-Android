@@ -79,7 +79,7 @@ import com.mindcluster.safediary.assistantai.presentation.components.TypingIndic
 import com.mindcluster.safediary.assistantai.presentation.viewmodels.AssistantViewModel
 import com.mindcluster.safediary.diary.presentation.viewmodels.DiaryViewModel
 import com.mindcluster.safediary.diary.presentation.views.DiaryGalleryScreen
-import com.mindcluster.safediary.profiles.infrastructure.local.ProfilePreferences
+import com.mindcluster.safediary.shared.presentation.components.UserProfileAvatar
 import com.mindcluster.safediary.shared.presentation.components.GrokStyleHeaderSwitch
 import com.mindcluster.safediary.shared.presentation.components.MainViewMode
 import com.mindcluster.safediary.shared.presentation.components.SafeDiaryBottomNavBar
@@ -110,14 +110,6 @@ fun AiChatScreen(
     val coroutineScope = rememberCoroutineScope()
     val focusManager = LocalFocusManager.current
     val keyboardController = LocalSoftwareKeyboardController.current
-
-    val profilePreferences = remember { ProfilePreferences(context) }
-    val userInitials = remember(profilePreferences.firstName, profilePreferences.lastName) {
-        val f = profilePreferences.firstName.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
-        val l = profilePreferences.lastName.firstOrNull()?.uppercaseChar()?.toString().orEmpty()
-        val combined = "$f$l"
-        if (combined.isNotBlank()) combined else "SD"
-    }
 
     val internalDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val useInternalDrawer = onOpenDrawer == null
@@ -286,27 +278,11 @@ fun AiChatScreen(
                                         .background(Color(0xFF0F766E))
                                 )
                             }
-                            // Profile circular avatar
-                            Box(
-                                modifier = Modifier
-                                    .size(36.dp)
-                                    .clip(CircleShape)
-                                    .background(Color(0xFFD1E3D4))
-                                    .border(1.dp, Color(0xFFCBD5E1), CircleShape)
-                                    .clickable {
-                                        focusManager.clearFocus()
-                                        keyboardController?.hide()
-                                        onNavigateToSettings()
-                                    },
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = userInitials,
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF1E3A2F)
-                                )
-                            }
+                            UserProfileAvatar(onClick = {
+                                focusManager.clearFocus()
+                                keyboardController?.hide()
+                                onNavigateToSettings()
+                            })
                         }
                     }
                 }

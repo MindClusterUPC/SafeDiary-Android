@@ -42,8 +42,21 @@ class AuthSessionPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_LOGGED_IN, value).apply()
 
+    var sessionExpired: Boolean
+        get() = prefs.getBoolean(KEY_SESSION_EXPIRED, false)
+        set(value) = prefs.edit().putBoolean(KEY_SESSION_EXPIRED, value).apply()
+
     init {
-        AuthSessionHolder.token = authToken
+        val storedToken = authToken
+        if (isLoggedIn && !SessionTokenPolicy.isUsable(storedToken)) {
+            // Old versions stored mock tokens as authenticated sessions. Preserve local notes,
+            // but require an actual IAM login before any further authenticated request.
+            clear()
+            sessionExpired = true
+            AuthSessionHolder.rejectStoredSession()
+        } else {
+            AuthSessionHolder.restoreToken(storedToken)
+        }
     }
 
     fun clear() {
@@ -61,10 +74,6 @@ class AuthSessionPreferences(context: Context) {
         const val NO_ID = 0L
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
+        private const val KEY_SESSION_EXPIRED = "session_expired"
     }
-}
-
-object AuthSessionHolder {
-    @Volatile
-    var token: String? = null
 }

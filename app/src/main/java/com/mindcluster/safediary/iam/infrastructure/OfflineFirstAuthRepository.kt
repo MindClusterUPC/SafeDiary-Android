@@ -59,14 +59,15 @@ class OfflineFirstAuthRepository(
         return response.toSession(email)
     }
 
-    /** Stores the new session; data cached for a different account is removed before it can be shown. */
+    /** Switches session and shared profile preferences; chat and diary storage are scoped per account. */
     private suspend fun startSession(response: SignInResponseDto, email: String) {
         val accountId = response.resolvedAccountId
+        val accessToken = response.resolvedToken
         if (accountId != authSessionPreferences.lastAccountId) {
             clearLocalData()
             profilePreferences.clear()
         }
-        authSessionPreferences.authToken = response.resolvedToken
+        authSessionPreferences.authToken = accessToken
         authSessionPreferences.patientAccountId = accountId
         authSessionPreferences.patientProfileId = AuthSessionPreferences.NO_ID
         authSessionPreferences.userEmail = email

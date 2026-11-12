@@ -24,7 +24,7 @@ fun ProfessionalCard(professional: Professional, favorite: Boolean, onFavorite: 
                 PatientBadge("✓ Licencia verificada")
             }
             IconToggleButton(checked = favorite, onCheckedChange = { onFavorite() }) {
-                Icon(if (favorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder, if (favorite) "Quitar de guardados" else "Guardar especialista", tint = SecondaryTeal)
+                Icon(if (favorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder, if (favorite) "Quitar de favoritos" else "Añadir especialista a favoritos", tint = SecondaryTeal)
             }
         }
         PatientInfo(professional.rating?.let { "★ $it · ${professional.reviewCount} reseñas" } ?: "Aún sin reseñas")

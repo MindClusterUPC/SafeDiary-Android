@@ -272,6 +272,7 @@
 
     <!-- IAM Strings (Spanish) -->
     <string name="auth_login_title">Iniciar sesión</string>
+    <string name="auth_session_expired">Tu sesión ya no es válida. Inicia sesión de nuevo para continuar.</string>
     <string name="auth_register_title">Crear cuenta en el Santuario</string>
     <string name="auth_tab_login">Iniciar sesión</string>
     <string name="auth_tab_register">Crear cuenta</string>
@@ -337,4 +338,6 @@
     <string name="diary_prompt_feeling">¿Cómo me siento ahora?</string>
     <string name="diary_prompt_grateful">Algo que agradezco</string>
     <string name="diary_prompt_release">Algo que quiero soltar</string>
+    <string name="avatar_image_error">No se pudo abrir la imagen. Elige otra foto de hasta 5 MB.</string>
+    <string name="avatar_saving">Guardando foto…</string>
 </resources>

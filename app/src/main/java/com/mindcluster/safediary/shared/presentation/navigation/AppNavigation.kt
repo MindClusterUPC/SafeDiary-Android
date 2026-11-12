@@ -3,9 +3,15 @@ package com.mindcluster.safediary.shared.presentation.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -20,6 +26,7 @@ import com.mindcluster.safediary.profiles.presentation.views.PatientProfileScree
 import com.mindcluster.safediary.profiles.presentation.views.SafeSupportContactScreen
 import com.mindcluster.safediary.profiles.presentation.views.SettingsScreen
 import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionHolder
 
 @Composable
 fun AppNavigation(
@@ -27,10 +34,34 @@ fun AppNavigation(
 ) {
     val context = LocalContext.current
     val authSessionPreferences = remember { AuthSessionPreferences(context) }
-    val startDestination = if (authSessionPreferences.isLoggedIn) NavRoutes.AI_CHAT else NavRoutes.SIGN_IN
+    val startDestination = remember {
+        if (authSessionPreferences.isLoggedIn) NavRoutes.AI_CHAT else NavRoutes.SIGN_IN
+    }
+    val requiresSignIn by AuthSessionHolder.requiresSignIn.collectAsStateWithLifecycle()
+    var activeAccountId by remember { mutableStateOf(authSessionPreferences.patientAccountId) }
+    var sessionGeneration by remember { mutableStateOf(0) }
+    var showSessionNotice by rememberSaveable {
+        mutableStateOf(authSessionPreferences.sessionExpired)
+    }
 
-    val diaryModule = remember { DiaryModule.getInstance(context) }
+    LaunchedEffect(requiresSignIn) {
+        if (requiresSignIn) {
+            authSessionPreferences.clear()
+            activeAccountId = 0L
+            sessionGeneration++
+            authSessionPreferences.sessionExpired = true
+            showSessionNotice = true
+            navController.navigate(NavRoutes.SIGN_IN) {
+                popUpTo(navController.graph.id) { inclusive = true }
+                launchSingleTop = true
+            }
+            AuthSessionHolder.acknowledgeSignInRequired()
+        }
+    }
+
+    val diaryModule = remember(activeAccountId, sessionGeneration) { DiaryModule.getInstance(context) }
     val diaryViewModel: DiaryViewModel = viewModel(
+        key = "diary-account-$activeAccountId-session-$sessionGeneration",
         factory = DiaryViewModel.Factory(diaryModule.diaryRepository, authSessionPreferences)
     )
 
@@ -42,10 +73,15 @@ fun AppNavigation(
         composable(NavRoutes.SIGN_IN) {
             SignInScreen(
                 onSignInSuccess = {
+                    activeAccountId = authSessionPreferences.patientAccountId
+                    sessionGeneration++
+                    authSessionPreferences.sessionExpired = false
+                    showSessionNotice = false
                     navController.navigate(NavRoutes.AI_CHAT) {
                         popUpTo(NavRoutes.SIGN_IN) { inclusive = true }
                     }
-                }
+                },
+                sessionExpired = showSessionNotice
             )
         }
 
@@ -105,6 +141,8 @@ fun AppNavigation(
                 onNavigateToSafeContact = { navController.navigate(NavRoutes.SAFE_CONTACT) },
                 onNavigateToPayments = { navController.navigate(NavRoutes.PATIENT_PAYMENTS) },
                 onLogout = {
+                    activeAccountId = 0L
+                    sessionGeneration++
                     navController.navigate(NavRoutes.SIGN_IN) {
                         popUpTo(0) { inclusive = true }
                     }

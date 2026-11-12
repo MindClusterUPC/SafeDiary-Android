@@ -1,9 +1,11 @@
 package com.mindcluster.safediary.assistantai.infrastructure.local
 
 import android.content.Context
+import com.mindcluster.safediary.shared.infrastructure.security.AccountStorage
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
 
-class ChatPreferences(context: Context) {
-    private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+class ChatPreferences(context: Context, accountId: Long = AuthSessionPreferences(context).patientAccountId) {
+    private val prefs = context.getSharedPreferences(AccountStorage.chatPreferencesName(accountId), Context.MODE_PRIVATE)
 
     fun getLastOpenedConversationId(): String? = prefs.getString(KEY_LAST_CONVERSATION_ID, null)
 
@@ -18,7 +20,6 @@ class ChatPreferences(context: Context) {
     }
 
     companion object {
-        private const val PREFS_NAME = "diarito_prefs"
         private const val KEY_LAST_CONVERSATION_ID = "last_opened_conversation_id"
     }
 }
