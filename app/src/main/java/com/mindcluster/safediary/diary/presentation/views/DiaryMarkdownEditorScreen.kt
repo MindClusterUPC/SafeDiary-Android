@@ -16,14 +16,14 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,25 +49,23 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mindcluster.safediary.R
-import com.mindcluster.safediary.diary.presentation.components.MarkdownFormattingToolbar
-import com.mindcluster.safediary.diary.presentation.components.MarkdownRenderView
+import com.mindcluster.safediary.diary.presentation.components.DiaryFormattingToolbar
+import com.mindcluster.safediary.diary.presentation.components.DiaryMarkup
 import com.mindcluster.safediary.diary.presentation.viewmodels.DiaryViewModel
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
 import com.mindcluster.safediary.shared.presentation.theme.PrimaryNavy
+import com.mindcluster.safediary.shared.presentation.theme.SecondaryContainer
 import com.mindcluster.safediary.shared.presentation.theme.SecondaryTeal
 import com.mindcluster.safediary.shared.presentation.theme.SlatePlaceholder
 import com.mindcluster.safediary.shared.presentation.theme.SlateSubtle
-
-private enum class EditorTab {
-    EDIT,
-    PREVIEW
-}
 
 @Composable
 fun DiaryMarkdownEditorScreen(
@@ -76,7 +74,6 @@ fun DiaryMarkdownEditorScreen(
     modifier: Modifier = Modifier
 ) {
     val draft by viewModel.currentDraft.collectAsStateWithLifecycle()
-    var selectedTab by remember { mutableStateOf(EditorTab.EDIT) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
     var menuExpanded by remember { mutableStateOf(false) }
     val contentFocusRequester = remember { FocusRequester() }
@@ -102,7 +99,20 @@ fun DiaryMarkdownEditorScreen(
     }
 
     val currentTitle = draft?.title.orEmpty()
-    val currentContent = draft?.content.orEmpty()
+
+    // The body keeps its cursor and selection locally so formatting is applied where the writer is.
+    var content by remember { mutableStateOf(TextFieldValue(draft?.content.orEmpty())) }
+    LaunchedEffect(draft?.localId) {
+        val stored = draft?.content.orEmpty()
+        if (stored != content.text) content = TextFieldValue(stored, TextRange(stored.length))
+    }
+    val updateContent: (TextFieldValue) -> Unit = { updated ->
+        content = updated
+        viewModel.onContentChanged(updated.text)
+    }
+    val formatting = remember {
+        DiaryMarkup.visualTransformation(SecondaryTeal, SecondaryContainer.copy(alpha = 0.35f))
+    }
 
     Scaffold(
         modifier = modifier
@@ -133,28 +143,12 @@ fun DiaryMarkdownEditorScreen(
                         )
                     }
 
-                    // Mode Toggle: [ Edit | Preview ]
-                    Box(
-                        modifier = Modifier
-                            .clip(CircleShape)
-                            .background(Color(0xFFEDEFEF))
-                            .padding(2.dp)
-                    ) {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            EditorTabPill(
-                                label = stringResource(R.string.tab_edit),
-                                icon = Icons.Outlined.Edit,
-                                isSelected = selectedTab == EditorTab.EDIT,
-                                onClick = { selectedTab = EditorTab.EDIT }
-                            )
-                            EditorTabPill(
-                                label = stringResource(R.string.tab_preview),
-                                icon = Icons.Outlined.Visibility,
-                                isSelected = selectedTab == EditorTab.PREVIEW,
-                                onClick = { selectedTab = EditorTab.PREVIEW }
-                            )
-                        }
-                    }
+                    Text(
+                        text = stringResource(R.string.diary_editor_heading),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = PrimaryNavy
+                    )
 
                     // Options Menu (⋮)
                     Box {
@@ -185,18 +179,17 @@ fun DiaryMarkdownEditorScreen(
             }
         },
         bottomBar = {
-            if (selectedTab == EditorTab.EDIT) {
-                MarkdownFormattingToolbar(
-                    onInsertSymbol = { prefix, suffix ->
-                        val updated = if (currentContent.isEmpty()) {
-                            "$prefix$suffix"
-                        } else {
-                            "$currentContent\n$prefix$suffix"
-                        }
-                        viewModel.onContentChanged(updated)
-                    }
-                )
-            }
+            DiaryFormattingToolbar(
+                activeLineStyle = DiaryMarkup.lineStyleAtCursor(content),
+                onLineStyle = { style ->
+                    updateContent(DiaryMarkup.toggleLineStyle(content, style))
+                    contentFocusRequester.requestFocus()
+                },
+                onInlineStyle = { style ->
+                    updateContent(DiaryMarkup.toggleInlineStyle(content, style))
+                    contentFocusRequester.requestFocus()
+                }
+            )
         }
     ) { innerPadding ->
         Column(
@@ -204,101 +197,90 @@ fun DiaryMarkdownEditorScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            when (selectedTab) {
-                EditorTab.EDIT -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp)
-                            .clickable(
-                                interactionSource = remember { MutableInteractionSource() },
-                                indication = null
-                            ) {
-                                contentFocusRequester.requestFocus()
-                            }
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
                     ) {
-                        // Title Input Field
-                        BasicTextField(
-                            value = currentTitle,
-                            onValueChange = { viewModel.onTitleChanged(it) },
-                            textStyle = TextStyle(
-                                fontSize = 22.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = PrimaryNavy
-                            ),
-                            cursorBrush = SolidColor(SecondaryTeal),
+                        contentFocusRequester.requestFocus()
+                    }
+            ) {
+                BasicTextField(
+                    value = currentTitle,
+                    onValueChange = { viewModel.onTitleChanged(it) },
+                    textStyle = TextStyle(
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = PrimaryNavy
+                    ),
+                    cursorBrush = SolidColor(SecondaryTeal),
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    decorationBox = { innerTextField ->
+                        Box(
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true,
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    contentAlignment = Alignment.CenterStart
-                                ) {
-                                    if (currentTitle.isEmpty()) {
-                                        Text(
-                                            text = stringResource(R.string.hint_note_title),
-                                            fontSize = 22.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = SlatePlaceholder
-                                        )
-                                    }
-                                    innerTextField()
-                                }
+                            contentAlignment = Alignment.CenterStart
+                        ) {
+                            if (currentTitle.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.hint_note_title),
+                                    fontSize = 22.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = SlatePlaceholder
+                                )
                             }
-                        )
-
-                        Spacer(modifier = Modifier.height(12.dp))
-
-                        // Markdown Body Input Field
-                        BasicTextField(
-                            value = currentContent,
-                            onValueChange = { viewModel.onContentChanged(it) },
-                            textStyle = TextStyle(
-                                fontSize = 16.sp,
-                                lineHeight = 24.sp,
-                                color = PrimaryNavy
-                            ),
-                            cursorBrush = SolidColor(SecondaryTeal),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .weight(1f)
-                                .focusRequester(contentFocusRequester),
-                            decorationBox = { innerTextField ->
-                                Box(
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentAlignment = Alignment.TopStart
-                                ) {
-                                    if (currentContent.isEmpty()) {
-                                        Text(
-                                            text = stringResource(R.string.hint_note_content),
-                                            fontSize = 16.sp,
-                                            lineHeight = 24.sp,
-                                            color = SlatePlaceholder
-                                        )
-                                    }
-                                    innerTextField()
-                                }
-                            }
-                        )
+                            innerTextField()
+                        }
                     }
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                if (content.text.isEmpty()) {
+                    WritingPrompts(
+                        onPromptSelected = { prompt ->
+                            val text = "> $prompt\n"
+                            updateContent(TextFieldValue(text, TextRange(text.length)))
+                            contentFocusRequester.requestFocus()
+                        }
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
                 }
 
-                EditorTab.PREVIEW -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    ) {
-                        Text(
-                            text = if (currentTitle.isBlank()) stringResource(R.string.untitled_note) else currentTitle,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryNavy,
-                            modifier = Modifier.padding(bottom = 8.dp)
-                        )
-                        MarkdownRenderView(markdown = currentContent, modifier = Modifier.weight(1f))
+                BasicTextField(
+                    value = content,
+                    onValueChange = updateContent,
+                    visualTransformation = formatting,
+                    textStyle = TextStyle(
+                        fontSize = 17.sp,
+                        lineHeight = 26.sp,
+                        color = PrimaryNavy
+                    ),
+                    cursorBrush = SolidColor(SecondaryTeal),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                        .focusRequester(contentFocusRequester),
+                    decorationBox = { innerTextField ->
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.TopStart
+                        ) {
+                            if (content.text.isEmpty()) {
+                                Text(
+                                    text = stringResource(R.string.hint_note_content),
+                                    fontSize = 17.sp,
+                                    lineHeight = 26.sp,
+                                    color = SlatePlaceholder
+                                )
+                            }
+                            innerTextField()
+                        }
                     }
-                }
+                )
             }
         }
 
@@ -328,35 +310,34 @@ fun DiaryMarkdownEditorScreen(
     }
 }
 
+/** Gentle questions to start writing when the page is blank, as in a guided journal. */
 @Composable
-private fun EditorTabPill(
-    label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        shape = CircleShape,
-        color = if (isSelected) Color.White else Color.Transparent,
-        contentColor = if (isSelected) PrimaryNavy else SlateSubtle
+private fun WritingPrompts(onPromptSelected: (String) -> Unit) {
+    val prompts = listOf(
+        stringResource(R.string.diary_prompt_today),
+        stringResource(R.string.diary_prompt_feeling),
+        stringResource(R.string.diary_prompt_grateful),
+        stringResource(R.string.diary_prompt_release)
+    )
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState()),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                tint = if (isSelected) SecondaryTeal else SlateSubtle,
-                modifier = Modifier.size(15.dp)
-            )
-            Text(
-                text = label,
-                fontSize = 12.sp,
-                fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal
-            )
+        prompts.forEach { prompt ->
+            Surface(
+                onClick = { onPromptSelected(prompt) },
+                shape = CircleShape,
+                color = SecondaryContainer.copy(alpha = 0.35f),
+                contentColor = PrimaryNavy
+            ) {
+                Text(
+                    text = prompt,
+                    fontSize = 13.sp,
+                    modifier = Modifier.padding(horizontal = 14.dp, vertical = 8.dp)
+                )
+            }
         }
     }
 }

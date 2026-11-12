@@ -52,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.mindcluster.safediary.R
+import com.mindcluster.safediary.diary.presentation.components.DiaryMarkup
 import com.mindcluster.safediary.diary.domain.model.DiaryEntryAggregate
 import com.mindcluster.safediary.diary.presentation.viewmodels.DiaryViewModel
 import com.mindcluster.safediary.shared.presentation.theme.BackgroundSanctuary
@@ -225,7 +226,7 @@ private fun DiarySquareCard(
 
             // Preview snippet
             Text(
-                text = if (entry.content.isBlank()) stringResource(R.string.note_empty_snippet) else entry.content,
+                text = if (entry.content.isBlank()) stringResource(R.string.note_empty_snippet) else DiaryMarkup.plainText(entry.content),
                 style = MaterialTheme.typography.bodySmall,
                 color = if (entry.content.isBlank()) SlatePlaceholder else SlateSubtle,
                 maxLines = 4,

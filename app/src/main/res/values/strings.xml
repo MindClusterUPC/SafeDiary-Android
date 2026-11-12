@@ -325,11 +325,19 @@
     <string name="empty_diary_subtitle">Un espacio seguro para plasmar tus pensamientos, reflexiones y vivencias cotidianas.</string>
     <string name="action_create_first_note">Escribir mi primera nota</string>
     <string name="action_back">Volver</string>
-    <string name="tab_edit">Editar</string>
-    <string name="tab_preview">Vista previa</string>
     <string name="hint_note_title">Título de la nota...</string>
-    <string name="hint_note_content">Escribe tu reflexión aquí en Markdown...</string>
+    <string name="hint_note_content">Escribe lo que piensas o sientes. Esta página es solo tuya.</string>
     <string name="untitled_note">Nota sin título</string>
+    <string name="diary_editor_heading">Mi diario</string>
+    <string name="diary_format_title">Título</string>
+    <string name="diary_format_bold">Negrita</string>
+    <string name="diary_format_italic">Cursiva</string>
+    <string name="diary_format_highlight">Destacar</string>
+    <string name="diary_format_list">Lista</string>
+    <string name="diary_prompt_today">¿Qué pasó hoy?</string>
+    <string name="diary_prompt_feeling">¿Cómo me siento ahora?</string>
+    <string name="diary_prompt_grateful">Algo que agradezco</string>
+    <string name="diary_prompt_release">Algo que quiero soltar</string>
     <string name="avatar_image_error">No se pudo abrir la imagen. Elige otra foto de hasta 5 MB.</string>
     <string name="avatar_saving">Guardando foto…</string>
 </resources>
