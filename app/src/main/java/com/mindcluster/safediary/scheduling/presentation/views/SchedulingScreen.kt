@@ -104,6 +104,9 @@ fun SchedulingScreen(
             page == "reservation" && appointment != null &&
                 (appointment.status == AppointmentStatus.HELD || appointment.status == AppointmentStatus.EXPIRED) ->
                 ReservationContent(appointment, state.clinician(appointment.clinicianId), state.now,
+                    isWorking = state.isWorking,
+                    canSimulatePayment = viewModel.canSimulatePayment,
+                    onSimulatePayment = { viewModel.simulatePayment(appointment.id) },
                     onCancel = { cancelDialog = true },
                     onChat = { openChat(appointment.contactRequestId) }
                 )

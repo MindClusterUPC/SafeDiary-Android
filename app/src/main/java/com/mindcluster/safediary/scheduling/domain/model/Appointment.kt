@@ -15,7 +15,8 @@ data class Appointment(
     val holdExpiresAt: Long? = null,
     val accessOpensAt: Long? = null,
     val accessClosesAt: Long? = null,
-    val patientAccountId: Long? = null
+    val patientAccountId: Long? = null,
+    val paymentReference: String? = null
 ) {
     val durationMinutes: Int get() = ((endsAt - startsAt) / 60_000).toInt()
     val amountLabel: String get() = (if (currency == "PEN") "S/ " else "$currency ") + "%.2f".format(java.util.Locale.US, amount)

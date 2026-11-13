@@ -49,6 +49,7 @@ class SchedulingViewModel(
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SchedulingUiState())
     val uiState = _uiState.asStateFlow()
+    val canSimulatePayment get() = gateway.canSimulatePayment
 
     /** A hold past its expiry is shown as expired right away; the backend releases the slot on its own. */
     fun tick(now: Long = System.currentTimeMillis()) {
@@ -152,6 +153,19 @@ class SchedulingViewModel(
                             "Este horario ya no está disponible o la propuesta cambió. Puedes seguir coordinando por el chat."
                         else result.message
                     )
+                    refresh()
+                }
+            }
+        }
+    }
+
+    fun simulatePayment(id: Long) {
+        val appointment = _uiState.value.appointments.firstOrNull { it.id == id } ?: return
+        working {
+            when (val result = gateway.simulatePayment(appointment)) {
+                is SchedulingResult.Success -> replace(result.value)
+                is SchedulingResult.Failure -> {
+                    fail(result.message)
                     refresh()
                 }
             }

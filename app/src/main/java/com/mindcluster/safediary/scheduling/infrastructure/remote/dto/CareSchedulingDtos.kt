@@ -41,7 +41,15 @@ data class AppointmentDto(
     @SerializedName("holdExpiresAt") val holdExpiresAt: String?,
     @SerializedName("accessOpensAt") val accessOpensAt: String?,
     @SerializedName("accessClosesAt") val accessClosesAt: String?,
-    @SerializedName("patientAccountId") val patientAccountId: Long? = null
+    @SerializedName("patientAccountId") val patientAccountId: Long? = null,
+    @SerializedName("paymentReference") val paymentReference: String? = null
+)
+
+data class SimulatedAppointmentPaymentDto(
+    @SerializedName("paymentReference") val paymentReference: String,
+    @SerializedName("approved") val approved: Boolean,
+    @SerializedName("amount") val amount: Double,
+    @SerializedName("currency") val currency: String
 )
 
 data class ClinicalSessionDto(

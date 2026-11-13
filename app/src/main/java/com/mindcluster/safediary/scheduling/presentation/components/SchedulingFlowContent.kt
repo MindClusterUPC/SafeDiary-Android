@@ -75,7 +75,12 @@ fun CoordinationContent(
 
 /** US-014: one-hour hold with the remaining time and the amount, never shown as a confirmed appointment. */
 @Composable
-fun ReservationContent(appointment: Appointment, clinician: ClinicianSummary, now: Long, onCancel: () -> Unit, onChat: () -> Unit) {
+fun ReservationContent(
+    appointment: Appointment, clinician: ClinicianSummary, now: Long,
+    isWorking: Boolean, canSimulatePayment: Boolean,
+    onSimulatePayment: () -> Unit, onCancel: () -> Unit, onChat: () -> Unit
+) {
+    var confirmTestPayment by rememberSaveable(appointment.id) { mutableStateOf(false) }
     val expired = appointment.status == AppointmentStatus.EXPIRED
     PatientHeading(if (expired) "La reserva venció" else "Tu horario está reservado", if (expired) "Acuerda un nuevo horario desde el chat." else "Completa el pago para confirmar la cita.")
     PatientCard {
@@ -102,10 +107,24 @@ fun ReservationContent(appointment: Appointment, clinician: ClinicianSummary, no
     }
     if (expired) PatientButton("Volver a coordinar", onChat, Modifier.fillMaxWidth())
     else {
-        PatientButton("Pago en línea próximamente", {}, Modifier.fillMaxWidth(), enabled = false)
-        PatientInfo("La cita se confirmará automáticamente cuando se apruebe el pago de esta reserva.")
-        PatientButton("Cancelar reserva", onCancel, Modifier.fillMaxWidth(), secondary = true)
+        if (canSimulatePayment) {
+            PatientInfo("Pago de prueba local. Confirma esta cita sin cobrar dinero ni solicitar una tarjeta.")
+            PatientButton(if (isWorking) "Procesando pago de prueba…" else "Simular pago · ${appointment.amountLabel}",
+                { confirmTestPayment = true }, Modifier.fillMaxWidth(), enabled = !isWorking && appointment.isHoldActive(now))
+        } else {
+            PatientButton("Pago en línea próximamente", {}, Modifier.fillMaxWidth(), enabled = false)
+            PatientInfo("La cita se confirmará automáticamente cuando se apruebe el pago de esta reserva.")
+        }
+        PatientButton("Cancelar reserva", onCancel, Modifier.fillMaxWidth(), secondary = true, enabled = !isWorking)
     }
+    if (confirmTestPayment && !expired) AlertDialog(
+        onDismissRequest = { confirmTestPayment = false },
+        title = { Text("¿Simular este pago?") },
+        text = { Text("Se confirmará la cita con ${clinician.name} por ${appointment.amountLabel}. Es una prueba local: no se cobrará dinero.") },
+        confirmButton = { TextButton(onClick = { confirmTestPayment = false; onSimulatePayment() },
+            enabled = !isWorking && appointment.isHoldActive(now)) { Text("Confirmar pago de prueba") } },
+        dismissButton = { TextButton(onClick = { confirmTestPayment = false }) { Text("Volver") } }
+    )
 }
 
 /** US-038 / US-050: confirmed, completed, cancelled or expired appointment. */

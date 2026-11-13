@@ -1,12 +1,22 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
 }
 
+val localDevelopmentProperties = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.isFile) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+
 fun getEnvOrProperty(envKey: String, propKey: String, defaultValue: String): String {
     return System.getenv(envKey)
         ?: (project.findProperty(propKey) as String?)
+        ?: localDevelopmentProperties.getProperty(propKey)
         ?: defaultValue
 }
 

@@ -1,6 +1,7 @@
 package com.mindcluster.safediary.scheduling.infrastructure.remote
 
 import android.util.Log
+import com.mindcluster.safediary.BuildConfig
 import com.mindcluster.safediary.scheduling.domain.model.Appointment
 import com.mindcluster.safediary.scheduling.domain.model.AppointmentStatus
 import com.mindcluster.safediary.scheduling.domain.model.BookableSlot
@@ -21,10 +22,12 @@ import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ProposeSch
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.RespondContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SendContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SendCoordinationMessageDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SimulatedAppointmentPaymentDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.parseInstantMillis
 import com.mindcluster.safediary.shared.infrastructure.network.RetrofitClientProvider
 import kotlinx.coroutines.CancellationException
 import retrofit2.Response
+import java.net.URI
 
 sealed interface SchedulingResult<out T> {
     data class Success<T>(val value: T) : SchedulingResult<T>
@@ -36,6 +39,7 @@ class RetrofitCareSchedulingGateway(
     private val apiService: CareSchedulingApiService = RetrofitClientProvider.createService()
 ) {
     private val tag = "CareSchedulingGateway"
+    val canSimulatePayment = localPaymentSimulationAvailable(BuildConfig.DEBUG, BuildConfig.API_BASE_URL)
 
     suspend fun sendContactRequest(clinicianId: Long, message: String): SchedulingResult<ContactRequest> =
         call("sendContactRequest") { apiService.sendContactRequest(SendContactRequestDto(clinicianId, message)) }
@@ -58,6 +62,27 @@ class RetrofitCareSchedulingGateway(
     suspend fun acceptProposal(appointmentId: Long): SchedulingResult<Appointment> =
         call("acceptProposal") { apiService.acceptProposal(appointmentId) }
             .map { it.toDomain() ?: throw IllegalStateException("Unknown appointment status") }
+
+    /** Development-only payment; the server remains the source of truth for confirmation. */
+    suspend fun simulatePayment(appointment: Appointment): SchedulingResult<Appointment> {
+        if (!canSimulatePayment) return SchedulingResult.Failure(403, "El pago simulado solo está disponible en el entorno local de desarrollo.")
+        if (!appointment.isHoldActive(System.currentTimeMillis()))
+            return SchedulingResult.Failure(409, "La reserva ya no está activa. Actualiza tus citas.")
+        val reference = appointment.paymentReference?.takeIf { it.isNotBlank() }
+            ?: return SchedulingResult.Failure(422, "La reserva no tiene una referencia de pago. Actualiza tus citas.")
+        val result = call("simulatePayment") {
+            apiService.simulatePayment(appointment.id, SimulatedAppointmentPaymentDto(reference, true, appointment.amount, appointment.currency))
+        }
+        if (result is SchedulingResult.Failure) return result
+        return when (val refreshed = getAppointments()) {
+            is SchedulingResult.Failure -> refreshed
+            is SchedulingResult.Success -> {
+                val confirmed = refreshed.value.firstOrNull { it.id == appointment.id && it.status == AppointmentStatus.CONFIRMED }
+                if (confirmed != null) SchedulingResult.Success(confirmed)
+                else SchedulingResult.Failure(409, "La cita aún no figura confirmada. Actualiza para consultar el resultado del pago.")
+            }
+        }
+    }
 
     suspend fun cancelAppointment(appointmentId: Long): SchedulingResult<Appointment> =
         call("cancelAppointment") { apiService.cancelAppointment(appointmentId) }
@@ -170,9 +195,16 @@ private fun AppointmentDto.toDomain(): Appointment? {
         holdExpiresAt = parseInstantMillis(holdExpiresAt),
         accessOpensAt = parseInstantMillis(accessOpensAt),
         accessClosesAt = parseInstantMillis(accessClosesAt),
-        patientAccountId = patientAccountId
+        patientAccountId = patientAccountId,
+        paymentReference = paymentReference
     )
 }
+
+internal fun localPaymentSimulationAvailable(debugBuild: Boolean, baseUrl: String): Boolean =
+    debugBuild && runCatching {
+        val uri = URI(baseUrl)
+        uri.scheme == "http" && uri.host?.lowercase() in setOf("localhost", "127.0.0.1", "10.0.2.2", "[::1]", "::1")
+    }.getOrDefault(false)
 
 private fun ClinicalSessionDto.toSession() = ClinicalSession(
     status = status.orEmpty(),

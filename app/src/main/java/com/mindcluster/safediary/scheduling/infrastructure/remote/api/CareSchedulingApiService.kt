@@ -11,6 +11,7 @@ import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ProposeSch
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.RespondContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SendContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SendCoordinationMessageDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SimulatedAppointmentPaymentDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -42,6 +43,12 @@ interface CareSchedulingApiService {
 
     @POST("api/v1/schedule/proposals/{appointmentId}/acceptance")
     suspend fun acceptProposal(@Path("appointmentId") appointmentId: Long): Response<AppointmentDto>
+
+    @POST("api/v1/dev/care-scheduling/appointments/{appointmentId}/payment-result")
+    suspend fun simulatePayment(
+        @Path("appointmentId") appointmentId: Long,
+        @Body request: SimulatedAppointmentPaymentDto
+    ): Response<Map<String, String>>
 
     @POST("api/v1/appointments/{id}/cancellation")
     suspend fun cancelAppointment(@Path("id") appointmentId: Long): Response<AppointmentDto>
