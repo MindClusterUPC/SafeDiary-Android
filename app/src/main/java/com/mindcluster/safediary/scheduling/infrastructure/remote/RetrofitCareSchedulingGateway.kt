@@ -16,6 +16,7 @@ import com.mindcluster.safediary.scheduling.infrastructure.remote.api.CareSchedu
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.AppointmentDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ClinicalSessionDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.CloseSessionDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ConsultationCheckoutRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.CoordinationMessageDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ProposeScheduleDto
@@ -83,6 +84,11 @@ class RetrofitCareSchedulingGateway(
             }
         }
     }
+
+    /** US-037: Stripe Checkout URL for the held appointment. */
+    suspend fun startCheckout(appointmentId: Long): SchedulingResult<String> =
+        call("startCheckout") { apiService.startCheckout(ConsultationCheckoutRequestDto(appointmentId)) }
+            .map { it.checkoutUrl?.takeIf { url -> url.isNotBlank() } ?: throw IllegalStateException("Missing checkout URL") }
 
     suspend fun cancelAppointment(appointmentId: Long): SchedulingResult<Appointment> =
         call("cancelAppointment") { apiService.cancelAppointment(appointmentId) }

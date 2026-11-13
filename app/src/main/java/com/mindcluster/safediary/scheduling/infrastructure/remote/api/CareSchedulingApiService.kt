@@ -5,6 +5,8 @@ import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.BookableSl
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ClinicalSessionDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ClinicianNameDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.CloseSessionDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ConsultationCheckoutDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ConsultationCheckoutRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.CoordinationMessageDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ProposeScheduleDto
@@ -49,6 +51,10 @@ interface CareSchedulingApiService {
         @Path("appointmentId") appointmentId: Long,
         @Body request: SimulatedAppointmentPaymentDto
     ): Response<Map<String, String>>
+
+    /** Payments and Payouts: Stripe Checkout for the held appointment; the webhook confirms it in Care Scheduling. */
+    @POST("api/v1/payments/consultations/checkout")
+    suspend fun startCheckout(@Body request: ConsultationCheckoutRequestDto): Response<ConsultationCheckoutDto>
 
     @POST("api/v1/appointments/{id}/cancellation")
     suspend fun cancelAppointment(@Path("id") appointmentId: Long): Response<AppointmentDto>

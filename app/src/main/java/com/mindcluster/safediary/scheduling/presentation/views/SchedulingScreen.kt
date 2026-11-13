@@ -15,6 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.mindcluster.safediary.payments.presentation.components.StripeCheckoutWebViewDialog
 import com.mindcluster.safediary.scheduling.domain.model.*
 import com.mindcluster.safediary.scheduling.presentation.components.*
 import com.mindcluster.safediary.scheduling.presentation.viewmodels.AgendaMode
@@ -107,6 +108,7 @@ fun SchedulingScreen(
                     isWorking = state.isWorking,
                     canSimulatePayment = viewModel.canSimulatePayment,
                     onSimulatePayment = { viewModel.simulatePayment(appointment.id) },
+                    onPay = { viewModel.pay(appointment.id) },
                     onCancel = { cancelDialog = true },
                     onChat = { openChat(appointment.contactRequestId) }
                 )
@@ -213,6 +215,14 @@ fun SchedulingScreen(
         confirmButton = { TextButton(onClick = { viewModel.cancel(appointment.id); cancelDialog = false; page = "detail" }) { Text("Sí, cancelar", color = ErrorRed) } },
         dismissButton = { TextButton(onClick = { cancelDialog = false }) { Text("Conservar") } }
     )
+    state.checkoutUrl?.let { url ->
+        StripeCheckoutWebViewDialog(
+            checkoutUrl = url,
+            onSuccess = { viewModel.closeCheckout(completed = true) },
+            onCancelled = { viewModel.closeCheckout(completed = false) },
+            onDismissRequest = { viewModel.closeCheckout(completed = false) }
+        )
+    }
     state.actionError?.let { error ->
         AlertDialog(
             onDismissRequest = viewModel::dismissError,

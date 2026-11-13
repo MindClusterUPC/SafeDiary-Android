@@ -52,6 +52,15 @@ data class SimulatedAppointmentPaymentDto(
     @SerializedName("currency") val currency: String
 )
 
+/** Payments and Payouts derives the patient, the psychologist and the amount from the held appointment. */
+data class ConsultationCheckoutRequestDto(
+    @SerializedName("appointmentId") val appointmentId: Long
+)
+
+data class ConsultationCheckoutDto(
+    @SerializedName("checkoutUrl") val checkoutUrl: String?
+)
+
 data class ClinicalSessionDto(
     @SerializedName("id") val id: Long,
     @SerializedName("status") val status: String?,

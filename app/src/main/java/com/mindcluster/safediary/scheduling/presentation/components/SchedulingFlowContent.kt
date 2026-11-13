@@ -78,7 +78,7 @@ fun CoordinationContent(
 fun ReservationContent(
     appointment: Appointment, clinician: ClinicianSummary, now: Long,
     isWorking: Boolean, canSimulatePayment: Boolean,
-    onSimulatePayment: () -> Unit, onCancel: () -> Unit, onChat: () -> Unit
+    onSimulatePayment: () -> Unit, onPay: () -> Unit, onCancel: () -> Unit, onChat: () -> Unit
 ) {
     var confirmTestPayment by rememberSaveable(appointment.id) { mutableStateOf(false) }
     val expired = appointment.status == AppointmentStatus.EXPIRED
@@ -112,8 +112,9 @@ fun ReservationContent(
             PatientButton(if (isWorking) "Procesando pago de prueba…" else "Simular pago · ${appointment.amountLabel}",
                 { confirmTestPayment = true }, Modifier.fillMaxWidth(), enabled = !isWorking && appointment.isHoldActive(now))
         } else {
-            PatientButton("Pago en línea próximamente", {}, Modifier.fillMaxWidth(), enabled = false)
-            PatientInfo("La cita se confirmará automáticamente cuando se apruebe el pago de esta reserva.")
+            PatientButton(if (isWorking) "Preparando el pago…" else "Pagar · ${appointment.amountLabel}",
+                onPay, Modifier.fillMaxWidth(), enabled = !isWorking && appointment.isHoldActive(now))
+            PatientInfo("El pago se procesa de forma segura con Stripe. La cita se confirmará automáticamente cuando se apruebe.", Icons.Outlined.Lock)
         }
         PatientButton("Cancelar reserva", onCancel, Modifier.fillMaxWidth(), secondary = true, enabled = !isWorking)
     }

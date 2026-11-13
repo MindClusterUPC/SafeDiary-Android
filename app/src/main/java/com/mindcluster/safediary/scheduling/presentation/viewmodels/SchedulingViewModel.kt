@@ -6,6 +6,7 @@ import com.mindcluster.safediary.scheduling.domain.model.*
 import com.mindcluster.safediary.scheduling.infrastructure.remote.RetrofitCareSchedulingGateway
 import com.mindcluster.safediary.scheduling.infrastructure.remote.SchedulingResult
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -30,6 +31,9 @@ data class SchedulingUiState(
     val actionError: String? = null,
     /** Video call URL waiting to be opened by the screen. */
     val joinUrl: String? = null,
+    /** Stripe Checkout opened for [checkoutAppointmentId]. */
+    val checkoutUrl: String? = null,
+    val checkoutAppointmentId: Long? = null,
     /** Local consent preference: nothing is shared with the clinician from this screen yet. */
     val sharedContext: Set<Long> = emptySet()
 ) {
@@ -172,6 +176,43 @@ class SchedulingViewModel(
         }
     }
 
+    /** US-037: opens Stripe Checkout for the held appointment; the amount is decided by the backend. */
+    fun pay(id: Long) {
+        working {
+            when (val result = gateway.startCheckout(id)) {
+                is SchedulingResult.Success -> _uiState.update { it.copy(checkoutUrl = result.value, checkoutAppointmentId = id) }
+                is SchedulingResult.Failure -> {
+                    fail(
+                        if (result.status == 422) "La reserva ya no está activa o el especialista aún no puede recibir pagos. Actualiza tus citas o coordina por el chat."
+                        else result.message
+                    )
+                    refresh()
+                }
+            }
+        }
+    }
+
+    /**
+     * Closes Stripe Checkout. After a completed payment the appointment is confirmed by the Stripe webhook, so the
+     * list is reloaded a few times until the confirmation arrives.
+     */
+    fun closeCheckout(completed: Boolean) {
+        val id = _uiState.value.checkoutAppointmentId
+        _uiState.update { it.copy(checkoutUrl = null, checkoutAppointmentId = null) }
+        if (!completed || id == null) return
+        working {
+            repeat(PAYMENT_CONFIRMATION_ATTEMPTS) { attempt ->
+                if (attempt > 0) delay(PAYMENT_CONFIRMATION_INTERVAL_MS)
+                val result = gateway.getAppointments()
+                if (result is SchedulingResult.Success) {
+                    result.value.firstOrNull { it.id == id }?.let { replace(it) }
+                    if (result.value.any { it.id == id && it.status == AppointmentStatus.CONFIRMED }) return@working
+                }
+            }
+            fail("Tu pago se está procesando. La cita aparecerá confirmada en cuanto se apruebe; actualiza en unos minutos.")
+        }
+    }
+
     /** US-050: cancels a proposal, a hold or a confirmed appointment and releases the slot. */
     fun cancel(id: Long) {
         working {
@@ -242,6 +283,9 @@ class SchedulingViewModel(
 
     private fun fail(message: String) { _uiState.update { it.copy(actionError = message) } }
 }
+
+private const val PAYMENT_CONFIRMATION_ATTEMPTS = 6
+private const val PAYMENT_CONFIRMATION_INTERVAL_MS = 2_000L
 
 internal fun Appointment.expiredLocally(now: Long) =
     if (status == AppointmentStatus.HELD && holdExpiresAt != null && holdExpiresAt <= now) copy(status = AppointmentStatus.EXPIRED) else this
