@@ -44,6 +44,7 @@ android {
         val endpointPaymentsCancel = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_CANCEL", "safediary.endpointPaymentsCancel", "api/v1/payments/subscriptions/cancel")
         val endpointPaymentsHistory = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_HISTORY", "safediary.endpointPaymentsHistory", "api/v1/payments/history")
         val endpointPaymentsMethods = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_METHODS", "safediary.endpointPaymentsMethods", "api/v1/payments/methods")
+        val endpointPaymentsMethodsSetup = getEnvOrProperty("SAFEDY_ENDPOINT_PAYMENTS_METHODS_SETUP", "safediary.endpointPaymentsMethodsSetup", "api/v1/payments/methods/setup")
         val stripeDemoUrl = getEnvOrProperty("SAFEDY_STRIPE_DEMO_URL", "safediary.stripeDemoUrl", "https://checkout.stripe.com/pay/demo_session_safediary")
 
         buildConfigField("String", "ENDPOINT_AUTH_SIGN_IN", "\"$endpointAuthSignIn\"")
@@ -54,6 +55,7 @@ android {
         buildConfigField("String", "ENDPOINT_PAYMENTS_CANCEL", "\"$endpointPaymentsCancel\"")
         buildConfigField("String", "ENDPOINT_PAYMENTS_HISTORY", "\"$endpointPaymentsHistory\"")
         buildConfigField("String", "ENDPOINT_PAYMENTS_METHODS", "\"$endpointPaymentsMethods\"")
+        buildConfigField("String", "ENDPOINT_PAYMENTS_METHODS_SETUP", "\"$endpointPaymentsMethodsSetup\"")
         buildConfigField("String", "STRIPE_DEMO_URL", "\"$stripeDemoUrl\"")
     }
 

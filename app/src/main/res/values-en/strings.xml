@@ -258,6 +258,10 @@
     <string name="payments_health_wallet">SafeDiary Health Wallet</string>
     <string name="payments_default_badge">DEFAULT</string>
     <string name="payments_add_new_card">+ Add New Card or Digital Wallet</string>
+    <string name="payments_opening_stripe">Connecting to Stripe…</string>
+    <string name="payments_method_saved_toast">Payment method saved</string>
+    <string name="payments_method_cancelled_toast">Payment method setup cancelled</string>
+    <string name="payments_setup_error_title">Could not open Stripe</string>
     <string name="payments_checkout_prefs">Consultation Checkout Preferences</string>
     <string name="payments_auto_debit">One-Click Session Auto-Debit</string>
     <string name="payments_auto_debit_desc">Charges default card only after session completion</string>

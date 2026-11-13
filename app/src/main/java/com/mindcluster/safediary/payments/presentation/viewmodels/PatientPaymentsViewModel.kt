@@ -23,6 +23,8 @@ data class PatientPaymentsUiState(
     val history: List<PaymentHistoryItem> = emptyList(),
     val selectedFilter: PaymentCategory? = null,
     val checkoutUrl: String? = null,
+    val isCheckoutForSetup: Boolean = false,
+    val isSettingUpPaymentMethod: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 ) {
@@ -34,6 +36,7 @@ class PatientPaymentsViewModel(
     application: Application,
     private val getCurrentSubscriptionHandler: GetCurrentSubscriptionHandler,
     private val createSubscriptionCheckoutHandler: CreateSubscriptionCheckoutHandler,
+    private val createPaymentMethodSetupHandler: CreatePaymentMethodSetupHandler,
     private val cancelSubscriptionHandler: CancelSubscriptionHandler,
     private val updatePaymentPreferencesHandler: UpdatePaymentPreferencesHandler,
     private val getPaymentHistoryHandler: GetPaymentHistoryHandler,
@@ -109,7 +112,7 @@ class PatientPaymentsViewModel(
             )
             val checkoutUrl = result.getOrNull()
             if (checkoutUrl != null) {
-                _uiState.update { it.copy(checkoutUrl = checkoutUrl) }
+                _uiState.update { it.copy(checkoutUrl = checkoutUrl, isCheckoutForSetup = false) }
             } else {
                 // Free plan activated immediately
                 loadData()
@@ -117,8 +120,41 @@ class PatientPaymentsViewModel(
         }
     }
 
+    fun startAddPaymentMethod() {
+        if (_uiState.value.isSettingUpPaymentMethod) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSettingUpPaymentMethod = true, errorMessage = null) }
+            val result = createPaymentMethodSetupHandler.handle(
+                CreatePaymentMethodSetupCommand(patientAccountId)
+            )
+            result.fold(
+                onSuccess = { setupUrl ->
+                    _uiState.update {
+                        it.copy(
+                            checkoutUrl = setupUrl,
+                            isCheckoutForSetup = true,
+                            isSettingUpPaymentMethod = false
+                        )
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isSettingUpPaymentMethod = false,
+                            errorMessage = error.message ?: "No se pudo abrir Stripe para guardar el método de pago."
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun dismissError() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
     fun closeCheckout() {
-        _uiState.update { it.copy(checkoutUrl = null) }
+        _uiState.update { it.copy(checkoutUrl = null, isCheckoutForSetup = false) }
         loadData()
     }
 
@@ -132,6 +168,7 @@ class PatientPaymentsViewModel(
                 application = application,
                 getCurrentSubscriptionHandler = paymentsModule.getCurrentSubscriptionHandler,
                 createSubscriptionCheckoutHandler = paymentsModule.createSubscriptionCheckoutHandler,
+                createPaymentMethodSetupHandler = paymentsModule.createPaymentMethodSetupHandler,
                 cancelSubscriptionHandler = paymentsModule.cancelSubscriptionHandler,
                 updatePaymentPreferencesHandler = paymentsModule.updatePaymentPreferencesHandler,
                 getPaymentHistoryHandler = paymentsModule.getPaymentHistoryHandler,

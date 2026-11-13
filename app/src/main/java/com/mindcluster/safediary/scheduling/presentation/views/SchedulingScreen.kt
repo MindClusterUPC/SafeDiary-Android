@@ -109,6 +109,7 @@ fun SchedulingScreen(
                     canSimulatePayment = viewModel.canSimulatePayment,
                     onSimulatePayment = { viewModel.simulatePayment(appointment.id) },
                     onPay = { viewModel.pay(appointment.id) },
+                    onSkipPayment = { viewModel.skipPayment(appointment.id) },
                     onCancel = { cancelDialog = true },
                     onChat = { openChat(appointment.contactRequestId) }
                 )
@@ -220,15 +221,29 @@ fun SchedulingScreen(
             checkoutUrl = url,
             onSuccess = { viewModel.closeCheckout(completed = true) },
             onCancelled = { viewModel.closeCheckout(completed = false) },
-            onDismissRequest = { viewModel.closeCheckout(completed = false) }
+            onDismissRequest = { viewModel.closeCheckout(completed = false) },
+            onError = viewModel::checkoutFailed
         )
     }
     state.actionError?.let { error ->
+        val canOfferSkip = appointment != null &&
+            appointment.status == AppointmentStatus.HELD &&
+            appointment.isHoldActive(state.now) &&
+            !viewModel.canSimulatePayment
         AlertDialog(
             onDismissRequest = viewModel::dismissError,
             title = { Text("No se pudo completar") },
             text = { Text(error) },
-            confirmButton = { TextButton(onClick = viewModel::dismissError) { Text("Entendido") } }
+            confirmButton = { TextButton(onClick = viewModel::dismissError) { Text("Entendido") } },
+            dismissButton = if (canOfferSkip) ({
+                TextButton(
+                    onClick = {
+                        viewModel.dismissError()
+                        viewModel.skipPayment(appointment!!.id)
+                    },
+                    enabled = !state.isWorking
+                ) { Text("Saltar pago solo por esta vez") }
+            }) else null
         )
     }
 }

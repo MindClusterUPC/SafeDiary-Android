@@ -35,4 +35,16 @@ interface PaymentsApiService {
         @Url url: String,
         @Query("patientAccountId") patientAccountId: Long
     ): Response<List<PaymentMethodItemDto>>
+
+    @POST
+    suspend fun createPaymentMethodSetup(
+        @Url url: String,
+        @Body request: CreatePaymentMethodSetupRequestDto
+    ): Response<PaymentMethodSetupResponseDto>
+
+    @PUT
+    suspend fun setDefaultPaymentMethod(
+        @Url url: String,
+        @Query("patientAccountId") patientAccountId: Long
+    ): Response<List<PaymentMethodItemDto>>
 }

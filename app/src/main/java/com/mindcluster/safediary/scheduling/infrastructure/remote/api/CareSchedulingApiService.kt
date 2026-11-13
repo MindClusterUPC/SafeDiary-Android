@@ -14,6 +14,7 @@ import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.RespondCon
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SendContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SendCoordinationMessageDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SimulatedAppointmentPaymentDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.SkipConsultationPaymentDto
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -55,6 +56,10 @@ interface CareSchedulingApiService {
     /** Payments and Payouts: Stripe Checkout for the held appointment; the webhook confirms it in Care Scheduling. */
     @POST("api/v1/payments/consultations/checkout")
     suspend fun startCheckout(@Body request: ConsultationCheckoutRequestDto): Response<ConsultationCheckoutDto>
+
+    /** Fallback when Stripe Checkout/webhooks cannot complete: confirms held appointment once for demo/call verification. */
+    @POST("api/v1/payments/consultations/{appointmentId}/skip")
+    suspend fun skipConsultationPayment(@Path("appointmentId") appointmentId: Long): Response<SkipConsultationPaymentDto>
 
     @POST("api/v1/appointments/{id}/cancellation")
     suspend fun cancelAppointment(@Path("id") appointmentId: Long): Response<AppointmentDto>

@@ -163,10 +163,28 @@ class SchedulingViewModel(
         }
     }
 
-    fun simulatePayment(id: Long) {
+    fun simulatePayment(id: Long) = confirmWithoutStripe(id, gateway::simulatePayment)
+
+    /** Fallback when Stripe Checkout/webhooks fail: confirms the held appointment once so video call testing can proceed. */
+    fun skipPayment(id: Long) = confirmWithoutStripe(id) { appointment ->
+        when (val result = gateway.skipPayment(appointment)) {
+            is SchedulingResult.Success -> result
+            is SchedulingResult.Failure -> SchedulingResult.Failure(
+                result.status,
+                when (result.status) {
+                    404 -> "El backend aún no tiene habilitada la ruta para saltar el pago. Actualiza el servidor e inténtalo de nuevo."
+                    409, 422 -> "La reserva venció o ya no admite omitir el pago. Actualiza tus citas o coordina un nuevo horario."
+                    else -> result.message
+                }
+            )
+        }
+    }
+
+    private fun confirmWithoutStripe(id: Long, action: suspend (Appointment) -> SchedulingResult<Appointment>) {
         val appointment = _uiState.value.appointments.firstOrNull { it.id == id } ?: return
         working {
-            when (val result = gateway.simulatePayment(appointment)) {
+            _uiState.update { it.copy(actionError = null) }
+            when (val result = action(appointment)) {
                 is SchedulingResult.Success -> replace(result.value)
                 is SchedulingResult.Failure -> {
                     fail(result.message)
@@ -183,13 +201,22 @@ class SchedulingViewModel(
                 is SchedulingResult.Success -> _uiState.update { it.copy(checkoutUrl = result.value, checkoutAppointmentId = id) }
                 is SchedulingResult.Failure -> {
                     fail(
-                        if (result.status == 422) "La reserva ya no está activa o el especialista aún no puede recibir pagos. Actualiza tus citas o coordina por el chat."
-                        else result.message
+                        when (result.status) {
+                            422 -> "El especialista aún no completó su cobro en Stripe o la reserva ya no está activa. Puedes saltar el pago solo por esta vez para probar la videollamada."
+                            409 -> "La reserva venció o su estado cambió. Actualiza tus citas o coordina otro horario."
+                            500, 502, 503 -> "Stripe no pudo iniciar el pago en este momento. Puedes reintentar o usar «Saltar pago solo por esta vez»."
+                            null -> "Sin conexión para abrir Stripe Checkout. Revisa tu red o usa «Saltar pago solo por esta vez»."
+                            else -> result.message
+                        }
                     )
                     refresh()
                 }
             }
         }
+    }
+
+    fun checkoutFailed(message: String) {
+        _uiState.update { it.copy(checkoutUrl = null, checkoutAppointmentId = null, actionError = message) }
     }
 
     /**
@@ -209,7 +236,7 @@ class SchedulingViewModel(
                     if (result.value.any { it.id == id && it.status == AppointmentStatus.CONFIRMED }) return@working
                 }
             }
-            fail("Tu pago se está procesando. La cita aparecerá confirmada en cuanto se apruebe; actualiza en unos minutos.")
+            fail("El pago tardó en confirmarse o el webhook de Stripe no respondió. Puedes esperar unos segundos y actualizar, o usar «Saltar pago solo por esta vez» para probar la videollamada.")
         }
     }
 

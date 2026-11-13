@@ -105,15 +105,18 @@ fun PatientPaymentsScreen(
                     Text(
                         text = stringResource(R.string.payments_add_method),
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                        color = SecondaryTeal,
-                        modifier = Modifier.clickable {
-                            Toast.makeText(context, "Agregar método de pago", Toast.LENGTH_SHORT).show()
+                        color = if (uiState.isSettingUpPaymentMethod) OnSurfaceVariant else SecondaryTeal,
+                        modifier = Modifier.clickable(enabled = !uiState.isSettingUpPaymentMethod) {
+                            viewModel.startAddPaymentMethod()
                         }
                     )
                 }
 
                 val defaultCard = sub?.paymentMethods?.firstOrNull { it.isDefault }
-                val backupCard = sub?.paymentMethods?.firstOrNull { !it.isDefault }
+                    ?: sub?.paymentMethods?.firstOrNull()
+                val backupCards = sub?.paymentMethods
+                    ?.filter { it.id != defaultCard?.id }
+                    .orEmpty()
 
                 if (sub?.paymentMethods.isNullOrEmpty()) {
                     Surface(
@@ -141,8 +144,8 @@ fun PatientPaymentsScreen(
                         HealthWalletCard(card = defaultCard)
                     }
 
-                    // Secondary Backup Card
-                    if (backupCard != null) {
+                    // Secondary Backup Cards
+                    backupCards.forEach { backupCard ->
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(16.dp),
@@ -194,8 +197,8 @@ fun PatientPaymentsScreen(
                 Surface(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable {
-                            Toast.makeText(context, "Configurar nueva tarjeta...", Toast.LENGTH_SHORT).show()
+                        .clickable(enabled = !uiState.isSettingUpPaymentMethod) {
+                            viewModel.startAddPaymentMethod()
                         },
                     shape = RoundedCornerShape(16.dp),
                     color = Color(0xFFEBF1FD)
@@ -207,11 +210,25 @@ fun PatientPaymentsScreen(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = stringResource(R.string.payments_add_new_card),
-                            style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
-                            color = PrimaryNavy
-                        )
+                        if (uiState.isSettingUpPaymentMethod) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(18.dp),
+                                strokeWidth = 2.dp,
+                                color = PrimaryNavy
+                            )
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Text(
+                                text = stringResource(R.string.payments_opening_stripe),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                color = PrimaryNavy
+                            )
+                        } else {
+                            Text(
+                                text = stringResource(R.string.payments_add_new_card),
+                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                color = PrimaryNavy
+                            )
+                        }
                     }
                 }
             }
@@ -339,17 +356,41 @@ fun PatientPaymentsScreen(
 
     // Stripe WebView Dialog
     uiState.checkoutUrl?.let { url ->
+        val isSetup = uiState.isCheckoutForSetup
         StripeCheckoutWebViewDialog(
             checkoutUrl = url,
             onSuccess = {
-                Toast.makeText(context, "Pago completado", Toast.LENGTH_SHORT).show()
+                val msg = if (isSetup) {
+                    context.getString(R.string.payments_method_saved_toast)
+                } else {
+                    "Pago completado"
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 viewModel.closeCheckout()
             },
             onCancelled = {
-                Toast.makeText(context, "Pago cancelado", Toast.LENGTH_SHORT).show()
+                val msg = if (isSetup) {
+                    context.getString(R.string.payments_method_cancelled_toast)
+                } else {
+                    "Pago cancelado"
+                }
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
                 viewModel.closeCheckout()
             },
             onDismissRequest = { viewModel.closeCheckout() }
+        )
+    }
+
+    uiState.errorMessage?.let { error ->
+        AlertDialog(
+            onDismissRequest = viewModel::dismissError,
+            title = { Text(stringResource(R.string.payments_setup_error_title)) },
+            text = { Text(error) },
+            confirmButton = {
+                TextButton(onClick = viewModel::dismissError) {
+                    Text(stringResource(android.R.string.ok))
+                }
+            }
         )
     }
 }

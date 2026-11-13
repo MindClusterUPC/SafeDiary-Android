@@ -61,6 +61,12 @@ data class ConsultationCheckoutDto(
     @SerializedName("checkoutUrl") val checkoutUrl: String?
 )
 
+data class SkipConsultationPaymentDto(
+    @SerializedName("appointmentId") val appointmentId: Long,
+    @SerializedName("appointmentStatus") val appointmentStatus: String?,
+    @SerializedName("reference") val reference: String?
+)
+
 data class ClinicalSessionDto(
     @SerializedName("id") val id: Long,
     @SerializedName("status") val status: String?,

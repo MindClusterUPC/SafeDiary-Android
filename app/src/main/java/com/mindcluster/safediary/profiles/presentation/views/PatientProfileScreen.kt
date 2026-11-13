@@ -58,13 +58,14 @@ fun PatientProfileScreen(
     val profile = uiState.profile
 
     val patientAccountId = profilesModule.authSessionPreferences.patientAccountId
-    val defaultPaymentMethod by produceState<com.mindcluster.safediary.payments.domain.model.PaymentMethodCard?>(
-        initialValue = null,
-        key1 = profile?.id
-    ) {
-        val sub = paymentsModule.repository.getSubscription(patientAccountId)
-        value = sub.paymentMethods.firstOrNull { it.isDefault } ?: sub.paymentMethods.firstOrNull()
+    val observedSubscription by paymentsModule.repository
+        .observeSubscription(patientAccountId)
+        .collectAsStateWithLifecycle(initialValue = null)
+    LaunchedEffect(patientAccountId, profile?.id) {
+        paymentsModule.repository.getSubscription(patientAccountId)
     }
+    val defaultPaymentMethod = observedSubscription?.paymentMethods?.firstOrNull { it.isDefault }
+        ?: observedSubscription?.paymentMethods?.firstOrNull()
 
     var showEditNameDialog by remember { mutableStateOf(false) }
 
