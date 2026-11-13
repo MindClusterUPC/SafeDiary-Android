@@ -78,9 +78,10 @@ fun CoordinationContent(
 fun ReservationContent(
     appointment: Appointment, clinician: ClinicianSummary, now: Long,
     isWorking: Boolean, canSimulatePayment: Boolean,
-    onSimulatePayment: () -> Unit, onCancel: () -> Unit, onChat: () -> Unit
+    onSimulatePayment: () -> Unit, onPay: () -> Unit, onSkipPayment: () -> Unit, onCancel: () -> Unit, onChat: () -> Unit
 ) {
     var confirmTestPayment by rememberSaveable(appointment.id) { mutableStateOf(false) }
+    var confirmSkipPayment by rememberSaveable(appointment.id) { mutableStateOf(false) }
     val expired = appointment.status == AppointmentStatus.EXPIRED
     PatientHeading(if (expired) "La reserva venció" else "Tu horario está reservado", if (expired) "Acuerda un nuevo horario desde el chat." else "Completa el pago para confirmar la cita.")
     PatientCard {
@@ -112,8 +113,11 @@ fun ReservationContent(
             PatientButton(if (isWorking) "Procesando pago de prueba…" else "Simular pago · ${appointment.amountLabel}",
                 { confirmTestPayment = true }, Modifier.fillMaxWidth(), enabled = !isWorking && appointment.isHoldActive(now))
         } else {
-            PatientButton("Pago en línea próximamente", {}, Modifier.fillMaxWidth(), enabled = false)
-            PatientInfo("La cita se confirmará automáticamente cuando se apruebe el pago de esta reserva.")
+            PatientButton(if (isWorking) "Preparando el pago…" else "Pagar · ${appointment.amountLabel}",
+                onPay, Modifier.fillMaxWidth(), enabled = !isWorking && appointment.isHoldActive(now))
+            PatientInfo("El pago se procesa de forma segura con Stripe. La cita se confirmará automáticamente cuando se apruebe.", Icons.Outlined.Lock)
+            PatientButton("Saltar pago solo por esta vez",
+                { confirmSkipPayment = true }, Modifier.fillMaxWidth(), secondary = true, enabled = !isWorking && appointment.isHoldActive(now))
         }
         PatientButton("Cancelar reserva", onCancel, Modifier.fillMaxWidth(), secondary = true, enabled = !isWorking)
     }
@@ -124,6 +128,14 @@ fun ReservationContent(
         confirmButton = { TextButton(onClick = { confirmTestPayment = false; onSimulatePayment() },
             enabled = !isWorking && appointment.isHoldActive(now)) { Text("Confirmar pago de prueba") } },
         dismissButton = { TextButton(onClick = { confirmTestPayment = false }) { Text("Volver") } }
+    )
+    if (confirmSkipPayment && !expired) AlertDialog(
+        onDismissRequest = { confirmSkipPayment = false },
+        title = { Text("¿Saltar pago solo por esta vez?") },
+        text = { Text("Se confirmará tu cita con ${clinician.name} sin procesar cobro en Stripe para que puedas probar la videollamada. Quedará registrada como «Pago omitido (Demo)» en tu historial.") },
+        confirmButton = { TextButton(onClick = { confirmSkipPayment = false; onSkipPayment() },
+            enabled = !isWorking && appointment.isHoldActive(now)) { Text("Sí, saltar pago") } },
+        dismissButton = { TextButton(onClick = { confirmSkipPayment = false }) { Text("Volver") } }
     )
 }
 

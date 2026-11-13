@@ -104,4 +104,43 @@ class RetrofitPaymentGateway(
         Log.w(tag, "getPaymentMethods network error: ${e.message}")
         null
     }
+
+    suspend fun createPaymentMethodSetup(
+        patientAccountId: Long
+    ): Result<PaymentMethodSetupResponseDto> = try {
+        val response = apiService.createPaymentMethodSetup(
+            url = ApiEndpoints.paymentsMethodsSetup,
+            request = CreatePaymentMethodSetupRequestDto(patientAccountId = patientAccountId)
+        )
+        val body = response.body()
+        if (response.isSuccessful && body != null) {
+            Result.success(body)
+        } else {
+            val detail = response.errorBody()?.string()?.takeIf { it.isNotBlank() } ?: response.message()
+            Log.w(tag, "createPaymentMethodSetup error ${response.code()}: $detail")
+            Result.failure(IllegalStateException("No se pudo iniciar el registro de pago (${response.code()})"))
+        }
+    } catch (e: Exception) {
+        Log.w(tag, "createPaymentMethodSetup network error: ${e.message}")
+        Result.failure(e)
+    }
+
+    suspend fun setDefaultPaymentMethod(
+        patientAccountId: Long,
+        paymentMethodId: String
+    ): List<PaymentMethodItemDto>? = try {
+        val response = apiService.setDefaultPaymentMethod(
+            url = ApiEndpoints.paymentMethodDefault(paymentMethodId),
+            patientAccountId = patientAccountId
+        )
+        if (response.isSuccessful) {
+            response.body()
+        } else {
+            Log.w(tag, "setDefaultPaymentMethod error ${response.code()}: ${response.message()}")
+            null
+        }
+    } catch (e: Exception) {
+        Log.w(tag, "setDefaultPaymentMethod network error: ${e.message}")
+        null
+    }
 }

@@ -2,7 +2,9 @@ package com.mindcluster.safediary.payments.presentation.components
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
+import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.background
@@ -29,9 +31,11 @@ fun StripeCheckoutWebViewDialog(
     checkoutUrl: String,
     onSuccess: () -> Unit,
     onCancelled: () -> Unit,
-    onDismissRequest: () -> Unit
+    onDismissRequest: () -> Unit,
+    onError: ((String) -> Unit)? = null
 ) {
     var isLoading by remember { mutableStateOf(true) }
+    var callbackFired by remember { mutableStateOf(false) }
 
     Dialog(
         onDismissRequest = onDismissRequest,
@@ -88,14 +92,46 @@ fun StripeCheckoutWebViewDialog(
                                         isLoading = false
                                     }
 
+                                    override fun onReceivedError(
+                                        view: WebView?,
+                                        request: WebResourceRequest?,
+                                        error: WebResourceError?
+                                    ) {
+                                        if (request?.isForMainFrame == true && !callbackFired) {
+                                            callbackFired = true
+                                            isLoading = false
+                                            onError?.invoke("No se pudo cargar la pasarela de pago de Stripe. Verifica tu conexión o salta el pago por esta vez.")
+                                                ?: onCancelled()
+                                        }
+                                    }
+
+                                    override fun onReceivedHttpError(
+                                        view: WebView?,
+                                        request: WebResourceRequest?,
+                                        errorResponse: WebResourceResponse?
+                                    ) {
+                                        if (request?.isForMainFrame == true && (errorResponse?.statusCode ?: 0) >= 400 && !callbackFired) {
+                                            callbackFired = true
+                                            isLoading = false
+                                            onError?.invoke("Stripe devolvió un error (${errorResponse?.statusCode}). Puedes reintentar o saltar el pago por esta vez.")
+                                                ?: onCancelled()
+                                        }
+                                    }
+
                                     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
                                         val url = request?.url?.toString().orEmpty()
                                         if (url.contains("/payments/subscriptions/success") || url.contains("session_id=")) {
-                                            onSuccess()
+                                            if (!callbackFired) {
+                                                callbackFired = true
+                                                onSuccess()
+                                            }
                                             return true
                                         }
                                         if (url.contains("/payments/subscriptions/cancel")) {
-                                            onCancelled()
+                                            if (!callbackFired) {
+                                                callbackFired = true
+                                                onCancelled()
+                                            }
                                             return true
                                         }
                                         return false

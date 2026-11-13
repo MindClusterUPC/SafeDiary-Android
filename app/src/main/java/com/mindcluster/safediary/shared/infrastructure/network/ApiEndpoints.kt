@@ -17,6 +17,8 @@ object ApiEndpoints {
     val paymentsCancel: String = BuildConfig.ENDPOINT_PAYMENTS_CANCEL
     val paymentsHistory: String = BuildConfig.ENDPOINT_PAYMENTS_HISTORY
     val paymentsMethods: String = BuildConfig.ENDPOINT_PAYMENTS_METHODS
+    val paymentsMethodsSetup: String = BuildConfig.ENDPOINT_PAYMENTS_METHODS_SETUP
+    fun paymentMethodDefault(paymentMethodId: String): String = "$paymentsMethods/$paymentMethodId/default"
 
     val stripeDemoUrl: String = BuildConfig.STRIPE_DEMO_URL
 

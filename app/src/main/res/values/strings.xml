@@ -258,6 +258,10 @@
     <string name="payments_health_wallet">SafeDiary Health Wallet</string>
     <string name="payments_default_badge">PREDETERMINADA</string>
     <string name="payments_add_new_card">+ Agregar nueva tarjeta o billetera digital</string>
+    <string name="payments_opening_stripe">Conectando con Stripe…</string>
+    <string name="payments_method_saved_toast">Método de pago guardado</string>
+    <string name="payments_method_cancelled_toast">Registro de método cancelado</string>
+    <string name="payments_setup_error_title">No se pudo abrir Stripe</string>
     <string name="payments_checkout_prefs">Preferencias de pago de consultas</string>
     <string name="payments_auto_debit">Auto-débito de sesión con un toque</string>
     <string name="payments_auto_debit_desc">Cobra a la tarjeta predeterminada solo tras finalizar la sesión</string>

@@ -4,6 +4,7 @@ import com.mindcluster.safediary.payments.domain.model.*
 import com.mindcluster.safediary.payments.domain.repository.PatientPaymentRepository
 import com.mindcluster.safediary.payments.infrastructure.local.PaymentPreferences
 import com.mindcluster.safediary.payments.infrastructure.remote.RetrofitPaymentGateway
+import com.mindcluster.safediary.payments.infrastructure.remote.dto.PaymentMethodItemDto
 import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 import com.mindcluster.safediary.shared.infrastructure.network.ApiEndpoints
 import com.mindcluster.safediary.shared.infrastructure.network.NetworkMonitor
@@ -47,16 +48,7 @@ class OfflineFirstPaymentRepository(
                 val methodsDto = remoteGateway.getPaymentMethods(patientAccountId)
                 if (methodsDto != null) {
                     current.paymentMethods = methodsDto.map { m ->
-                        PaymentMethodCard(
-                            id = m.id,
-                            title = if (m.brand.equals("VISA", ignoreCase = true)) "Visa terminada en ${m.last4}" else "${m.brand} terminada en ${m.last4}",
-                            brand = m.brand,
-                            last4 = m.last4,
-                            cardholder = m.cardholder,
-                            expiry = m.expiry,
-                            isDefault = m.isDefault,
-                            note = m.note
-                        )
+                        mapPaymentMethod(m)
                     }
                 }
                 subscriptionState.value = current
@@ -65,6 +57,16 @@ class OfflineFirstPaymentRepository(
             }
         }
         return current
+    }
+
+    override suspend fun createPaymentMethodSetup(patientAccountId: Long): String {
+        if (!networkMonitor.isOnline.value) {
+            throw IllegalStateException("Sin conexión a internet. Conéctate para agregar un método de pago.")
+        }
+        val dto = remoteGateway.createPaymentMethodSetup(patientAccountId).getOrThrow()
+        val url = dto.checkoutUrl?.takeIf { it.isNotBlank() }
+            ?: throw IllegalStateException(dto.message ?: "El servidor no devolvió el enlace de Stripe.")
+        return url
     }
 
     override suspend fun createSubscriptionCheckout(
@@ -127,9 +129,32 @@ class OfflineFirstPaymentRepository(
         val current = subscriptionState.value ?: buildFromPreferences(patientAccountId)
         current.setDefaultCard(cardId)
         preferences.defaultCardId = cardId
+
+        if (networkMonitor.isOnline.value) {
+            val remoteMethods = remoteGateway.setDefaultPaymentMethod(patientAccountId, cardId)
+            if (remoteMethods != null) {
+                current.paymentMethods = remoteMethods.map(::mapPaymentMethod)
+            }
+        }
+
         subscriptionState.value = current
         return current
     }
+
+    private fun mapPaymentMethod(m: PaymentMethodItemDto): PaymentMethodCard = PaymentMethodCard(
+        id = m.id,
+        title = if (m.brand.equals("VISA", ignoreCase = true)) {
+            "Visa terminada en ${m.last4}"
+        } else {
+            "${m.brand} terminada en ${m.last4}"
+        },
+        brand = m.brand,
+        last4 = m.last4,
+        cardholder = m.cardholder,
+        expiry = m.expiry,
+        isDefault = m.isDefault,
+        note = m.note
+    )
 
     override suspend fun getPaymentHistory(patientAccountId: Long): List<PaymentHistoryItem> {
         if (networkMonitor.isOnline.value) {

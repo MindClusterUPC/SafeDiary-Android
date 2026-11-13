@@ -35,6 +35,10 @@ class PaymentsModule(context: Context) {
         CreateSubscriptionCheckoutHandler(repository)
     }
 
+    val createPaymentMethodSetupHandler: CreatePaymentMethodSetupHandler by lazy {
+        CreatePaymentMethodSetupHandler(repository)
+    }
+
     val cancelSubscriptionHandler: CancelSubscriptionHandler by lazy {
         CancelSubscriptionHandler(repository)
     }

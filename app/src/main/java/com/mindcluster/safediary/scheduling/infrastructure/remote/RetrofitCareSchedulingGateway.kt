@@ -16,6 +16,7 @@ import com.mindcluster.safediary.scheduling.infrastructure.remote.api.CareSchedu
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.AppointmentDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ClinicalSessionDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.CloseSessionDto
+import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ConsultationCheckoutRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ContactRequestDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.CoordinationMessageDto
 import com.mindcluster.safediary.scheduling.infrastructure.remote.dto.ProposeScheduleDto
@@ -74,15 +75,33 @@ class RetrofitCareSchedulingGateway(
             apiService.simulatePayment(appointment.id, SimulatedAppointmentPaymentDto(reference, true, appointment.amount, appointment.currency))
         }
         if (result is SchedulingResult.Failure) return result
-        return when (val refreshed = getAppointments()) {
+        return reloadConfirmedAppointment(appointment.id)
+    }
+
+    /** Fallback to confirm a held appointment once when Stripe processing/webhooks are unavailable. */
+    suspend fun skipPayment(appointment: Appointment): SchedulingResult<Appointment> {
+        if (!appointment.isHoldActive(System.currentTimeMillis())) {
+            return SchedulingResult.Failure(409, "La reserva ya venció. Coordina un nuevo horario desde el chat.")
+        }
+        val result = call("skipConsultationPayment") { apiService.skipConsultationPayment(appointment.id) }
+        if (result is SchedulingResult.Failure) return result
+        return reloadConfirmedAppointment(appointment.id)
+    }
+
+    private suspend fun reloadConfirmedAppointment(appointmentId: Long): SchedulingResult<Appointment> =
+        when (val refreshed = getAppointments()) {
             is SchedulingResult.Failure -> refreshed
             is SchedulingResult.Success -> {
-                val confirmed = refreshed.value.firstOrNull { it.id == appointment.id && it.status == AppointmentStatus.CONFIRMED }
+                val confirmed = refreshed.value.firstOrNull { it.id == appointmentId && it.status == AppointmentStatus.CONFIRMED }
                 if (confirmed != null) SchedulingResult.Success(confirmed)
                 else SchedulingResult.Failure(409, "La cita aún no figura confirmada. Actualiza para consultar el resultado del pago.")
             }
         }
-    }
+
+    /** US-037: Stripe Checkout URL for the held appointment. */
+    suspend fun startCheckout(appointmentId: Long): SchedulingResult<String> =
+        call("startCheckout") { apiService.startCheckout(ConsultationCheckoutRequestDto(appointmentId)) }
+            .map { it.checkoutUrl?.takeIf { url -> url.isNotBlank() } ?: throw IllegalStateException("Missing checkout URL") }
 
     suspend fun cancelAppointment(appointmentId: Long): SchedulingResult<Appointment> =
         call("cancelAppointment") { apiService.cancelAppointment(appointmentId) }
@@ -138,13 +157,13 @@ class RetrofitCareSchedulingGateway(
         if (response.isSuccessful && body != null) {
             SchedulingResult.Success(body)
         } else {
-            Log.w(tag, "$name error ${response.code()}: ${response.message()}")
+            warn("$name error ${response.code()}: ${response.message()}")
             SchedulingResult.Failure(response.code(), messageFor(response.code()))
         }
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        Log.w(tag, "$name network error: ${e.message}")
+        warn("$name network error: ${e.message}")
         SchedulingResult.Failure(null, "No pudimos conectar con SafeDiary. Revisa tu conexión e inténtalo de nuevo.")
     }
 
@@ -152,10 +171,14 @@ class RetrofitCareSchedulingGateway(
         is SchedulingResult.Success -> try {
             SchedulingResult.Success(transform(value))
         } catch (e: Exception) {
-            Log.w(tag, "Unexpected response: ${e.message}")
+            warn("Unexpected response: ${e.message}")
             SchedulingResult.Failure(null, "Recibimos una respuesta inesperada. Inténtalo de nuevo.")
         }
         is SchedulingResult.Failure -> this
+    }
+
+    private fun warn(message: String) {
+        runCatching { Log.w(tag, message) }
     }
 
     private fun messageFor(status: Int) = when (status) {

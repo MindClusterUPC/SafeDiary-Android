@@ -12,6 +12,7 @@ interface PatientPaymentRepository {
         patientAccountId: Long,
         plan: SubscriptionPlan
     ): String? // returns checkoutUrl if required, or null if FREE activated
+    suspend fun createPaymentMethodSetup(patientAccountId: Long): String
     suspend fun cancelSubscription(patientAccountId: Long): PatientSubscriptionAggregate
     suspend fun updatePreferences(
         patientAccountId: Long,

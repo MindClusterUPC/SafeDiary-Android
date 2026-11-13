@@ -21,3 +21,16 @@ data class SubscriptionCheckoutResponseDto(
 data class CancelSubscriptionRequestDto(
     @SerializedName("patientAccountId") val patientAccountId: Long
 )
+
+data class CreatePaymentMethodSetupRequestDto(
+    @SerializedName("patientAccountId") val patientAccountId: Long,
+    @SerializedName("successUrl") val successUrl: String? = null,
+    @SerializedName("cancelUrl") val cancelUrl: String? = null
+)
+
+data class PaymentMethodSetupResponseDto(
+    @SerializedName("patientAccountId") val patientAccountId: Long,
+    @SerializedName("checkoutUrl") val checkoutUrl: String?,
+    @SerializedName("sessionId") val sessionId: String?,
+    @SerializedName("message") val message: String?
+)

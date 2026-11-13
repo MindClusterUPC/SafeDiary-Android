@@ -6,6 +6,7 @@ import com.mindcluster.safediary.scheduling.domain.model.*
 import com.mindcluster.safediary.scheduling.infrastructure.remote.RetrofitCareSchedulingGateway
 import com.mindcluster.safediary.scheduling.infrastructure.remote.SchedulingResult
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -30,6 +31,9 @@ data class SchedulingUiState(
     val actionError: String? = null,
     /** Video call URL waiting to be opened by the screen. */
     val joinUrl: String? = null,
+    /** Stripe Checkout opened for [checkoutAppointmentId]. */
+    val checkoutUrl: String? = null,
+    val checkoutAppointmentId: Long? = null,
     /** Local consent preference: nothing is shared with the clinician from this screen yet. */
     val sharedContext: Set<Long> = emptySet()
 ) {
@@ -159,16 +163,80 @@ class SchedulingViewModel(
         }
     }
 
-    fun simulatePayment(id: Long) {
+    fun simulatePayment(id: Long) = confirmWithoutStripe(id, gateway::simulatePayment)
+
+    /** Fallback when Stripe Checkout/webhooks fail: confirms the held appointment once so video call testing can proceed. */
+    fun skipPayment(id: Long) = confirmWithoutStripe(id) { appointment ->
+        when (val result = gateway.skipPayment(appointment)) {
+            is SchedulingResult.Success -> result
+            is SchedulingResult.Failure -> SchedulingResult.Failure(
+                result.status,
+                when (result.status) {
+                    404 -> "El backend aún no tiene habilitada la ruta para saltar el pago. Actualiza el servidor e inténtalo de nuevo."
+                    409, 422 -> "La reserva venció o ya no admite omitir el pago. Actualiza tus citas o coordina un nuevo horario."
+                    else -> result.message
+                }
+            )
+        }
+    }
+
+    private fun confirmWithoutStripe(id: Long, action: suspend (Appointment) -> SchedulingResult<Appointment>) {
         val appointment = _uiState.value.appointments.firstOrNull { it.id == id } ?: return
         working {
-            when (val result = gateway.simulatePayment(appointment)) {
+            _uiState.update { it.copy(actionError = null) }
+            when (val result = action(appointment)) {
                 is SchedulingResult.Success -> replace(result.value)
                 is SchedulingResult.Failure -> {
                     fail(result.message)
                     refresh()
                 }
             }
+        }
+    }
+
+    /** US-037: opens Stripe Checkout for the held appointment; the amount is decided by the backend. */
+    fun pay(id: Long) {
+        working {
+            when (val result = gateway.startCheckout(id)) {
+                is SchedulingResult.Success -> _uiState.update { it.copy(checkoutUrl = result.value, checkoutAppointmentId = id) }
+                is SchedulingResult.Failure -> {
+                    fail(
+                        when (result.status) {
+                            422 -> "El especialista aún no completó su cobro en Stripe o la reserva ya no está activa. Puedes saltar el pago solo por esta vez para probar la videollamada."
+                            409 -> "La reserva venció o su estado cambió. Actualiza tus citas o coordina otro horario."
+                            500, 502, 503 -> "Stripe no pudo iniciar el pago en este momento. Puedes reintentar o usar «Saltar pago solo por esta vez»."
+                            null -> "Sin conexión para abrir Stripe Checkout. Revisa tu red o usa «Saltar pago solo por esta vez»."
+                            else -> result.message
+                        }
+                    )
+                    refresh()
+                }
+            }
+        }
+    }
+
+    fun checkoutFailed(message: String) {
+        _uiState.update { it.copy(checkoutUrl = null, checkoutAppointmentId = null, actionError = message) }
+    }
+
+    /**
+     * Closes Stripe Checkout. After a completed payment the appointment is confirmed by the Stripe webhook, so the
+     * list is reloaded a few times until the confirmation arrives.
+     */
+    fun closeCheckout(completed: Boolean) {
+        val id = _uiState.value.checkoutAppointmentId
+        _uiState.update { it.copy(checkoutUrl = null, checkoutAppointmentId = null) }
+        if (!completed || id == null) return
+        working {
+            repeat(PAYMENT_CONFIRMATION_ATTEMPTS) { attempt ->
+                if (attempt > 0) delay(PAYMENT_CONFIRMATION_INTERVAL_MS)
+                val result = gateway.getAppointments()
+                if (result is SchedulingResult.Success) {
+                    result.value.firstOrNull { it.id == id }?.let { replace(it) }
+                    if (result.value.any { it.id == id && it.status == AppointmentStatus.CONFIRMED }) return@working
+                }
+            }
+            fail("El pago tardó en confirmarse o el webhook de Stripe no respondió. Puedes esperar unos segundos y actualizar, o usar «Saltar pago solo por esta vez» para probar la videollamada.")
         }
     }
 
@@ -242,6 +310,9 @@ class SchedulingViewModel(
 
     private fun fail(message: String) { _uiState.update { it.copy(actionError = message) } }
 }
+
+private const val PAYMENT_CONFIRMATION_ATTEMPTS = 6
+private const val PAYMENT_CONFIRMATION_INTERVAL_MS = 2_000L
 
 internal fun Appointment.expiredLocally(now: Long) =
     if (status == AppointmentStatus.HELD && holdExpiresAt != null && holdExpiresAt <= now) copy(status = AppointmentStatus.EXPIRED) else this
