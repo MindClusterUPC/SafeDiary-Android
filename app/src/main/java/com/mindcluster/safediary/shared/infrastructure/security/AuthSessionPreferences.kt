@@ -20,9 +20,19 @@ class AuthSessionPreferences(context: Context) {
             AuthSessionHolder.token = value
         }
 
+    /** IAM account id of the signed-in user; 0 when nobody is signed in. */
     var patientAccountId: Long
-        get() = prefs.getLong(KEY_PATIENT_ACCOUNT_ID, 1L)
+        get() = prefs.getLong(KEY_PATIENT_ACCOUNT_ID, NO_ID)
         set(value) = prefs.edit().putLong(KEY_PATIENT_ACCOUNT_ID, value).apply()
+
+    /** Id of the patient profile in Profiles, which is not the IAM account id; 0 when unknown. */
+    var patientProfileId: Long
+        get() = prefs.getLong(KEY_PATIENT_PROFILE_ID, NO_ID)
+        set(value) = prefs.edit().putLong(KEY_PATIENT_PROFILE_ID, value).apply()
+
+    /** Account that used the device last; kept after sign-out to detect a change of account. */
+    val lastAccountId: Long
+        get() = prefs.getLong(KEY_LAST_ACCOUNT_ID, NO_ID)
 
     var userEmail: String?
         get() = prefs.getString(KEY_USER_EMAIL, null)
@@ -32,12 +42,26 @@ class AuthSessionPreferences(context: Context) {
         get() = prefs.getBoolean(KEY_IS_LOGGED_IN, false)
         set(value) = prefs.edit().putBoolean(KEY_IS_LOGGED_IN, value).apply()
 
+    var sessionExpired: Boolean
+        get() = prefs.getBoolean(KEY_SESSION_EXPIRED, false)
+        set(value) = prefs.edit().putBoolean(KEY_SESSION_EXPIRED, value).apply()
+
     init {
-        AuthSessionHolder.token = authToken
+        val storedToken = authToken
+        if (isLoggedIn && !SessionTokenPolicy.isUsable(storedToken)) {
+            // Old versions stored mock tokens as authenticated sessions. Preserve local notes,
+            // but require an actual IAM login before any further authenticated request.
+            clear()
+            sessionExpired = true
+            AuthSessionHolder.rejectStoredSession()
+        } else {
+            AuthSessionHolder.restoreToken(storedToken)
+        }
     }
 
     fun clear() {
-        prefs.edit().clear().apply()
+        val lastAccount = prefs.getLong(KEY_PATIENT_ACCOUNT_ID, NO_ID).takeIf { it != NO_ID } ?: lastAccountId
+        prefs.edit().clear().putLong(KEY_LAST_ACCOUNT_ID, lastAccount).apply()
         AuthSessionHolder.token = null
     }
 
@@ -45,12 +69,11 @@ class AuthSessionPreferences(context: Context) {
         private const val PREFS_NAME = "safediary_auth_session"
         private const val KEY_AUTH_TOKEN = "auth_token"
         private const val KEY_PATIENT_ACCOUNT_ID = "patient_account_id"
+        private const val KEY_PATIENT_PROFILE_ID = "patient_profile_id"
+        private const val KEY_LAST_ACCOUNT_ID = "last_account_id"
+        const val NO_ID = 0L
         private const val KEY_USER_EMAIL = "user_email"
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
+        private const val KEY_SESSION_EXPIRED = "session_expired"
     }
-}
-
-object AuthSessionHolder {
-    @Volatile
-    var token: String? = null
 }

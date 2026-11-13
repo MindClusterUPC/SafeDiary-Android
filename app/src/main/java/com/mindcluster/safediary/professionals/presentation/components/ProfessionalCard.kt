@@ -24,14 +24,14 @@ fun ProfessionalCard(professional: Professional, favorite: Boolean, onFavorite: 
                 PatientBadge("✓ Licencia verificada")
             }
             IconToggleButton(checked = favorite, onCheckedChange = { onFavorite() }) {
-                Icon(if (favorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder, if (favorite) "Quitar de guardados" else "Guardar especialista", tint = SecondaryTeal)
+                Icon(if (favorite) Icons.Outlined.Bookmark else Icons.Outlined.BookmarkBorder, if (favorite) "Quitar de favoritos" else "Añadir especialista a favoritos", tint = SecondaryTeal)
             }
         }
-        PatientInfo("★ ${professional.rating} · ${professional.reviewCount} reseñas · ${professional.languages}")
+        PatientInfo(professional.rating?.let { "★ $it · ${professional.reviewCount} reseñas" } ?: "Aún sin reseñas")
         Surface(color = SurfaceContainerLow, shape = MaterialTheme.shapes.medium) {
             Row(Modifier.fillMaxWidth().padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-                Column(Modifier.weight(1f)) { PatientInfo("Disponibilidad", Icons.Outlined.CalendarMonth); Text(professional.availability, color = PrimaryNavy, style = MaterialTheme.typography.bodySmall) }
-                Column(horizontalAlignment = Alignment.End) { PatientInfo("Tarifa / 50 min"); Text("S/ ${professional.price}", fontWeight = FontWeight.Bold, color = PrimaryNavy) }
+                Column(Modifier.weight(1f)) { PatientInfo("Disponibilidad", Icons.Outlined.CalendarMonth); Text("Se coordina por chat", color = PrimaryNavy, style = MaterialTheme.typography.bodySmall) }
+                Column(horizontalAlignment = Alignment.End) { PatientInfo("Tarifa / ${professional.durationMinutes} min"); Text(professional.priceLabel, fontWeight = FontWeight.Bold, color = PrimaryNavy) }
             }
         }
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

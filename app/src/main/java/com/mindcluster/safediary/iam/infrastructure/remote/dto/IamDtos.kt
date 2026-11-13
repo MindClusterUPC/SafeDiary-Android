@@ -1,6 +1,7 @@
 package com.mindcluster.safediary.iam.infrastructure.remote.dto
 
 import com.google.gson.annotations.SerializedName
+import com.mindcluster.safediary.shared.infrastructure.security.SessionTokenPolicy
 
 data class SignInRequestDto(
     @SerializedName("email") val email: String,
@@ -23,10 +24,13 @@ data class SignInResponseDto(
     @SerializedName("roles") val roles: List<String>?
 ) {
     val resolvedAccountId: Long
-        get() = accountId ?: id ?: 1L
+        get() = sequenceOf(accountId, id).filterNotNull().firstOrNull { it > 0 }
+            ?: error("El servidor no devolvió una cuenta válida. Vuelve a iniciar sesión.")
 
     val resolvedToken: String
-        get() = accessToken ?: token ?: "mock_jwt_token_safe_diary"
+        get() = sequenceOf(accessToken, token).filterNotNull()
+            .map(String::trim).firstOrNull(SessionTokenPolicy::isUsable)
+            ?: error("El servidor no devolvió una sesión válida. Vuelve a iniciar sesión.")
 
     val resolvedRole: String
         get() = role ?: roles?.firstOrNull() ?: "PATIENT"

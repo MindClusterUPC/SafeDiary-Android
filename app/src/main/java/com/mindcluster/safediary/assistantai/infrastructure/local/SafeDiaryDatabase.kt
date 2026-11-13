@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.mindcluster.safediary.shared.infrastructure.security.AccountStorage
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
 import com.mindcluster.safediary.diary.infrastructure.local.dao.DiaryEntryDao
 import com.mindcluster.safediary.diary.infrastructure.local.entity.DiaryEntryEntity
 
@@ -18,19 +20,18 @@ abstract class SafeDiaryDatabase : RoomDatabase() {
     abstract fun diaryEntryDao(): DiaryEntryDao
 
     companion object {
-        @Volatile
-        private var INSTANCE: SafeDiaryDatabase? = null
+        private val instances = mutableMapOf<Long, SafeDiaryDatabase>()
 
-        fun getInstance(context: Context): SafeDiaryDatabase {
-            return INSTANCE ?: synchronized(this) {
-                INSTANCE ?: Room.databaseBuilder(
+        fun getInstance(context: Context, accountId: Long = AuthSessionPreferences(context).patientAccountId): SafeDiaryDatabase {
+            return synchronized(this) {
+                instances.getOrPut(accountId) { Room.databaseBuilder(
                     context.applicationContext,
                     SafeDiaryDatabase::class.java,
-                    "safediary.db"
+                    AccountStorage.databaseName(accountId)
                 )
                     .fallbackToDestructiveMigration(dropAllTables = true)
                     .build()
-                    .also { INSTANCE = it }
+                }
             }
         }
     }

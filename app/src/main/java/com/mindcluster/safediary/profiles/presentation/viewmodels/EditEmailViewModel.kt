@@ -124,7 +124,7 @@ class EditEmailViewModel(
                 application = application,
                 updatePatientEmailHandler = profilesModule.updatePatientEmailHandler,
                 authSessionPreferences = profilesModule.authSessionPreferences,
-                patientId = profilesModule.authSessionPreferences.patientAccountId,
+                patientId = profilesModule.authSessionPreferences.patientProfileId,
                 initialEmail = masked
             ) as T
         }

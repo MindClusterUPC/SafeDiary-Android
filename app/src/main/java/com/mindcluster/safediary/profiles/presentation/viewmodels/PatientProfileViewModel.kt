@@ -144,7 +144,7 @@ class PatientProfileViewModel(
                 updateAvatarHandler = profilesModule.updateAvatarHandler,
                 updateTherapeuticTopicsHandler = profilesModule.updateTherapeuticTopicsHandler,
                 updatePrivacySettingsHandler = profilesModule.updatePrivacySettingsHandler,
-                patientId = profilesModule.authSessionPreferences.patientAccountId
+                patientId = profilesModule.authSessionPreferences.patientProfileId
             ) as T
         }
     }

@@ -1,11 +1,34 @@
 package com.mindcluster.safediary.profiles.infrastructure.local
 
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
+
 import android.content.Context
 import android.content.SharedPreferences
 
 class ProfilePreferences(context: Context) {
+    private val appContext = context.applicationContext
+    private val avatarPrefs: SharedPreferences
+        get() {
+            val id = AuthSessionPreferences(appContext).patientAccountId
+            return appContext.getSharedPreferences("safediary_avatar_account_$id", Context.MODE_PRIVATE)
+        }
     private val prefs: SharedPreferences =
         context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+
+    val initials: String
+        get() = (firstName.trim().firstOrNull()?.uppercase().orEmpty() +
+                lastName.trim().firstOrNull()?.uppercase().orEmpty()).ifBlank { "SD" }
+
+    fun observeChanges(onChange: () -> Unit): () -> Unit {
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, _ -> onChange() }
+        val observedAvatarPrefs = avatarPrefs
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+        observedAvatarPrefs.registerOnSharedPreferenceChangeListener(listener)
+        return {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+            observedAvatarPrefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
 
     var firstName: String
         get() = prefs.getString(KEY_FIRST_NAME, "") ?: ""
@@ -20,12 +43,12 @@ class ProfilePreferences(context: Context) {
         set(value) = prefs.edit().putString(KEY_EMAIL, value).apply()
 
     var avatarType: String
-        get() = prefs.getString(KEY_AVATAR_TYPE, "INITIALS") ?: "INITIALS"
-        set(value) = prefs.edit().putString(KEY_AVATAR_TYPE, value).apply()
+        get() = avatarPrefs.getString(KEY_AVATAR_TYPE, "INITIALS") ?: "INITIALS"
+        set(value) = avatarPrefs.edit().putString(KEY_AVATAR_TYPE, value).apply()
 
     var avatarValue: String
-        get() = prefs.getString(KEY_AVATAR_VALUE, "") ?: ""
-        set(value) = prefs.edit().putString(KEY_AVATAR_VALUE, value).apply()
+        get() = avatarPrefs.getString(KEY_AVATAR_VALUE, "") ?: ""
+        set(value) = avatarPrefs.edit().putString(KEY_AVATAR_VALUE, value).apply()
 
     var selectedTopics: Set<String>
         get() = prefs.getStringSet(

@@ -1,5 +1,7 @@
 package com.mindcluster.safediary.profiles.presentation.views
 
+import com.mindcluster.safediary.shared.presentation.components.ProfileAvatarContent
+
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -123,13 +125,7 @@ fun PatientProfileScreen(
                             .clickable { viewModel.openAvatarSheet() },
                         contentAlignment = Alignment.Center
                     ) {
-                        val initials = profile?.initials?.ifBlank { "SD" } ?: "SD"
-                        Text(
-                            text = initials,
-                            fontSize = 32.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = PrimaryNavy
-                        )
+                        ProfileAvatarContent(Modifier.matchParentSize())
                     }
                     Box(
                         modifier = Modifier
@@ -350,8 +346,9 @@ fun PatientProfileScreen(
                 modifier = Modifier
                     .padding(bottom = 24.dp)
                     .clickable {
+                        profilesModule.profilePreferences.clear()
                         profilesModule.authSessionPreferences.clear()
-                        Toast.makeText(context, "Sesión cerrada correctamente", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.profile_logged_out_success), Toast.LENGTH_SHORT).show()
                         onLogout()
                     }
             )

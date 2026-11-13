@@ -22,13 +22,17 @@ fun BreathingExercise(id: String, minutes: Int, isActive: Boolean, onComplete: (
     val total = minutes * 60
     var remaining by rememberSaveable(id) { mutableIntStateOf(total) }
     var running by rememberSaveable(id) { mutableStateOf(true) }
+    var completionSent by rememberSaveable(id) { mutableStateOf(false) }
     val currentOnComplete by rememberUpdatedState(onComplete)
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     LaunchedEffect(running, isActive, lifecycle) {
         if (running && isActive) {
             lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 while (remaining > 0) { delay(1000); remaining-- }
-                currentOnComplete()
+                if (!completionSent) {
+                    completionSent = true
+                    currentOnComplete()
+                }
             }
         }
     }
@@ -39,12 +43,12 @@ fun BreathingExercise(id: String, minutes: Int, isActive: Boolean, onComplete: (
         Column(Modifier.fillMaxWidth().padding(vertical = 24.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(24.dp)) {
             Box(Modifier.size(200.dp).background(PatientMint, CircleShape), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(progress = { 1f - remaining.toFloat() / total }, modifier = Modifier.size(180.dp), color = SecondaryTeal, strokeWidth = 6.dp, trackColor = SurfaceContainerLow)
-                Text(if (running) instruction else "En pausa", style = MaterialTheme.typography.headlineSmall, color = SecondaryTeal)
+                Text(if (remaining == 0) "Completada" else if (running) instruction else "En pausa", style = MaterialTheme.typography.headlineSmall, color = SecondaryTeal)
             }
             Text("%02d:%02d".format(remaining / 60, remaining % 60), style = MaterialTheme.typography.displayLarge, color = PrimaryNavy)
             Text("Inhala 4 s · pausa 4 s · exhala 6 s", color = SlateSubtle, textAlign = TextAlign.Center)
             PatientInfo("Puedes pausar o salir cuando lo necesites.")
-            PatientButton(if (running) "Pausar" else "Continuar", { running = !running }, Modifier.fillMaxWidth())
+            if (remaining > 0) PatientButton(if (running) "Pausar" else "Continuar", { running = !running }, Modifier.fillMaxWidth())
         }
     }
     PatientButton("Salir del ejercicio", onExit, Modifier.fillMaxWidth(), secondary = true)

@@ -7,6 +7,7 @@ import com.mindcluster.safediary.profiles.infrastructure.remote.RetrofitPatientP
 import com.mindcluster.safediary.profiles.infrastructure.remote.dto.UpdateEmergencyContactRequestDto
 import com.mindcluster.safediary.shared.domain.events.DomainEventPublisher
 import com.mindcluster.safediary.shared.infrastructure.network.NetworkMonitor
+import com.mindcluster.safediary.shared.infrastructure.security.AuthSessionPreferences
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +19,8 @@ class OfflineFirstPatientProfileRepository(
     private val preferences: ProfilePreferences,
     private val remoteGateway: RetrofitPatientProfileGateway,
     private val networkMonitor: NetworkMonitor,
-    private val eventPublisher: DomainEventPublisher
+    private val eventPublisher: DomainEventPublisher,
+    private val authSessionPreferences: AuthSessionPreferences? = null
 ) : PatientProfileRepository {
 
     private val scope = CoroutineScope(Dispatchers.IO)
@@ -39,23 +41,32 @@ class OfflineFirstPatientProfileRepository(
             try {
                 val remoteDto = remoteGateway.fetchPatientProfile(patientId)
                 if (remoteDto != null) {
-                    preferences.firstName = remoteDto.firstName
-                    preferences.lastName = remoteDto.lastName
-                    preferences.email = remoteDto.email
+                    val currentEmail = authSessionPreferences?.userEmail
+                    // Guard against overwriting local profile with a different user's remote profile
+                    val isSameUser = currentEmail.isNullOrBlank() ||
+                        preferences.email.isBlank() ||
+                        remoteDto.email.equals(currentEmail, ignoreCase = true) ||
+                        remoteDto.email.equals(preferences.email, ignoreCase = true)
 
-                    if (remoteDto.emergencyContact != null) {
-                        val ec = remoteDto.emergencyContact
-                        val rel = RelationshipType.fromString(ec.relationship)
-                        preferences.hasEmergencyContact = true
-                        preferences.emergencyName = ec.name
-                        preferences.emergencyRelationship = rel.name
-                        preferences.emergencyPhone = ec.phoneNumber
-                        preferences.emergencyEmail = ec.email
-                    } else {
-                        preferences.hasEmergencyContact = false
-                        preferences.emergencyName = null
-                        preferences.emergencyPhone = null
-                        preferences.emergencyEmail = null
+                    if (isSameUser) {
+                        preferences.firstName = remoteDto.firstName
+                        preferences.lastName = remoteDto.lastName
+                        preferences.email = remoteDto.email
+
+                        if (remoteDto.emergencyContact != null) {
+                            val ec = remoteDto.emergencyContact
+                            val rel = RelationshipType.fromString(ec.relationship)
+                            preferences.hasEmergencyContact = true
+                            preferences.emergencyName = ec.name
+                            preferences.emergencyRelationship = rel.name
+                            preferences.emergencyPhone = ec.phoneNumber
+                            preferences.emergencyEmail = ec.email
+                        } else {
+                            preferences.hasEmergencyContact = false
+                            preferences.emergencyName = null
+                            preferences.emergencyPhone = null
+                            preferences.emergencyEmail = null
+                        }
                     }
                 }
             } catch (e: Exception) {

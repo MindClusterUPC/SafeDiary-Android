@@ -20,6 +20,7 @@ object ApiEndpoints {
 
     val stripeDemoUrl: String = BuildConfig.STRIPE_DEMO_URL
 
+    val currentPatient: String get() = "$patients/me"
     fun patientById(id: Long): String = "$patients/$id"
     fun patientEmergencyContact(id: Long): String = "$patients/$id/emergency-contact"
     fun patientEmail(id: Long): String = "$patients/$id/email"

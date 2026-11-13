@@ -151,7 +151,7 @@ class SafeContactViewModel(
                 getPatientProfileHandler = profilesModule.getPatientProfileHandler,
                 updateEmergencyContactHandler = profilesModule.updateEmergencyContactHandler,
                 removeEmergencyContactHandler = profilesModule.removeEmergencyContactHandler,
-                patientId = profilesModule.authSessionPreferences.patientAccountId
+                patientId = profilesModule.authSessionPreferences.patientProfileId
             ) as T
         }
     }

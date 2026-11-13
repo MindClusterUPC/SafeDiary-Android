@@ -18,7 +18,6 @@ import kotlinx.coroutines.launch
 
 data class SignInUiState(
     val isSignUpMode: Boolean = false,
-    val selectedRole: String = "PATIENT",
     val fullName: String = "",
     val email: String = "",
     val password: String = "",
@@ -70,10 +69,6 @@ class SignInViewModel(
         }
     }
 
-    fun onRoleSelected(role: String) {
-        _uiState.update { it.copy(selectedRole = role, errorMessage = null) }
-    }
-
     fun onFullNameChanged(fullName: String) {
         _uiState.update { it.copy(fullName = fullName, errorMessage = null) }
     }
@@ -110,7 +105,7 @@ class SignInViewModel(
                         fullName = state.fullName,
                         email = state.email,
                         password = state.password,
-                        role = state.selectedRole
+                        role = "PATIENT"
                     )
                 )
             } else {
