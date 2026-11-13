@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.mindcluster.safediary.R
+import com.mindcluster.safediary.payments.domain.model.SubscriptionPlan
 import com.mindcluster.safediary.payments.infrastructure.PaymentsModule
 import com.mindcluster.safediary.payments.presentation.components.HealthWalletCard
 import com.mindcluster.safediary.payments.presentation.components.PaymentHistoryFilterChips
@@ -47,6 +48,7 @@ fun PatientPaymentsScreen(
     )
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sub = uiState.subscription
+    var confirmDowngradeToFree by remember { mutableStateOf(false) }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -90,6 +92,16 @@ fun PatientPaymentsScreen(
                 .padding(horizontal = 20.dp, vertical = 8.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            // Subscription Plan Section
+            SubscriptionPlanSection(
+                currentPlan = sub?.plan ?: SubscriptionPlan.FREE,
+                activeUntil = sub?.activeUntil,
+                isBusy = uiState.isUpdatingPlan || uiState.isSettingUpPaymentMethod,
+                isUpdatingPlan = uiState.isUpdatingPlan,
+                onSelectPaidPlan = { plan -> viewModel.startCheckout(plan) },
+                onRequestDowngradeFree = { confirmDowngradeToFree = true }
+            )
+
             // Saved Payment Methods Section
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(
@@ -363,10 +375,10 @@ fun PatientPaymentsScreen(
                 val msg = if (isSetup) {
                     context.getString(R.string.payments_method_saved_toast)
                 } else {
-                    "Pago completado"
+                    context.getString(R.string.payments_plan_updated_toast)
                 }
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                viewModel.closeCheckout()
+                viewModel.closeCheckout(completed = true)
             },
             onCancelled = {
                 val msg = if (isSetup) {
@@ -375,9 +387,33 @@ fun PatientPaymentsScreen(
                     "Pago cancelado"
                 }
                 Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
-                viewModel.closeCheckout()
+                viewModel.closeCheckout(completed = false)
             },
-            onDismissRequest = { viewModel.closeCheckout() }
+            onDismissRequest = { viewModel.closeCheckout(completed = false) },
+            onError = { msg -> viewModel.checkoutFailed(msg) }
+        )
+    }
+
+    if (confirmDowngradeToFree) {
+        AlertDialog(
+            onDismissRequest = { confirmDowngradeToFree = false },
+            title = { Text(stringResource(R.string.payments_plan_cancel_title)) },
+            text = { Text(stringResource(R.string.payments_plan_cancel_msg)) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        confirmDowngradeToFree = false
+                        viewModel.cancelSubscription()
+                    }
+                ) {
+                    Text(stringResource(R.string.payments_plan_cancel_confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmDowngradeToFree = false }) {
+                    Text(stringResource(R.string.shared_button_cancel))
+                }
+            }
         )
     }
 
@@ -392,5 +428,140 @@ fun PatientPaymentsScreen(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun SubscriptionPlanSection(
+    currentPlan: SubscriptionPlan,
+    activeUntil: String?,
+    isBusy: Boolean,
+    isUpdatingPlan: Boolean,
+    onSelectPaidPlan: (SubscriptionPlan) -> Unit,
+    onRequestDowngradeFree: () -> Unit
+) {
+    Surface(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        color = SurfaceContainerLowest,
+        shadowElevation = 1.dp
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(18.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.payments_plan_section),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = PrimaryNavy
+                )
+                if (isUpdatingPlan) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp,
+                        color = SecondaryTeal
+                    )
+                }
+            }
+
+            if (currentPlan != SubscriptionPlan.FREE && !activeUntil.isNullOrBlank()) {
+                Text(
+                    text = "Activo hasta: ${activeUntil.take(10)}",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = OnSurfaceVariant
+                )
+            }
+
+            SubscriptionPlan.entries.forEach { plan ->
+                val isCurrent = plan == currentPlan
+                val desc = when (plan) {
+                    SubscriptionPlan.FREE -> stringResource(R.string.payments_plan_free_desc)
+                    SubscriptionPlan.TERRA -> stringResource(R.string.payments_plan_terra_desc)
+                    SubscriptionPlan.ASTRUM -> stringResource(R.string.payments_plan_astrum_desc)
+                }
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(14.dp),
+                    color = if (isCurrent) Color(0xFFF0FDF4) else Color(0xFFF8FAFC),
+                    border = if (isCurrent) BorderStroke(1.dp, SecondaryTeal) else BorderStroke(1.dp, Color(0xFFE2E8F0))
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(modifier = Modifier.weight(1f).padding(end = 10.dp)) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                Text(
+                                    text = plan.displayName,
+                                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                    color = PrimaryNavy
+                                )
+                                Text(
+                                    text = plan.price,
+                                    style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.SemiBold),
+                                    color = SecondaryTeal
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = desc,
+                                style = MaterialTheme.typography.bodySmall,
+                                color = OnSurfaceVariant
+                            )
+                        }
+
+                        if (isCurrent) {
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color(0xFF99F6E4)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.payments_plan_current),
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                    color = Color(0xFF0F766E),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                )
+                            }
+                        } else if (plan == SubscriptionPlan.FREE) {
+                            OutlinedButton(
+                                onClick = onRequestDowngradeFree,
+                                enabled = !isBusy,
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.payments_plan_downgrade_free),
+                                    style = MaterialTheme.typography.labelMedium
+                                )
+                            }
+                        } else {
+                            Button(
+                                onClick = { onSelectPaidPlan(plan) },
+                                enabled = !isBusy,
+                                colors = ButtonDefaults.buttonColors(containerColor = PrimaryNavy, contentColor = Color.White),
+                                contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    text = stringResource(R.string.payments_plan_choose),
+                                    style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold)
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

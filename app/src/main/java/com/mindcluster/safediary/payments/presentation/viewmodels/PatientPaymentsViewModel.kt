@@ -12,6 +12,7 @@ import com.mindcluster.safediary.payments.domain.model.PaymentCategory
 import com.mindcluster.safediary.payments.domain.model.PaymentHistoryItem
 import com.mindcluster.safediary.payments.domain.model.SubscriptionPlan
 import com.mindcluster.safediary.payments.infrastructure.PaymentsModule
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -25,6 +26,7 @@ data class PatientPaymentsUiState(
     val checkoutUrl: String? = null,
     val isCheckoutForSetup: Boolean = false,
     val isSettingUpPaymentMethod: Boolean = false,
+    val isUpdatingPlan: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null
 ) {
@@ -106,22 +108,57 @@ class PatientPaymentsViewModel(
     }
 
     fun startCheckout(plan: SubscriptionPlan) {
+        if (_uiState.value.isUpdatingPlan || _uiState.value.isSettingUpPaymentMethod) return
         viewModelScope.launch {
+            _uiState.update { it.copy(isUpdatingPlan = true, errorMessage = null) }
             val result = createSubscriptionCheckoutHandler.handle(
                 CreateSubscriptionCheckoutCommand(patientAccountId, plan)
             )
-            val checkoutUrl = result.getOrNull()
-            if (checkoutUrl != null) {
-                _uiState.update { it.copy(checkoutUrl = checkoutUrl, isCheckoutForSetup = false) }
-            } else {
-                // Free plan activated immediately
-                loadData()
-            }
+            result.fold(
+                onSuccess = { checkoutUrl ->
+                    _uiState.update { it.copy(isUpdatingPlan = false) }
+                    if (!checkoutUrl.isNullOrBlank()) {
+                        _uiState.update { it.copy(checkoutUrl = checkoutUrl, isCheckoutForSetup = false) }
+                    } else {
+                        loadData()
+                    }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isUpdatingPlan = false,
+                            errorMessage = error.message ?: "No se pudo cambiar el plan de suscripción."
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun cancelSubscription() {
+        if (_uiState.value.isUpdatingPlan || _uiState.value.isSettingUpPaymentMethod) return
+        viewModelScope.launch {
+            _uiState.update { it.copy(isUpdatingPlan = true, errorMessage = null) }
+            val result = cancelSubscriptionHandler.handle(CancelSubscriptionCommand(patientAccountId))
+            result.fold(
+                onSuccess = { updated ->
+                    _uiState.update { it.copy(subscription = updated, isUpdatingPlan = false) }
+                    loadData()
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            isUpdatingPlan = false,
+                            errorMessage = error.message ?: "No se pudo cancelar la suscripción."
+                        )
+                    }
+                }
+            )
         }
     }
 
     fun startAddPaymentMethod() {
-        if (_uiState.value.isSettingUpPaymentMethod) return
+        if (_uiState.value.isSettingUpPaymentMethod || _uiState.value.isUpdatingPlan) return
         viewModelScope.launch {
             _uiState.update { it.copy(isSettingUpPaymentMethod = true, errorMessage = null) }
             val result = createPaymentMethodSetupHandler.handle(
@@ -153,9 +190,22 @@ class PatientPaymentsViewModel(
         _uiState.update { it.copy(errorMessage = null) }
     }
 
-    fun closeCheckout() {
+    fun checkoutFailed(message: String) {
+        _uiState.update { it.copy(checkoutUrl = null, isCheckoutForSetup = false, errorMessage = message) }
+    }
+
+    fun closeCheckout(completed: Boolean = false) {
+        val wasSetup = _uiState.value.isCheckoutForSetup
         _uiState.update { it.copy(checkoutUrl = null, isCheckoutForSetup = false) }
-        loadData()
+        if (completed && !wasSetup) {
+            viewModelScope.launch {
+                loadData()
+                delay(1500)
+                loadData()
+            }
+        } else {
+            loadData()
+        }
     }
 
     class Factory(

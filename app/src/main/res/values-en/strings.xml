@@ -253,6 +253,17 @@
 
     <!-- Payments & Digital Wallet -->
     <string name="payments_title">Payments &amp; Digital Wallet</string>
+    <string name="payments_plan_section">Your Subscription Plan</string>
+    <string name="payments_plan_current">Current plan</string>
+    <string name="payments_plan_free_desc">Emotional diary and standard access at no cost</string>
+    <string name="payments_plan_terra_desc">Monthly subscription with expanded support</string>
+    <string name="payments_plan_astrum_desc">Annual subscription with full benefits</string>
+    <string name="payments_plan_choose">Select</string>
+    <string name="payments_plan_downgrade_free">Switch to Free</string>
+    <string name="payments_plan_cancel_title">Switch to Free plan?</string>
+    <string name="payments_plan_cancel_msg">Your current paid subscription will be cancelled and you will return to the Free plan.</string>
+    <string name="payments_plan_cancel_confirm">Yes, switch to Free</string>
+    <string name="payments_plan_updated_toast">Plan updated successfully</string>
     <string name="payments_saved_methods">Saved Payment Methods</string>
     <string name="payments_add_method">+ Add Method</string>
     <string name="payments_health_wallet">SafeDiary Health Wallet</string>

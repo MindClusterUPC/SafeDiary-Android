@@ -74,6 +74,9 @@ class OfflineFirstPaymentRepository(
         plan: SubscriptionPlan
     ): String? {
         if (plan == SubscriptionPlan.FREE) {
+            if (networkMonitor.isOnline.value) {
+                remoteGateway.createSubscriptionCheckout(patientAccountId, plan.name)
+            }
             val current = subscriptionState.value ?: buildFromPreferences(patientAccountId)
             current.updatePlan(SubscriptionPlan.FREE, SubscriptionStatus.ACTIVE, null)
             preferences.currentPlan = SubscriptionPlan.FREE.name
@@ -83,15 +86,15 @@ class OfflineFirstPaymentRepository(
             return null
         }
 
-        if (networkMonitor.isOnline.value) {
-            val response = remoteGateway.createSubscriptionCheckout(patientAccountId, plan.name)
-            if (response?.checkoutRequired == true) {
-                return response.checkoutUrl
-            }
+        if (!networkMonitor.isOnline.value) {
+            throw IllegalStateException("Sin conexión a internet. Conéctate para cambiar de plan.")
         }
 
-        // Offline / fallback demo link from configured endpoint
-        return ApiEndpoints.stripeDemoUrl
+        val response = remoteGateway.createSubscriptionCheckout(patientAccountId, plan.name)
+            ?: throw IllegalStateException("No se pudo iniciar el cambio de plan con Stripe. Inténtalo de nuevo.")
+
+        return response.checkoutUrl?.takeIf { it.isNotBlank() }
+            ?: throw IllegalStateException(response.message ?: "El servidor no devolvió el enlace de Stripe.")
     }
 
     override suspend fun cancelSubscription(patientAccountId: Long): PatientSubscriptionAggregate {

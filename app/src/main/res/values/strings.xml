@@ -253,6 +253,17 @@
 
     <!-- Payments & Digital Wallet -->
     <string name="payments_title">Pagos y billetera digital</string>
+    <string name="payments_plan_section">Tu plan de suscripción</string>
+    <string name="payments_plan_current">Plan actual</string>
+    <string name="payments_plan_free_desc">Diario emocional y acceso estándar sin costo</string>
+    <string name="payments_plan_terra_desc">Suscripción mensual con seguimiento ampliado</string>
+    <string name="payments_plan_astrum_desc">Suscripción anual con todos los beneficios</string>
+    <string name="payments_plan_choose">Elegir</string>
+    <string name="payments_plan_downgrade_free">Pasar a Free</string>
+    <string name="payments_plan_cancel_title">¿Cambiar al plan gratuito?</string>
+    <string name="payments_plan_cancel_msg">Se cancelará tu suscripción de pago actual y volverás al plan Free.</string>
+    <string name="payments_plan_cancel_confirm">Sí, pasar a Free</string>
+    <string name="payments_plan_updated_toast">Plan actualizado correctamente</string>
     <string name="payments_saved_methods">Métodos de pago guardados</string>
     <string name="payments_add_method">+ Agregar método</string>
     <string name="payments_health_wallet">SafeDiary Health Wallet</string>
